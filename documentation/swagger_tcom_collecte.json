@@ -1,0 +1,563 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "API Collecte TCOM",
+    "version": "1.0.5",
+    "description": "API permettant de collecter les décision intègres et leurs métadonnées en provenance des tribunaux de commerce"
+  },
+  "paths": {
+    "/decision": {
+      "summary": "Ressource manipulant des décisions intègres",
+      "description": "Les ressources pour modifier une décision intègre sont :\n* PUT : téléchargement d'une décision intègre",
+      "put": {
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "properties": {
+                  "fichierDecisionIntegre": {
+                    "format": "binary",
+                    "type": "string"
+                  },
+                  "texteDecisionIntegre": {
+                    "type": "string"
+                  },
+                  "metadonnees": {
+                    "$ref": "#/components/schemas/Metadonnees"
+                  }
+                }
+              },
+              "examples": {
+                "Exemple d'envoi": {
+                  "value": {
+                    "fichierDecisionIntegre": "<FICHIER>",
+                    "texteDecisionIntegre": "Texte de la décision",
+                    "metadonnees": {
+                      "idDecision": "66177ce6e5d",
+                      "idGroupement": "ABC",
+                      "idJuridiction": "7501",
+                      "libelleJuridiction": "Tribunal judiciaire de Paris",
+                      "dateDecision": "20240322",
+                      "numeroDossier": "2021F00123",
+                      "libelleMatiere": "Demande de nullité d'un bail",
+                      "libelleProcedure": "Demande en référé",
+                      "decisionPublique": true,
+                      "debatPublique": true,
+                      "interetParticulier": false,
+                      "occultationsComplementaires": {
+                        "personneMorale": true,
+                        "personnePhysicoMorale": false,
+                        "adresse": true,
+                        "dateCivile": false,
+                        "plaqueImmatriculation": true,
+                        "cadastre": false,
+                        "chaineNumeroIdentifiante": false,
+                        "coordonneeElectronique": true,
+                        "professionnelMagistratGreffier": false,
+                        "motif": true,
+                        "conserverElement": "#dateCivile|automobile",
+                        "supprimerElement": "#magistratGreffe|120.000€"
+                      },
+                      "composition": [
+                        {
+                          "fonction": "Greffier",
+                          "nom": "Dupond",
+                          "prenom": "Henry",
+                          "civilite": "Monsieur"
+                        }
+                      ],
+                      "parties": [
+                        {
+                          "type": "PP",
+                          "role": "PARTIE",
+                          "nom": "Dupond",
+                          "prenom": "Julien",
+                          "civilite": "Monsieur",
+                          "qualite": "I",
+                          "adresse": {
+                            "numero": "20bis",
+                            "type": "rue",
+                            "voie": "du Bourg",
+                            "codePostal": "39100",
+                            "localite": "Dole"
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              },
+              "encoding": {
+                "fichierDecisionIntegre": {
+                  "contentType": "application/pdf"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "tags": ["decision"],
+        "responses": {
+          "201": {
+            "description": "La decision a bien été prise en compte"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erreur"
+                }
+              }
+            },
+            "description": "La requête n'est pas correcte"
+          },
+          "401": {
+            "description": "La requête n'est pas autorisée"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erreur"
+                }
+              }
+            },
+            "description": "Une erreur interne s'est produite"
+          }
+        },
+        "operationId": "putDecision",
+        "summary": "Télécharger une décision intègre",
+        "description": "Une décision intègre au format PDF ainsi que son contenu en texte brut et ses métadonnées associées seront téléchargés dans un but de pseudonymisation et de normalisation en aval par Judilibre"
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Metadonnees": {
+        "description": "Métadonnées de la décision",
+        "required": [
+          "idDecision",
+          "idGroupement",
+          "idJuridiction",
+          "libelleJuridiction",
+          "dateDecision",
+          "numeroDossier",
+          "libelleMatiere",
+          "decisionPublique",
+          "debatPublique",
+          "interetParticulier",
+          "occultationsComplementaires",
+          "composition",
+          "parties"
+        ],
+        "type": "object",
+        "properties": {
+          "idDecision": {
+            "description": "Identifiant unique de la décision dans le système d'information source",
+            "type": "string"
+          },
+          "idGroupement": {
+            "description": "Identifiant unique du groupement émetteur",
+            "type": "string"
+          },
+          "idJuridiction": {
+            "description": "Identifiant unique de la juridiction émettrice",
+            "minimum": 4,
+            "maximum": 4,
+            "type": "string"
+          },
+          "libelleJuridiction": {
+            "description": "Intitulé complet de la juridiction émettrice",
+            "type": "string"
+          },
+          "dateDecision": {
+            "description": "Date de rendu de la décision au format AAAAMMJJ",
+            "minimum": 8,
+            "maximum": 8,
+            "type": "string"
+          },
+          "numeroDossier": {
+            "description": "Numéro du dossier associée à la décision rendue",
+            "minimum": 11,
+            "maximum": 11,
+            "type": "string"
+          },
+          "idChambre": {
+            "description": "Identifiant unique de la chambre de la juridiction émettrice",
+            "type": "string"
+          },
+          "libelleChambre": {
+            "description": "Intitulé complet de la chambre de la juridiction émettrice",
+            "type": "string"
+          },
+          "idMatiere": {
+            "description": "Identifiant unique ou code relatif au fond de la décision",
+            "type": "string"
+          },
+          "libelleMatiere": {
+            "description": "Intitulé complet relatif au fond de la décision",
+            "type": "string"
+          },
+          "idProcedure": {
+            "description": "Identifiant unique ou code relatif au type de procédure",
+            "type": "string"
+          },
+          "libelleProcedure": {
+            "description": "Intitulé complet relatif au type de procédure",
+            "type": "string"
+          },
+          "decisionPublique": {
+            "description": "Caractère public de la décision",
+            "type": "boolean"
+          },
+          "debatPublique": {
+            "description": "Caractère public des débats précédant la décision",
+            "type": "boolean"
+          },
+          "interetParticulier": {
+            "description": "Caractère \"d'intérêt particulier\" de la décision",
+            "type": "boolean"
+          },
+          "occultationsComplementaires": {
+            "description": "Occultations complémentaires demandées",
+            "$ref": "#/components/schemas/OccultationsComplementaires"
+          },
+          "composition": {
+            "description": "Liste  des membres de la composition de jugement (juges, greffier, procureur...)",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MembreComposition"
+            }
+          },
+          "parties": {
+            "description": "Liste des parties de la décision",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MembrePartie"
+            }
+          }
+        },
+        "example": {
+          "idDecision": "66177ce6e5d",
+          "idGroupement": "ABC",
+          "idJuridiction": "7501",
+          "libelleJuridiction": "Tribunal judiciaire de Paris",
+          "dateDecision": "20240322",
+          "numeroDossier": "2021F00123",
+          "libelleMatiere": "Demande de nullité d'un bail",
+          "libelleProcedure": "Demande en référé",
+          "decisionPublique": true,
+          "debatPublique": true,
+          "interetParticulier": false,
+          "occultationsComplementaires": {
+            "personneMorale": true,
+            "personnePhysicoMorale": false,
+            "adresse": true,
+            "dateCivile": false,
+            "plaqueImmatriculation": true,
+            "cadastre": false,
+            "chaineNumeroIdentifiante": false,
+            "coordonneeElectronique": true,
+            "professionnelMagistratGreffier": false,
+            "motif": true,
+            "conserverElement": "#dateCivile|automobile",
+            "supprimerElement": "#magistratGreffe|120.000€"
+          },
+          "composition": [
+            {
+              "fonction": "Greffier",
+              "nom": "Dupond",
+              "prenom": "Henry",
+              "civilite": "Monsieur"
+            }
+          ],
+          "parties": [
+            {
+              "type": "PP",
+              "role": "PARTIE",
+              "nom": "Dupond",
+              "prenom": "Julien",
+              "civilite": "Monsieur",
+              "qualite": "I",
+              "adresse": {
+                "numero": "20bis",
+                "type": "rue",
+                "voie": "du Bourg",
+                "codePostal": "39100",
+                "localite": "Dole"
+              }
+            }
+          ]
+        }
+      },
+      "OccultationsComplementaires": {
+        "description": "Objet définissant les occultations complémentaires",
+        "required": [
+          "personneMorale",
+          "personnePhysicoMorale",
+          "adresse",
+          "dateCivile",
+          "plaqueImmatriculation",
+          "cadastre",
+          "chaineNumeroIdentifiante",
+          "coordonneeElectronique",
+          "professionnelMagistratGreffier",
+          "motif"
+        ],
+        "type": "object",
+        "properties": {
+          "personneMorale": {
+            "description": "Occultation des personnes morales",
+            "type": "boolean"
+          },
+          "personnePhysicoMorale": {
+            "description": "Occultation des personnes physico-morales/géo-morales",
+            "type": "boolean"
+          },
+          "adresse": {
+            "description": "Occultation des adresses",
+            "type": "boolean"
+          },
+          "dateCivile": {
+            "description": "Occultation des dates civiles (naissance, mariage, décès)",
+            "type": "boolean"
+          },
+          "plaqueImmatriculation": {
+            "description": "Occultation des plaques d'immatriculation",
+            "type": "boolean"
+          },
+          "cadastre": {
+            "description": "Occultation des informations de cadastre",
+            "type": "boolean"
+          },
+          "chaineNumeroIdentifiante": {
+            "description": "Occultation des chaînes de numéros identifiantes",
+            "type": "boolean"
+          },
+          "coordonneeElectronique": {
+            "description": "Occultation des coordonnées électroniques",
+            "type": "boolean"
+          },
+          "professionnelMagistratGreffier": {
+            "description": "Occultation spéciale soumise à décision du président du tribunal de commerce et visant les noms des juges, magistrats et greffiers",
+            "type": "boolean"
+          },
+          "motif": {
+            "description": "Occultation des motifs",
+            "type": "boolean"
+          },
+          "conserverElement": {
+            "description": "Champ de saisie libre (soumis à des règles de rédaction précises) définissant les éléments complémentaires à conserver",
+            "type": "string",
+            "example": "#dateCivile|automobile"
+          },
+          "supprimerElement": {
+            "description": "Champ de saisie libre (soumis à des règles de rédaction précises) définissant les éléments complémentaires à supprimer",
+            "type": "string",
+            "example": "#magistratGreffe|120.000€"
+          }
+        },
+        "example": {
+          "personneMorale": true,
+          "personnePhysicoMorale": false,
+          "adresse": true,
+          "dateCivile": false,
+          "plaqueImmatriculation": true,
+          "cadastre": false,
+          "chaineNumeroIdentifiante": false,
+          "coordonneeElectronique": true,
+          "professionnelMagistratGreffier": false,
+          "motif": true,
+          "conserverElement": "#dateCivile|automobile",
+          "supprimerElement": "#magistratGreffe|120.000€"
+        }
+      },
+      "MembreComposition": {
+        "description": "Membre de la composition de jugement",
+        "required": ["fonction", "nom"],
+        "type": "object",
+        "properties": {
+          "fonction": {
+            "description": "fonction",
+            "type": "string"
+          },
+          "nom": {
+            "description": "Nom",
+            "type": "string"
+          },
+          "prenom": {
+            "description": "Prénom",
+            "type": "string"
+          },
+          "civilite": {
+            "description": "Civilité",
+            "type": "string"
+          }
+        },
+        "example": {
+          "fonction": "Greffier",
+          "nom": "Dupond",
+          "prenom": "Henry",
+          "civilite": "Monsieur"
+        }
+      },
+      "MembrePartie": {
+        "description": "Membre des parties de la décision",
+        "required": ["type", "role", "nom"],
+        "type": "object",
+        "properties": {
+          "type": {
+            "description": "Type de la partie",
+            "enum": ["PP", "PM"],
+            "type": "string"
+          },
+          "role": {
+            "description": "Rôle de la partie",
+            "enum": [
+              "AVOCAT",
+              "AVOCAT GENERAL",
+              "GREFFIER",
+              "PRESIDENT",
+              "RAPPORTEUR",
+              "MANDATAIRE",
+              "PARTIE",
+              "AUTRE"
+            ],
+            "type": "string"
+          },
+          "nom": {
+            "description": "Nom de la partie",
+            "type": "string"
+          },
+          "nomUsage": {
+            "description": "Nom d'usage de la partie",
+            "type": "string"
+          },
+          "prenom": {
+            "description": "Prénom de la partie",
+            "type": "string"
+          },
+          "prenomAutre": {
+            "description": "Autre prénom de la partie",
+            "type": "string"
+          },
+          "alias": {
+            "description": "Alias de la partie",
+            "type": "string"
+          },
+          "civilite": {
+            "description": "Civilité de la partie",
+            "type": "string"
+          },
+          "qualite": {
+            "description": "Qualité de la partie",
+            "enum": ["I", "K", "N"],
+            "type": "string"
+          },
+          "adresse": {
+            "description": "Adresse de la partie",
+            "$ref": "#/components/schemas/Adresse"
+          }
+        },
+        "example": {
+          "type": "PP",
+          "role": "PARTIE",
+          "nom": "Dupond",
+          "prenom": "Julien",
+          "civilite": "Monsieur",
+          "qualite": "I",
+          "adresse": {
+            "numero": "20bis",
+            "type": "rue",
+            "voie": "du Bourg",
+            "codePostal": "39100",
+            "localite": "Dole"
+          }
+        }
+      },
+      "Adresse": {
+        "description": "Adresse",
+        "type": "object",
+        "properties": {
+          "numero": {
+            "description": "Numéro de voie",
+            "type": "string"
+          },
+          "type": {
+            "description": "Type de voie",
+            "type": "string"
+          },
+          "voie": {
+            "description": "Libellé de la voie",
+            "type": "string"
+          },
+          "complement": {
+            "description": "Complément d'adresse",
+            "type": "string"
+          },
+          "codePostal": {
+            "description": "Code postal",
+            "type": "string"
+          },
+          "localite": {
+            "description": "Localité",
+            "type": "string"
+          },
+          "bureau": {
+            "description": "Bureau distributeur",
+            "type": "string"
+          }
+        },
+        "example": {
+          "numero": "20bis",
+          "type": "rue",
+          "voie": "du Bourg",
+          "codePostal": "39100",
+          "localite": "Dole"
+        }
+      },
+      "Erreur": {
+        "title": "Erreur",
+        "description": "Erreur définie pour l'ensemble de l'API.",
+        "type": "object",
+        "properties": {
+          "code": {
+            "description": "Code de l'erreur (se référer à la documentation technique).",
+            "type": "string"
+          },
+          "message": {
+            "description": "Message compréhensible par un humain.",
+            "type": "string"
+          },
+          "horodatage": {
+            "format": "date-time",
+            "description": "Horodatage de l'erreur.",
+            "type": "string"
+          }
+        },
+        "example": {
+          "code": "Code erreur",
+          "message": "Message d'erreur",
+          "horodatage": "2019-04-23T18:25:43.511Z"
+        }
+      }
+    },
+    "securitySchemes": {
+      "oAuth2": {
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "https://localhost/token",
+            "refreshUrl": "https://localhost/refresh"
+          }
+        },
+        "type": "oauth2",
+        "description": "Cette API utilise le protocole OAuth 2 avec un flow client credential"
+      }
+    }
+  },
+  "security": [
+    {
+      "oAuth2": []
+    }
+  ]
+}

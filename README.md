@@ -1,2 +1,3 @@
-# juritcom
+# JuriTCOM
+
 Collecte TCOM pour Judilibre

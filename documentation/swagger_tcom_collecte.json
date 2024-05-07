@@ -177,8 +177,8 @@
           },
           "numeroDossier": {
             "description": "Numéro du dossier associée à la décision rendue",
-            "minimum": 11,
-            "maximum": 11,
+            "minimum": 10,
+            "maximum": 20,
             "type": "string"
           },
           "idChambre": {
@@ -402,7 +402,7 @@
       },
       "MembrePartie": {
         "description": "Membre des parties de la décision",
-        "required": ["type", "role", "nom"],
+        "required": ["type", "role", "nom", "prenom", "qualite"],
         "type": "object",
         "properties": {
           "type": {
@@ -450,7 +450,7 @@
           },
           "qualite": {
             "description": "Qualité de la partie",
-            "enum": ["I", "K", "N"],
+            "enum": ["F", "I", "K", "N"],
             "type": "string"
           },
           "adresse": {

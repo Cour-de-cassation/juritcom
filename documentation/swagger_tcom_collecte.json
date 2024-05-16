@@ -2,7 +2,7 @@
   "openapi": "3.0.3",
   "info": {
     "title": "API Collecte TCOM",
-    "version": "1.0.5",
+    "version": "1.0.6",
     "description": "API permettant de collecter les décision intègres et leurs métadonnées en provenance des tribunaux de commerce"
   },
   "paths": {
@@ -375,7 +375,7 @@
       },
       "MembreComposition": {
         "description": "Membre de la composition de jugement",
-        "required": ["fonction", "nom"],
+        "required": ["nom"],
         "type": "object",
         "properties": {
           "fonction": {
@@ -405,7 +405,7 @@
       },
       "MembrePartie": {
         "description": "Membre des parties de la décision",
-        "required": ["type", "role", "nom", "prenom", "qualite"],
+        "required": ["type", "role", "nom", "qualite"],
         "type": "object",
         "properties": {
           "type": {
@@ -428,7 +428,7 @@
             "type": "string"
           },
           "nom": {
-            "description": "Nom de la partie",
+            "description": "Nom de la partie (ou nom et prénom)",
             "type": "string"
           },
           "nomUsage": {

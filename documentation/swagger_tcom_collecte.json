@@ -99,7 +99,7 @@
         "tags": ["decision"],
         "responses": {
           "201": {
-            "description": "La decision a bien été prise en compte"
+            "description": "La décision a bien été prise en compte"
           },
           "400": {
             "content": {

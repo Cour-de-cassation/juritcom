@@ -34,7 +34,7 @@
                     "texteDecisionIntegre": "Texte de la décision",
                     "metadonnees": {
                       "idDecision": "66177ce6e5d",
-                      "idGroupement": "ABC",
+                      "idGroupement": "ABCD",
                       "idJuridiction": "7501",
                       "libelleJuridiction": "Tribunal judiciaire de Paris",
                       "dateDecision": "20240322",
@@ -42,22 +42,8 @@
                       "libelleMatiere": "Demande de nullité d'un bail",
                       "libelleProcedure": "Demande en référé",
                       "decisionPublique": true,
-                      "debatPublique": true,
+                      "debatChambreDuConseil": false,
                       "interetParticulier": false,
-                      "occultationsComplementaires": {
-                        "personneMorale": true,
-                        "personnePhysicoMorale": false,
-                        "adresse": true,
-                        "dateCivile": false,
-                        "plaqueImmatriculation": true,
-                        "cadastre": false,
-                        "chaineNumeroIdentifiante": false,
-                        "coordonneeElectronique": true,
-                        "professionnelMagistratGreffier": false,
-                        "motif": true,
-                        "conserverElement": "#dateCivile|automobile",
-                        "supprimerElement": "#magistratGreffe|120.000€"
-                      },
                       "composition": [
                         {
                           "fonction": "Greffier",
@@ -82,7 +68,21 @@
                             "localite": "Dole"
                           }
                         }
-                      ]
+                      ],
+                      "occultationsComplementaires": {
+                        "personneMorale": true,
+                        "personnePhysicoMoraleGeoMorale": false,
+                        "adresse": true,
+                        "dateCivile": false,
+                        "plaqueImmatriculation": true,
+                        "cadastre": false,
+                        "chaineNumeroIdentifiante": false,
+                        "coordonneeElectronique": true,
+                        "professionnelMagistratGreffier": false,
+                        "motif": true,
+                        "conserverElement": "#dateCivile|automobile",
+                        "supprimerElement": "#magistratGreffe|120.000€"
+                      }
                     }
                   }
                 }
@@ -143,11 +143,11 @@
           "dateDecision",
           "numeroDossier",
           "decisionPublique",
-          "debatPublique",
+          "debatChambreDuConseil",
           "interetParticulier",
-          "occultationsComplementaires",
           "composition",
-          "parties"
+          "parties",
+          "occultationsComplementaires"
         ],
         "type": "object",
         "properties": {
@@ -157,6 +157,8 @@
           },
           "idGroupement": {
             "description": "Identifiant unique du groupement émetteur",
+            "minimum": 4,
+            "maximum": 4,
             "type": "string"
           },
           "idJuridiction": {
@@ -177,7 +179,7 @@
           },
           "numeroDossier": {
             "description": "Numéro du dossier associée à la décision rendue",
-            "minimum": 10,
+            "minimum": 20,
             "maximum": 20,
             "type": "string"
           },
@@ -209,17 +211,13 @@
             "description": "Caractère public de la décision",
             "type": "boolean"
           },
-          "debatPublique": {
-            "description": "Caractère public des débats précédant la décision",
+          "debatChambreDuConseil": {
+            "description": "Caractère non public des débats précédant la décision",
             "type": "boolean"
           },
           "interetParticulier": {
             "description": "Caractère \"d'intérêt particulier\" de la décision",
             "type": "boolean"
-          },
-          "occultationsComplementaires": {
-            "description": "Occultations complémentaires demandées",
-            "$ref": "#/components/schemas/OccultationsComplementaires"
           },
           "composition": {
             "description": "Liste  des membres de la composition de jugement (juges, greffier, procureur...)",
@@ -234,11 +232,15 @@
             "items": {
               "$ref": "#/components/schemas/MembrePartie"
             }
+          },
+          "occultationsComplementaires": {
+            "description": "Occultations complémentaires demandées",
+            "$ref": "#/components/schemas/OccultationsComplementaires"
           }
         },
         "example": {
           "idDecision": "66177ce6e5d",
-          "idGroupement": "ABC",
+          "idGroupement": "ABCD",
           "idJuridiction": "7501",
           "libelleJuridiction": "Tribunal judiciaire de Paris",
           "dateDecision": "20240322",
@@ -246,22 +248,8 @@
           "libelleMatiere": "Demande de nullité d'un bail",
           "libelleProcedure": "Demande en référé",
           "decisionPublique": true,
-          "debatPublique": true,
+          "debatChambreDuConseil": false,
           "interetParticulier": false,
-          "occultationsComplementaires": {
-            "personneMorale": true,
-            "personnePhysicoMorale": false,
-            "adresse": true,
-            "dateCivile": false,
-            "plaqueImmatriculation": true,
-            "cadastre": false,
-            "chaineNumeroIdentifiante": false,
-            "coordonneeElectronique": true,
-            "professionnelMagistratGreffier": false,
-            "motif": true,
-            "conserverElement": "#dateCivile|automobile",
-            "supprimerElement": "#magistratGreffe|120.000€"
-          },
           "composition": [
             {
               "fonction": "Greffier",
@@ -286,14 +274,28 @@
                 "localite": "Dole"
               }
             }
-          ]
+          ],
+          "occultationsComplementaires": {
+            "personneMorale": true,
+            "personnePhysicoMoraleGeoMorale": false,
+            "adresse": true,
+            "dateCivile": false,
+            "plaqueImmatriculation": true,
+            "cadastre": false,
+            "chaineNumeroIdentifiante": false,
+            "coordonneeElectronique": true,
+            "professionnelMagistratGreffier": false,
+            "motif": true,
+            "conserverElement": "#dateCivile|automobile",
+            "supprimerElement": "#magistratGreffe|120.000€"
+          }
         }
       },
       "OccultationsComplementaires": {
         "description": "Objet définissant les occultations complémentaires",
         "required": [
           "personneMorale",
-          "personnePhysicoMorale",
+          "personnePhysicoMoraleGeoMorale",
           "adresse",
           "dateCivile",
           "plaqueImmatriculation",
@@ -309,7 +311,7 @@
             "description": "Occultation des personnes morales",
             "type": "boolean"
           },
-          "personnePhysicoMorale": {
+          "personnePhysicoMoraleGeoMorale": {
             "description": "Occultation des personnes physico-morales/géo-morales",
             "type": "boolean"
           },
@@ -358,7 +360,7 @@
         },
         "example": {
           "personneMorale": true,
-          "personnePhysicoMorale": false,
+          "personnePhysicoMoraleGeoMorale": false,
           "adresse": true,
           "dateCivile": false,
           "plaqueImmatriculation": true,
@@ -378,6 +380,7 @@
         "properties": {
           "fonction": {
             "description": "fonction",
+            "enum": ["GREFFIER", "JUGE", "PROCUREUR", "PRESIDENT"],
             "type": "string"
           },
           "nom": {
@@ -408,6 +411,8 @@
           "type": {
             "description": "Type de la partie",
             "enum": ["PP", "PM"],
+            "minimum": 2,
+            "maximum": 2,
             "type": "string"
           },
           "role": {
@@ -415,8 +420,6 @@
             "enum": [
               "AVOCAT",
               "AVOCAT GENERAL",
-              "GREFFIER",
-              "PRESIDENT",
               "RAPPORTEUR",
               "MANDATAIRE",
               "PARTIE",
@@ -451,6 +454,8 @@
           "qualite": {
             "description": "Qualité de la partie",
             "enum": ["F", "I", "K", "N"],
+            "minimum": 1,
+            "maximum": 1,
             "type": "string"
           },
           "adresse": {

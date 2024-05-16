@@ -2,7 +2,7 @@
 
 ## Envoi (côté TCOM/Infogreffe)
 
-1. Pour chaque décision à publier dans Judilibre (nouvelle ou mise à jour), la juridiction émettrice effectue une requête HTTPS `PUT /decision` sur l'API de collecte du SDER, suivant les spécifications du [Swagger](./swagger_tcom_collecte.json) (texte brut, fichier PDF et métadonnées) ;
+1. Pour chaque décision à publier dans Judilibre (nouvelle ou mise à jour), la juridiction émettrice effectue une requête HTTPS `PUT /decision` sur l'API de collecte du SDER, suivant les spécifications du [Swagger](./swagger_tcom_collecte.json) (texte brut issu du fichier PDF, fichier PDF signé et métadonnées complètes) ;
 2. La juridiction émettrice attend la réponse de l'API et agit suivant le code HTTP associée à celle-ci :
    - `201` : la décision a bien été prise en compte ;
    - `400` : la requête d'envoi est incorrecte (la réponse contient les erreurs constatées côté SDER) - la juridiction émettrice doit reprendre l'envoi dès que possible, avec une décision et des données corrigées ;
@@ -13,17 +13,17 @@
 
 Chaque décision, reçue via le point d'entrée `PUT /decision` de l'application `JuriTCOM`, est validée :
 
-- Présence et validation des informations obligatoires ;
+- Présence et validation des informations obligatoires (texte brut, fichier PDF signées et métadonnées) ;
 - Analyse anti-virus du fichier PDF joint à la requête (_a priori_ en utilisant [ESET](https://help.eset.com/essl/91/fr-FR/on_demand_scan_via_terminal.html)) ;
-- En cas d'anomalie, une erreur `400` est retournée avec les détails de celle-ci ;
-- Sinon, la décision est stockée dans un bucket S3 privé, en vue de sa normalisation ultérieure, et une réponse `201` est retournée.
+- En cas d'anomalie, une erreur `400` est retournée avec les détails des erreurs rencontrées ;
+- Sinon, l'ensemble de la décision est stocké dans un bucket S3 privé, en vue de sa normalisation ultérieure, et une réponse `201` est retournée.
 
 ## Normalisation (application `JuriTCOM`, côté SDER/Open, plateforme privée)
 
 Le batch de normalisation, intégré à l'application `JuriTCOM`, a pour objectif de traiter et de normaliser les données brutes des décisions de justice provenant des TCOM afin de les rendre cohérentes et exploitables par le processus de publication de Judilibre :
 
 - Récupération des décisions brutes en attente de normalisation dans le bucket S3 privé (texte brut et métadonnées définies par le [Swagger](./swagger_tcom_collecte.json)) ;
-- Traitement et normalisation des décisions brutes suivant différents modules de normalisation, se concentrant chacun sur un aspect spécifique des données et appliquant des règles de normalisation prédéfinies (lesquelles peuvent utiliser des fichiers de configuration au format JSON pour définir les mappages et les valeurs prédéfinies devant être associées à certains codes ou identifiants reçus) ;
+- Traitement et normalisation des décisions brutes suivant différents modules de normalisation, se concentrant chacun sur un aspect spécifique des données et appliquant des règles de normalisation prédéfinies (lesquelles peuvent utiliser des fichiers de configuration au format JSON pour définir les mappages et les valeurs prédéfinies devant être associées à certains codes ou identifiants reçus). Une attention particulièr est portée sur les données relatives aux occultations complémentaires (afin que l'application Label puisse traiter au mieux la décision), ainsi qu'à toutes les informations susceptibles de valider le caractère public de la décision (en cas d'anomalie ou d'indétermination, la décision doit être bloquée en lui appliquant l'un des états `labelStatus` prédéfinis, par exemple : `ignored_decisionNonPublique`, `ignored_dateDecisionIncoherente`, `ignored_controleRequis`, etc.) ;
 - Enregistrement des décisions normalisées dans la collection `decisions` de la base de données SDER à l'aide de l'API DBSDER. Ces décisions deviennent disponibles pour la suite des traitements orchestrée par l'application Label. Les décisions intègres au format PDF (fichiers non publiés) doivent demeurer archivées dans un bucket S3 privé ;
 - Les décisions en anomalie (erreur de normalisation, caractère non public, etc.) doivent être identifiées et bloquées en attendant que la juridiction émettrice soit notifiée et procède aux corrections nécessaires (avant une reprise de l'envoi).
 

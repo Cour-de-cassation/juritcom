@@ -13,7 +13,7 @@
 
 Chaque décision, reçue via le point d'entrée `PUT /decision` de l'application `JuriTCOM`, est validée :
 
-- Présence et validation des informations obligatoires (texte brut, fichier PDF signées et métadonnées) ;
+- Présence et validation des informations obligatoires (texte brut, fichier PDF signé et métadonnées) ;
 - Analyse anti-virus du fichier PDF joint à la requête (_a priori_ en utilisant [ESET](https://help.eset.com/essl/91/fr-FR/on_demand_scan_via_terminal.html)) ;
 - En cas d'anomalie, une erreur `400` est retournée avec les détails des erreurs rencontrées ;
 - Sinon, l'ensemble de la décision est stocké dans un bucket S3 privé, en vue de sa normalisation ultérieure, et une réponse `201` est retournée.

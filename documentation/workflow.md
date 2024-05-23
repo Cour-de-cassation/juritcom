@@ -19,7 +19,7 @@ Chaque décision, reçue via le point d'entrée `PUT /decision` de l'application
 
    - Présence et validation des informations obligatoires (texte brut, fichier PDF signé et métadonnées) en suivant les spécifications du [Swagger](./swagger_tcom_collecte.json) ;
    - En cas d'anomalie, une erreur `400` est retournée avec les détails des erreurs rencontrées ;
-   - Sinon, l'ensemble de la décision est stocké dans un bucket S3 privé, en vue de sa normalisation ultérieure, et une réponse `201` est retournée.
+   - Sinon, l'ensemble de la décision est stocké dans un bucket S3 privé (bucket "décisions brutes"), en vue de sa normalisation ultérieure, et une réponse `201` est retournée.
 
 2. Analyse anti-virus effectuée au niveau de la couche réseau :
 
@@ -27,14 +27,14 @@ Chaque décision, reçue via le point d'entrée `PUT /decision` de l'application
    - En l'absence de virus, le workflow de collecte est sollicité :
      - Présence et validation des informations obligatoires (texte brut, fichier PDF signé et métadonnées) en suivant les spécifications du [Swagger](./swagger_tcom_collecte.json) ;
      - En cas d'anomalie de validation, une erreur `400` est retournée avec les détails des erreurs rencontrées ;
-     - Sinon, l'ensemble de la décision est stocké dans un bucket S3 privé, en vue de sa normalisation ultérieure, et une réponse `201` est retournée.
+     - Sinon, l'ensemble de la décision est stocké dans un bucket S3 privé (bucket "décisions brutes"), en vue de sa normalisation ultérieure, et une réponse `201` est retournée.
 
 3. Analyse anti-virus effectuée à la volée lors de la collecte, de manière **synchrone** (dans le cas où le temps d'analyse n'est pas susceptible de provoquer un _timeout_ de la requête d'origine) :
 
    - Présence et validation des informations obligatoires (texte brut, fichier PDF signé et métadonnées) en suivant les spécifications du [Swagger](./swagger_tcom_collecte.json) ;
    - Analyse anti-virus à la volée du fichier PDF joint à la requête (_a priori_ en utilisant [ESET](https://help.eset.com/essl/91/fr-FR/on_demand_scan_via_terminal.html), ce qui nécessite le stockage du fichier reçu dans un espace temporaire devant être détruit après analyse) ;
    - En cas d'anomalie, une erreur `400` est retournée avec les détails des erreurs rencontrées ;
-   - Sinon, l'ensemble de la décision est stocké dans un bucket S3 privé, en vue de sa normalisation ultérieure, et une réponse `201` est retournée.
+   - Sinon, l'ensemble de la décision est stocké dans un bucket S3 privé (bucket "décisions brutes"), en vue de sa normalisation ultérieure, et une réponse `201` est retournée.
 
 4. Analyse anti-virus effectuée à la volée lors de la collecte, de manière **asynchrone** (dans le cas où le temps d'analyse est susceptible de provoquer un _timeout_ de la requête d'origine) :
 
@@ -42,7 +42,7 @@ Chaque décision, reçue via le point d'entrée `PUT /decision` de l'application
      - Présence et validation des informations obligatoires (texte brut, fichier PDF signé et métadonnées) en suivant les spécifications du [Swagger](./swagger_tcom_collecte.json) ;
      - Analyse anti-virus à la volée du fichier PDF joint à la requête (_a priori_ en utilisant [ESET](https://help.eset.com/essl/91/fr-FR/on_demand_scan_via_terminal.html), ce qui nécessite le stockage du fichier reçu dans un espace temporaire devant être détruit après analyse) ;
      - En cas d'anomalie, le "job" est clos en état d'erreur, avec les détails des erreurs rencontrées ;
-     - Sinon, le "job" est clos en état de succès et l'ensemble de la décision est stocké dans un bucket S3 privé, en vue de sa normalisation ultérieure.
+     - Sinon, le "job" est clos en état de succès et l'ensemble de la décision est stocké dans un bucket S3 privé (bucket "décisions brutes"), en vue de sa normalisation ultérieure.
    - En parallèle, un point d'entrée additionnel de l'API de collecte (par exemple : `POST /jobStatus`) est accessible à l'instance émettrice pour le suivi du "job" considéré. Ce point d'entrée retourne l'état d'avancement du job sous la forme d'un objet JSON du type `{ "jobId": "<ID ou URI>", "jobStatus": "<status>", "elapsedTime": <temps écoulé> }`, la propriété `jobStatus` pouvant prendre les valeurs `pending` (en cours), `failure` (échoué) ou `success` (succès). Dans le cas où le "job" est dans un état `failure`, l'objet JSON doit contenir une propriété `reason` détaillant les raisons de l'échec de la collecte (contenu manquant ou invalide, virus détecté, etc.).
 
 ## Normalisation (application `JuriTCOM`, côté SDER/Open, plateforme privée)
@@ -53,9 +53,18 @@ Pour référence, le processus de normalisation des décisions des tribunaux jud
 
 En résumé :
 
-- Récupération des décisions brutes en attente de normalisation dans le bucket S3 privé (texte brut et métadonnées définies par le [Swagger](./swagger_tcom_collecte.json)) ;
-- Traitement et normalisation des décisions brutes suivant différents modules de normalisation, se concentrant chacun sur un aspect spécifique des données et appliquant des règles de normalisation prédéfinies (lesquelles peuvent utiliser des fichiers de configuration au format JSON pour définir les mappages et les valeurs prédéfinies devant être associées à certains codes ou identifiants reçus). Une attention particulièr est portée sur les données relatives aux occultations complémentaires (afin que l'application Label puisse traiter au mieux la décision), ainsi qu'à toutes les informations susceptibles de valider le caractère public de la décision (en cas d'anomalie ou d'indétermination, la décision doit être bloquée en lui appliquant l'un des états `labelStatus` prédéfinis, par exemple : `ignored_decisionNonPublique`, `ignored_dateDecisionIncoherente`, `ignored_controleRequis`, etc.) ;
-- Enregistrement des décisions normalisées dans la collection `decisions` de la base de données SDER à l'aide de l'API DBSDER. Ces décisions deviennent disponibles pour la suite des traitements orchestrée par l'application Label. Les décisions intègres au format PDF (fichiers non publiés) doivent demeurer archivées dans un bucket S3 privé ;
+- Récupération des décisions brutes en attente de normalisation dans le bucket S3 privé (bucket "décisions brutes", lesquelles contiennent le texte brut et les métadonnées définies par le [Swagger](./swagger_tcom_collecte.json)) ;
+- Traitement et normalisation des décisions brutes suivant différents modules de normalisation, se concentrant chacun sur un aspect spécifique des données et appliquant des règles de normalisation prédéfinies (lesquelles peuvent utiliser des fichiers de configuration au format JSON pour définir les mappages et les valeurs prédéfinies devant être associées à certains codes ou identifiants reçus). Une attention particulièr est portée sur les données relatives aux occultations complémentaires (afin que l'application Label puisse traiter au mieux la décision), ainsi qu'à toutes les informations susceptibles de valider le caractère public de la décision (en cas d'anomalie ou d'indétermination, la décision doit être bloquée en lui appliquant l'un des états `labelStatus` prédéfinis, par exemple : `ignored_decisionNonPublique`, `ignored_dateDecisionIncoherente`, `ignored_controleRequis`, etc.). Cette normalisation comprend les principales étapes suivantes :
+
+  1.  Génération d'un identifiant unique si la propriété `idDecision` fournie par l'instance émettrice n'est pas exploitable (à réévaluer avec les premiers lots de test), cf. [generateUniqueId.ts](https://github.com/Cour-de-cassation/juritj/blob/dev/src/batch/normalization/services/generateUniqueId.ts) avec, pour les TCOM, l'utilisation des propriétés `idGroupement`, `idJuridiction`, `numeroDossier` et `dateDecision` ;
+  1.  Suppression ou remplacement des caractères erronés ou inutiles, cf. [removeOrReplaceUnnecessaryCharacters.ts](https://github.com/Cour-de-cassation/juritj/blob/dev/src/batch/normalization/services/removeOrReplaceUnnecessaryCharacters.ts) (là aussi, à réévaluer avec les premiers lots de test) ;
+  1.  Mappage des valeurs suivant les [spécifications de typage de l'API DBSDER](https://github.com/Cour-de-cassation/dbsder-api-types), cf. [decision.dto.ts](https://github.com/Cour-de-cassation/juritj/blob/dev/src/batch/normalization/infrastructure/decision.dto.ts), à reprendre suivant le Swagger des TCOM (pas nécessaire pour la phase de chiffrage, la structure de données étant analogue) ;
+  1.  Calcul de l'état `labelStatus`, cf. [computeLabelStatus.ts](https://github.com/Cour-de-cassation/juritj/blob/dev/src/batch/normalization/services/computeLabelStatus.ts), à détailler pour les TCOM (pas nécessaire pour la phase de chiffrage, les règles étant analogues) ;
+  1.  Calcul des indicateurs d'occultation, cf. [computeOccultation.ts](https://github.com/Cour-de-cassation/juritj/blob/dev/src/batch/normalization/services/computeOccultation.ts), **@TODO à préciser pour les TCOM car les informations collectées sont plus complètes que pour les TJ**.
+
+- Enregistrement des décisions normalisées dans la collection `decisions` de la base de données SDER à l'aide de l'API DBSDER. Ces décisions deviennent disponibles pour la suite des traitements orchestrée par l'application Label.
+- Les décisions intègres et normalisées (avec leur fichier au format PDF non publié) doivent être archivées dans un autre bucket S3 privé (bucket "décisions normalisées") ;
+- Les décisions brutes doivent être supprimées du bucket S3 privé (bucket "décisions brutes") à l'issue de la normalisation ;
 - Les décisions en anomalie (erreur de normalisation, caractère non public, etc.) doivent être identifiées et bloquées en attendant que la juridiction émettrice soit notifiée et procède aux corrections nécessaires (avant une reprise de l'envoi).
 
 ### Gestion des erreurs et journalisation

@@ -9,41 +9,16 @@
    - `401` : la requête d'envoi n'est pas autorisée (le certificat requis pour la requête manque ou a expiré) - la juridiction émettrice doit contacter l'équipe technique côté Infogreffe afin de vérifier les paramètres de connexion avant reprise de l'envoi ;
    - `500` : la requête d'envoi a généré une erreur interne côté SDER (la réponse contient les erreurs constatées) - la juridiction émettrice doit contacter l'équipe technique du SDER afin d'analyser les anomalies avant reprise de l'envoi.
 
-**Note** : dans le cas où la collecte s'effectuerait de manière asynchrone (scénario _4_ ci-après), alors l'instance émettrice recevrait immédiatement (outre une éventuelle erreur `401`) une réponse avec un code HTTP `202` ("Accepted", cf. [RFC](https://www.rfc-editor.org/rfc/rfc9110.html#name-202-accepted)) indiquant que la requête a bien été réceptionnée et qu'elle est en cours de traitement. Cette réponse contiendrait un identifiant (ou URI) permettant à l'instance émettrice d'interroger ultérieurement le serveur afin de connaître l'état d'avancement du traitement de la requête (modalités de réponses à spécifier le cas échéant).
+**Note** : comme détaillé ci-après, l'analyse anti-virus du fichier PDF transmis s'effectuera en tâche de fond et séparément de la collecte. _La réponse à la requête d'envoi ne contiendra donc pas d'information relative au résultat de cette analyse anti-virus_ (en d'autres termes : la présence d'un virus dans le fichier PDF reçu n'est pas une cause d'erreur ni un critère bloquant pour la publication de la décision). En cas de détection _a posteriori_ d'un fichier PDF vérolé, l'instance émettrice en sera notifiée et pourra effectuer les actions nécessaires de son côté avant de procéder à un nouvel envoi. Cela n'aura pas d'impact sur le contenu publié dans Judilibre (qui se base sur la version texte brut soumise à l'origine).
 
 ## Collecte (application `JuriTCOM`, côté SDER/Open, plateforme privée)
 
-Chaque décision, reçue via le point d'entrée `PUT /decision` de l'application `JuriTCOM`, est validée suivant 4 scénarii possibles :
+Chaque décision, reçue via le point d'entrée `PUT /decision` de l'application `JuriTCOM`, est validée et traitée _de manière synchrone_ :
 
-1. Pas d'analyse anti-virus :
-
-   - Présence et validation des informations obligatoires (texte brut, fichier PDF signé et métadonnées) en suivant les spécifications du [Swagger](./swagger_tcom_collecte.json) ;
-   - En cas d'anomalie, une erreur `400` est retournée avec les détails des erreurs rencontrées ;
-   - Sinon, l'ensemble de la décision est stocké dans un bucket S3 privé (bucket "décisions brutes"), en vue de sa normalisation ultérieure, et une réponse `201` est retournée.
-
-2. Analyse anti-virus effectuée au niveau de la couche réseau :
-
-   - Si la présence d'un virus est détectée dans le flux, en amont de la collecte, alors une erreur est censée être retournée à l'émetteur et le workflow de collecte n'est jamais sollicité (_à préciser suivant les spécifications techniques de la solution préconisée par le MJ_). Dans ce cas, un mécanisme secondaire (possiblement en batch) doit être implémenté afin d'analyser les logs de l'anti-virus de sorte à intégrer l'erreur dans le système d'information et, si nécessaire, correctement en informer l'instance émettrice ;
-   - En l'absence de virus, le workflow de collecte est sollicité :
-     - Présence et validation des informations obligatoires (texte brut, fichier PDF signé et métadonnées) en suivant les spécifications du [Swagger](./swagger_tcom_collecte.json) ;
-     - En cas d'anomalie de validation, une erreur `400` est retournée avec les détails des erreurs rencontrées ;
-     - Sinon, l'ensemble de la décision est stocké dans un bucket S3 privé (bucket "décisions brutes"), en vue de sa normalisation ultérieure, et une réponse `201` est retournée.
-
-3. Analyse anti-virus effectuée à la volée lors de la collecte, de manière **synchrone** (dans le cas où le temps d'analyse n'est pas susceptible de provoquer un _timeout_ de la requête d'origine) :
-
-   - Présence et validation des informations obligatoires (texte brut, fichier PDF signé et métadonnées) en suivant les spécifications du [Swagger](./swagger_tcom_collecte.json) ;
-   - Analyse anti-virus à la volée du fichier PDF joint à la requête (_a priori_ en utilisant [ESET](https://help.eset.com/essl/91/fr-FR/on_demand_scan_via_terminal.html), ce qui nécessite le stockage du fichier reçu dans un espace temporaire devant être détruit après analyse) ;
-   - En cas d'anomalie, une erreur `400` est retournée avec les détails des erreurs rencontrées ;
-   - Sinon, l'ensemble de la décision est stocké dans un bucket S3 privé (bucket "décisions brutes"), en vue de sa normalisation ultérieure, et une réponse `201` est retournée.
-
-4. Analyse anti-virus effectuée à la volée lors de la collecte, de manière **asynchrone** (dans le cas où le temps d'analyse est susceptible de provoquer un _timeout_ de la requête d'origine) :
-
-   - Une réponse avec un code HTTP `202` et les informations requises pour le suivi du traitement (identifiant de "job" ou URI de suivi) est retournée immédiatement à l'émetteur, avant de poursuivre "en tâche de fond" le workflow de collecte (sous la forme d'un "job" identifié) ;
-     - Présence et validation des informations obligatoires (texte brut, fichier PDF signé et métadonnées) en suivant les spécifications du [Swagger](./swagger_tcom_collecte.json) ;
-     - Analyse anti-virus à la volée du fichier PDF joint à la requête (_a priori_ en utilisant [ESET](https://help.eset.com/essl/91/fr-FR/on_demand_scan_via_terminal.html), ce qui nécessite le stockage du fichier reçu dans un espace temporaire devant être détruit après analyse) ;
-     - En cas d'anomalie, le "job" est clos en état d'erreur, avec les détails des erreurs rencontrées ;
-     - Sinon, le "job" est clos en état de succès et l'ensemble de la décision est stocké dans un bucket S3 privé (bucket "décisions brutes"), en vue de sa normalisation ultérieure.
-   - En parallèle, un point d'entrée additionnel de l'API de collecte (par exemple : `POST /jobStatus`) est accessible à l'instance émettrice pour le suivi du "job" considéré. Ce point d'entrée retourne l'état d'avancement du job sous la forme d'un objet JSON du type `{ "jobId": "<ID ou URI>", "jobStatus": "<status>" }`, la propriété `jobStatus` pouvant prendre les valeurs `pending` (en cours), `failure` (échoué) ou `success` (succès). Dans le cas où le "job" est dans un état `failure`, l'objet JSON doit contenir une propriété `reason` détaillant les raisons de l'échec de la collecte (contenu manquant ou invalide, virus détecté, etc.).
+- Vérification des éléments d'authentification, une erreur `401` étant retournée en cas d'anomalie ;
+- Présence et validation des informations obligatoires (texte brut, fichier PDF signé et métadonnées) en suivant les spécifications du [Swagger](./swagger_tcom_collecte.json). En cas d'anomalie, une erreur `400` est retournée avec les détails des erreurs rencontrées ;
+- L'ensemble de la décision dûment validée (hors fichier PDF) est stocké dans un bucket S3 privé (bucket "décisions brutes"), en vue de sa normalisation ultérieure, et une réponse `201` est aussitôt retournée ;
+- En complément, le fichier PDF signé est déposé dans un espace de stockage prédéfini afin de le soumettre de manière passive à une analyse anti-virus effectuée en tâche de fond (_a priori_ en utilisant `ESET`).
 
 ## Normalisation (application `JuriTCOM`, côté SDER/Open, plateforme privée)
 
@@ -67,21 +42,28 @@ En résumé :
       - Elaboration de la propriété `additionalTerms` à partir des propriétés `motif` (booléen), `conserverElement` et `supprimerElement` (chaînes de caractères facultatives). Spécifications à confirmer par l'équipe Data Science du SDER (règles de traitement minimales).
 
 - Enregistrement des décisions normalisées dans la collection `decisions` de la base de données SDER à l'aide de l'API DBSDER. Ces décisions deviennent disponibles pour la suite des traitements orchestrée par l'application Label.
-- Les décisions intègres et normalisées (avec leur fichier au format PDF non publié) doivent être archivées dans un autre bucket S3 privé (bucket "décisions normalisées") ;
+- Les décisions normalisées doivent être archivées dans un autre bucket S3 privé (bucket "décisions normalisées") ;
 - Les décisions brutes doivent être supprimées du bucket S3 privé (bucket "décisions brutes") à l'issue de la normalisation ;
 - Les décisions en anomalie (erreur de normalisation, caractère non public, etc.) doivent être identifiées et bloquées en attendant que la juridiction émettrice soit notifiée et procède aux corrections nécessaires (avant une reprise de l'envoi).
 
+### Batch de suivi de l'analyse anti-virus (application `JuriTCOM`, côté SDER/Open, plateforme privée)
+
+Parallèlement un autre batch, lui aussi intégré à l'application `JuriTCOM`, va analyser ponctuellement les résultats de l'analyse anti-virus des fichiers PDF déposés lors de la collecte :
+
+- Si un virus est détecté, le fichier doit être supprimé et l'instance émettrice doit en être informée (génération d'une alerte ou de toute autre information pouvant être traitée _a posteriori_ par le SDER afin de permettre l'envoi d'un mail comprenant les détails requis : identification de la décision, date de collecte, nature de la menace détectée) ;
+- En l'absence de virus, le fichier doit être archivé dans le bucket S3 privé qui le concerne, suivant l'état de la décision qui lui est associée (bucket "décisions brutes" ou bucket "décisions normalisées").
+
 ### Gestion des erreurs et journalisation
 
-Tout au long des processus de collecte et de normalisation, les erreurs sont gérées et journalisées à l'aide du module de journalisation (logger.ts).
+Tout au long des processus de collecte et de normalisation, les erreurs sont gérées et journalisées à l'aide du module de journalisation.
 
 Les erreurs spécifiques, telles que les erreurs de validation ou les erreurs d'intégrité des données, sont capturées et traitées de manière appropriée.
 
-### Exécution du batch
+### Exécution des batchs
 
-Le batch de normalisation est exécuté périodiquement ou déclenché manuellement pour traiter les nouvelles données ou mettre à jour les données existantes.
+Le batch de normalisation et le batch de suivi de l'analyse anti-virus sont exécutés périodiquement ou déclenchés manuellement pour traiter les nouvelles données ou mettre à jour les données existantes.
 
-La fréquence et le mode d'exécution du batch peuvent être configurés en fonction des besoins du projet.
+La fréquence et le mode d'exécution de ces batchs peuvent être configurés en fonction des besoins du projet.
 
 ## Pseudonymisation et validation (application `Label`, côté SDER, plateforme privée)
 

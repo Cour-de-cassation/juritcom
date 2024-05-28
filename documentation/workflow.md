@@ -48,7 +48,7 @@ En résumé :
 
 ### Batch de suivi de l'analyse anti-virus (application `JuriTCOM`, côté SDER/Open, plateforme privée)
 
-Parallèlement un autre batch, lui aussi intégré à l'application `JuriTCOM`, va analyser ponctuellement les résultats de l'analyse anti-virus des fichiers PDF déposés lors de la collecte :
+Un autre batch, lui aussi intégré à l'application `JuriTCOM`, va analyser ponctuellement les résultats de l'analyse anti-virus des fichiers PDF déposés lors de la collecte :
 
 - Si un virus est détecté, le fichier doit être supprimé et l'instance émettrice doit en être informée (génération d'une alerte ou de toute autre information pouvant être traitée _a posteriori_ par le SDER afin de permettre l'envoi d'un mail comprenant les détails requis : identification de la décision, date de collecte, nature de la menace détectée) ;
 - En l'absence de virus, le fichier doit être archivé dans le bucket S3 privé qui le concerne, suivant l'état de la décision qui lui est associée (bucket "décisions brutes" ou bucket "décisions normalisées").

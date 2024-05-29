@@ -410,7 +410,7 @@
         "properties": {
           "type": {
             "description": "Type de la partie",
-            "enum": ["PP", "PM"],
+            "enum": ["PP", "PM", "NA"],
             "minimum": 2,
             "maximum": 2,
             "type": "string"

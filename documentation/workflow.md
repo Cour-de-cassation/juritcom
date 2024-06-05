@@ -11,7 +11,7 @@
 
 **Note** : comme détaillé ci-après, l'analyse anti-virus du fichier PDF transmis s'effectuera en tâche de fond et séparément de la collecte. _La réponse à la requête d'envoi ne contiendra donc pas d'information relative au résultat de cette analyse anti-virus_ (en d'autres termes : la présence d'un virus dans le fichier PDF reçu n'est pas une cause d'erreur ni un critère bloquant pour la publication de la décision). En cas de détection _a posteriori_ d'un fichier PDF vérolé, l'instance émettrice en sera notifiée et pourra effectuer les actions nécessaires de son côté avant de procéder à un nouvel envoi. Cela n'aura pas d'impact sur le contenu publié dans Judilibre (qui se base sur la version texte brut soumise à l'origine).
 
-## Collecte (application `JuriTCOM`, côté SDER/Open, plateforme privée)
+## Collecte (application `JuriTCOM`, côté SDER/Open, plateforme privée) - **LOT1**
 
 Chaque décision, reçue via le point d'entrée `PUT /decision` de l'application `JuriTCOM`, est validée et traitée _de manière synchrone_ :
 
@@ -20,7 +20,7 @@ Chaque décision, reçue via le point d'entrée `PUT /decision` de l'application
 - L'ensemble de la décision dûment validée (hors fichier PDF) est stocké dans un bucket S3 privé (bucket "décisions brutes"), en vue de sa normalisation ultérieure, et une réponse `201` est aussitôt retournée ;
 - En complément, le fichier PDF signé est déposé dans un espace de stockage prédéfini afin de le soumettre de manière passive à une analyse anti-virus effectuée en tâche de fond (_a priori_ en utilisant `ESET`).
 
-## Normalisation (application `JuriTCOM`, côté SDER, plateforme privée)
+## Normalisation (application `JuriTCOM`, côté SDER, plateforme privée) - **LOT2, a priori internalisé**
 
 Le batch de normalisation, intégré à l'application `JuriTCOM`, a pour objectif de traiter et de normaliser les données brutes des décisions de justice provenant des TCOM et validées lors de la collecte, afin de les rendre cohérentes et exploitables par le processus de publication de Judilibre.
 
@@ -46,7 +46,7 @@ En résumé :
 - Les décisions brutes doivent être supprimées du bucket S3 privé (bucket "décisions brutes") à l'issue de la normalisation ;
 - Les décisions en anomalie (erreur de normalisation, caractère non public, etc.) doivent être identifiées et bloquées en attendant que la juridiction émettrice soit notifiée et procède aux corrections nécessaires (avant une reprise de l'envoi).
 
-### Batch de suivi de l'analyse anti-virus (application `JuriTCOM`, côté SDER, plateforme privée)
+### Batch de suivi de l'analyse anti-virus (application `JuriTCOM`, côté SDER, plateforme privée) - **LOT2 ? a priori internalisé**
 
 Un autre batch, lui aussi intégré à l'application `JuriTCOM`, va analyser ponctuellement les résultats de l'analyse anti-virus des fichiers PDF déposés lors de la collecte :
 

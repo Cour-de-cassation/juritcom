@@ -1,5 +1,12 @@
 # Workflow général du processus de collecte et de publication des décisions des TCOM
 
+- [Envoi (Infogreffe)](#envoi-c%C3%B4t%C3%A9-tcominfogreffe)
+- [Collecte (Open - Lot 1)](#collecte-application-juritcom-c%C3%B4t%C3%A9-sderopen-plateforme-priv%C3%A9e---lot1)
+- [Normalisation (SDER)](#normalisation-application-juritcom-c%C3%B4t%C3%A9-sder-plateforme-priv%C3%A9e---internalis%C3%A9)
+- [Batch de suivi de l'anti-virus (Open - Lot 2)](#batch-de-suivi-de-lanalyse-anti-virus-application-juritcom-c%C3%B4t%C3%A9-sderopen-plateforme-priv%C3%A9e---lot2)
+- [Pseudonymisation (SDER)](#pseudonymisation-et-validation-application-label-c%C3%B4t%C3%A9-sder-plateforme-priv%C3%A9e)
+- [Publication (SDER)](#publication-application-judilibre-sder-c%C3%B4t%C3%A9-sder-plateformes-priv%C3%A9e-et-publique)
+
 ## Envoi (côté TCOM/Infogreffe)
 
 1. Pour chaque décision à publier dans Judilibre (nouvelle ou mise à jour), la juridiction émettrice effectue une requête HTTPS `PUT /decision` sur l'API de collecte du SDER, suivant les spécifications du [Swagger](./swagger_tcom_collecte.json) (texte brut issu du fichier PDF, fichier PDF signé et métadonnées complètes) ;

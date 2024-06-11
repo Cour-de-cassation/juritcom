@@ -2,13 +2,13 @@
   "openapi": "3.0.3",
   "info": {
     "title": "API Collecte TCOM",
-    "version": "1.0.6",
+    "version": "1.0.7",
     "description": "API permettant de collecter les décision intègres et leurs métadonnées en provenance des tribunaux de commerce"
   },
   "paths": {
     "/decision": {
       "summary": "Ressource manipulant des décisions intègres",
-      "description": "Les ressources pour modifier une décision intègre sont :\n* PUT : téléchargement d'une décision intègre",
+      "description": "Les ressources pour modifier des décisions intègres sont :\n* PUT : téléchargement d'une décision intègre",
       "put": {
         "requestBody": {
           "content": {
@@ -128,6 +128,58 @@
         "operationId": "putDecision",
         "summary": "Télécharger une décision intègre",
         "description": "Une décision intègre au format PDF ainsi que son contenu en texte brut et ses métadonnées associées seront téléchargés dans un but de pseudonymisation et de normalisation en aval par Judilibre"
+      }
+    },
+    "/decision/{decisionId}": {
+      "summary": "Ressource manipulant une décision intègre donnée",
+      "description": "Les ressources pour modifier une décision intègre donnée sont :\n* DELETE : suppression d'une décision intègre",
+      "parameters": [
+        {
+          "in": "path",
+          "name": "decisionId",
+          "schema": {
+            "type": "string"
+          },
+          "required": true,
+          "description": "Identifiant de la décision à modifier (correspond à la propriété decisionId fournie dans les métadonnées lors de la création de la décision)"
+        }
+      ],
+      "delete": {
+        "tags": ["decision"],
+        "responses": {
+          "204": {
+            "description": "La décision a bien été supprimée"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erreur"
+                }
+              }
+            },
+            "description": "La requête n'est pas correcte"
+          },
+          "401": {
+            "description": "La requête n'est pas autorisée"
+          },
+          "404": {
+            "description": "La décision est introuvable"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erreur"
+                }
+              }
+            },
+            "description": "Une erreur interne s'est produite"
+          }
+        },
+        "operationId": "deleteDecision",
+        "summary": "Supprimer une décision intègre",
+        "description": "Une décision intègre sera supprimée et, le cas échéant, dépubliée Judilibre"
       }
     }
   },

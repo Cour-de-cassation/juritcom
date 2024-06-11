@@ -3,6 +3,7 @@
 - [Envoi (Infogreffe)](#envoi-c%C3%B4t%C3%A9-tcominfogreffe)
 - [Suppression (Infogreffe)](#suppression-c%C3%B4t%C3%A9-tcominfogreffe)
 - [Collecte (Open - Lot 1)](#collecte-application-juritcom-c%C3%B4t%C3%A9-sderopen-plateforme-priv%C3%A9e---lot1)
+- [Suppression (SDER/Open - Lot non défini)](#suppression-application-juritcom-c%C3%B4t%C3%A9-sderopen-plateforme-priv%C3%A9e---lot-non-defini)
 - [Normalisation (SDER)](#normalisation-application-juritcom-c%C3%B4t%C3%A9-sder-plateforme-priv%C3%A9e---internalis%C3%A9)
 - [Batch de suivi de l'anti-virus (Open - Lot 2)](#batch-de-suivi-de-lanalyse-anti-virus-application-juritcom-c%C3%B4t%C3%A9-sderopen-plateforme-priv%C3%A9e---lot2)
 - [Pseudonymisation (SDER)](#pseudonymisation-et-validation-application-label-c%C3%B4t%C3%A9-sder-plateforme-priv%C3%A9e)

@@ -1,6 +1,7 @@
 # Workflow général du processus de collecte et de publication des décisions des TCOM
 
 - [Envoi (Infogreffe)](#envoi-c%C3%B4t%C3%A9-tcominfogreffe)
+- [Suppression (Infogreffe)](#suppression-c%C3%B4t%C3%A9-tcominfogreffe)
 - [Collecte (Open - Lot 1)](#collecte-application-juritcom-c%C3%B4t%C3%A9-sderopen-plateforme-priv%C3%A9e---lot1)
 - [Normalisation (SDER)](#normalisation-application-juritcom-c%C3%B4t%C3%A9-sder-plateforme-priv%C3%A9e---internalis%C3%A9)
 - [Batch de suivi de l'anti-virus (Open - Lot 2)](#batch-de-suivi-de-lanalyse-anti-virus-application-juritcom-c%C3%B4t%C3%A9-sderopen-plateforme-priv%C3%A9e---lot2)
@@ -18,6 +19,20 @@
 
 **Note** : comme détaillé ci-après, l'analyse anti-virus du fichier PDF transmis s'effectuera en tâche de fond et séparément de la collecte. _La réponse à la requête d'envoi ne contiendra donc pas d'information relative au résultat de cette analyse anti-virus_ (en d'autres termes : la présence d'un virus dans le fichier PDF reçu n'est pas une cause d'erreur ni un critère bloquant pour la publication de la décision). En cas de détection _a posteriori_ d'un fichier PDF vérolé, l'instance émettrice en sera notifiée et pourra effectuer les actions nécessaires de son côté avant de procéder à un nouvel envoi. Cela n'aura pas d'impact sur le contenu publié dans Judilibre (qui se base sur la version texte brut soumise à l'origine).
 
+## Suppression (côté TCOM/Infogreffe)
+
+1. Pour chaque décision à supprimer, la juridiction émettrice effectue une requête HTTPS `DELETE /decision/<ID>` sur la même API, avec l'identifiant de la décision suivant les spécifications du [Swagger](./swagger_tcom_collecte.json) ;
+2. La juridiction émettrice attend la réponse de l'API et agit suivant le code HTTP associée à celle-ci :
+   - `204` : la décision a bien été supprimée (aucun contenu retourné) ;
+   - `400` : la requête d'envoi est incorrecte (la réponse contient les erreurs constatées côté SDER, par exemple : absence d'identifiant) - la juridiction émettrice doit reprendre l'opération dès que possible avec une requête corrigée ;
+   - `401` : la requête d'envoi n'est pas autorisée (le certificat requis pour la requête manque ou a expiré) - la juridiction émettrice doit contacter l'équipe technique côté Infogreffe afin de vérifier les paramètres de connexion avant reprise de l'opération ;
+   - `404` : la décision à supprimer n'a pas été trouvée dans la base SDER - la juridiction émettrice doit reprendre l'opération avec un identifiant correct ou contacter l'équipe technique du SDER afin d'analyser l'anomalie ;
+   - `500` : la requête d'envoi a généré une erreur interne côté SDER (la réponse contient les erreurs constatées) - la juridiction émettrice doit contacter l'équipe technique du SDER afin d'analyser les anomalies avant reprise de l'opération.
+
+Si la décision à supprimer a déjà été publiée dans Judilibre, celle-ci sera aussitôt retirée de l'Open Data.
+
+La suppression côté SDER est seulement "logique" (la décision passe à un état "supprimée" : son contenu et ses métadonnées demeurent dans la base de données privée du SDER et ne sont pas "physiquement" effacés). Ceci permet de restaurer rapidement la décision en cas d'erreur de suppression (opération à effectuer manuellement après que la juridiction émettrice ait contacté l'équipe technique du SDER).
+
 ## Collecte (application `JuriTCOM`, côté SDER/Open, plateforme privée) - **LOT1**
 
 Chaque décision, reçue via le point d'entrée `PUT /decision` de l'application `JuriTCOM`, est validée et traitée _de manière synchrone_ :
@@ -26,6 +41,15 @@ Chaque décision, reçue via le point d'entrée `PUT /decision` de l'application
 - Présence et validation des informations obligatoires (texte brut, fichier PDF signé et métadonnées) en suivant les spécifications du [Swagger](./swagger_tcom_collecte.json). En cas d'anomalie, une erreur `400` est retournée avec les détails des erreurs rencontrées ;
 - L'ensemble de la décision dûment validée (hors fichier PDF) est stocké dans un bucket S3 privé (bucket "décisions brutes"), en vue de sa normalisation ultérieure, et une réponse `201` est aussitôt retournée ;
 - En complément, le fichier PDF signé est déposé dans un espace de stockage prédéfini afin de le soumettre de manière passive à une analyse anti-virus effectuée en tâche de fond (_a priori_ en utilisant `ESET`).
+
+## Suppression (application `JuriTCOM`, côté SDER/Open, plateforme privée) - **LOT NON DEFINI**
+
+Chaque décision à supprimer via le point d'entrée `DELETE /decision/<ID>` de l'application `JuriTCOM`, est validée et traitée _de manière synchrone_ :
+
+- Vérification des éléments d'authentification, une erreur `401` étant retournée en cas d'anomalie ;
+- Présence et validation des informations obligatoires (identifiant de la décision) en suivant les spécifications du [Swagger](./swagger_tcom_collecte.json). En cas d'anomalie, une erreur `400` est retournée avec les détails des erreurs rencontrées ;
+- Test d'existence de la décision à supprimer dans la base SDER. En cas de non-existence de la décision, une erreur `404` est retournée ;
+- La décision dûment validée passe à l'état "supprimée" (via l'API DBSDER, pas de suppression réelle dans la base de données). Si elle a déjà été publiée dans Judilibre, alors elle est aussitôt dépubliée (via l'API Judilibre Admin). Une réponse `204` est retournée immédiatement.
 
 ## Normalisation (application `JuriTCOM`, côté SDER, plateforme privée) - **internalisé**
 

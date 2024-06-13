@@ -8,7 +8,7 @@
   "paths": {
     "/decision": {
       "summary": "Ressource manipulant des décisions intègres",
-      "description": "Les ressources pour modifier des décisions intègres sont :\n* PUT : téléchargement d'une décision intègre",
+      "description": "Les ressources pour modifier des décisions intègres sont :\n* PUT : envoi d'une décision intègre",
       "put": {
         "requestBody": {
           "content": {
@@ -126,7 +126,7 @@
           }
         },
         "operationId": "putDecision",
-        "summary": "Télécharger une décision intègre",
+        "summary": "Envoyer une décision intègre",
         "description": "Une décision intègre au format PDF ainsi que son contenu en texte brut et ses métadonnées associées seront téléchargés dans un but de pseudonymisation et de normalisation en aval par Judilibre"
       }
     },

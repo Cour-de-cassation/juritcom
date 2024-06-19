@@ -79,7 +79,8 @@
                         "chaineNumeroIdentifiante": false,
                         "coordonneeElectronique": true,
                         "professionnelMagistratGreffier": false,
-                        "motif": true,
+                        "motifsDebatsChambreConseil": true,
+                        "motifsSecretAffaires": false,
                         "conserverElement": "#dateCivile|automobile",
                         "supprimerElement": "#magistratGreffe|120.000€"
                       }
@@ -337,7 +338,8 @@
             "chaineNumeroIdentifiante": false,
             "coordonneeElectronique": true,
             "professionnelMagistratGreffier": false,
-            "motif": true,
+            "motifsDebatsChambreConseil": true,
+            "motifsSecretAffaires": false,
             "conserverElement": "#dateCivile|automobile",
             "supprimerElement": "#magistratGreffe|120.000€"
           }
@@ -355,7 +357,8 @@
           "chaineNumeroIdentifiante",
           "coordonneeElectronique",
           "professionnelMagistratGreffier",
-          "motif"
+          "motifsDebatsChambreConseil",
+          "motifsSecretAffaires"
         ],
         "type": "object",
         "properties": {
@@ -395,8 +398,12 @@
             "description": "Occultation spéciale soumise à décision du président du tribunal de commerce et visant les noms des juges, magistrats et greffiers",
             "type": "boolean"
           },
-          "motif": {
-            "description": "Occultation des motifs",
+          "motifsDebatsChambreConseil": {
+            "description": "Occultation des motifs (débats en chambre du conseil : protection de la vie privée ou de la sécurité physique)",
+            "type": "boolean"
+          },
+          "motifsSecretAffaires": {
+            "description": "Occultation des motifs (secret des affaires)",
             "type": "boolean"
           },
           "conserverElement": {
@@ -420,7 +427,8 @@
           "chaineNumeroIdentifiante": false,
           "coordonneeElectronique": true,
           "professionnelMagistratGreffier": false,
-          "motif": true,
+          "motifsDebatsChambreConseil": true,
+          "motifsSecretAffaires": false,
           "conserverElement": "#dateCivile|automobile",
           "supprimerElement": "#magistratGreffe|120.000€"
         }

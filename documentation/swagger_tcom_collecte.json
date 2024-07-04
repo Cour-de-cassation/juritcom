@@ -2,7 +2,7 @@
   "openapi": "3.0.3",
   "info": {
     "title": "API Collecte TCOM",
-    "version": "1.0.7",
+    "version": "1.0.8",
     "description": "API permettant de collecter les décision intègres et leurs métadonnées en provenance des tribunaux de commerce"
   },
   "paths": {
@@ -46,7 +46,7 @@
                       "interetParticulier": false,
                       "composition": [
                         {
-                          "fonction": "Greffier",
+                          "fonction": "GRF",
                           "nom": "Dupond",
                           "prenom": "Henry",
                           "civilite": "Monsieur"
@@ -210,7 +210,7 @@
           },
           "idGroupement": {
             "description": "Identifiant unique du groupement émetteur",
-            "minimum": 4,
+            "minimum": 1,
             "maximum": 4,
             "type": "string"
           },
@@ -232,7 +232,7 @@
           },
           "numeroDossier": {
             "description": "Numéro du dossier associée à la décision rendue",
-            "minimum": 20,
+            "minimum": 1,
             "maximum": 20,
             "type": "string"
           },
@@ -305,7 +305,7 @@
           "interetParticulier": false,
           "composition": [
             {
-              "fonction": "Greffier",
+              "fonction": "GRF",
               "nom": "Dupond",
               "prenom": "Henry",
               "civilite": "Monsieur"
@@ -440,7 +440,7 @@
         "properties": {
           "fonction": {
             "description": "fonction",
-            "enum": ["GREFFIER", "JUGE", "PROCUREUR", "PRESIDENT"],
+            "enum": ["GRF", "JUG", "PDT", "PRO", "JUS"],
             "type": "string"
           },
           "nom": {
@@ -457,7 +457,7 @@
           }
         },
         "example": {
-          "fonction": "Greffier",
+          "fonction": "GRF",
           "nom": "Dupond",
           "prenom": "Henry",
           "civilite": "Monsieur"

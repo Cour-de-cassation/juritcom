@@ -41,7 +41,7 @@ COPY --from=prod --chown=node:node /home/node/node_modules/ ./node_modules/
 COPY --from=prod --chown=node:node /home/node/dist/shared ./dist/shared
 
 # --- Base final image with batch dist content --- #
-FROM shared as batch 
+FROM shared as batch
 
 USER node
 COPY --from=prod --chown=node:node /home/node/dist/batch ./dist/batch

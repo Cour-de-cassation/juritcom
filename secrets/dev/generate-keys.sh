@@ -34,7 +34,7 @@ openssl x509 -in client-cert.pem -noout -text
 # 10. Verifying validity of server certificate
 openssl verify -CAfile ca-cert.pem client-cert.pem
 
-# 11. Generate fake TCOM CA's private key and self-signed certificate 
+# 11. Generate fake TCOM CA's private key and self-signed certificate
 openssl req -x509 -sha256 -newkey rsa:4096 -days 365 -nodes -keyout tcom-key.pem -out tcom-cert.pem -subj "/C=FR/ST=Paris/L=Paris/O=MinJu/OU=Cour de cassation/CN=CC2/emailAddress=some@mail.com"
 
 # 12. Generate fake TCOM client private key and certificate signing request (CSR)

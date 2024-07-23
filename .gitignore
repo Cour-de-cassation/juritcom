@@ -1,7 +1,12 @@
+# compiled output
+/dist
+/node_modules
+
 # Logs
 logs
 *.log
 npm-debug.log*
+pnpm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
@@ -35,12 +40,32 @@ bower_components
 # node-waf configuration
 .lock-wscript
 
+# OS
+.DS_Store
+
 # Compiled binary addons (https://nodejs.org/api/addons.html)
 build/Release
 
 # Dependency directories
 node_modules/
 jspm_packages/
+
+# IDEs and editors
+/.idea
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# IDE - VSCode
+.vscode/*
+!.vscode/snippets.code-snippets
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
 
 # Snowpack dependency directory (https://snowpack.dev/)
 web_modules/
@@ -78,6 +103,7 @@ web_modules/
 .env.test.local
 .env.production.local
 .env.local
+docker.env
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache
@@ -99,6 +125,9 @@ dist
 
 # vuepress build output
 .vuepress/dist
+
+# Wordperfect Documents
+*.wpd
 
 # vuepress v2.x temp and cache directory
 .temp
@@ -128,3 +157,7 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# Secrets
+/secrets/
+!/secrets/dev/generate-keys.sh

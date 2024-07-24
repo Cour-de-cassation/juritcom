@@ -14,14 +14,13 @@ include:
     file: 'trivy-template-job.yml'
 
 stages:  
-  - deploy
   - build
   - sast
   - test
   - quality
   - docker
   - scan_docker
-  #- deploy
+  - deploy
 
 
 # Utilisation du cache pour accélérer les builds

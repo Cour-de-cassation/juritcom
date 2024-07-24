@@ -102,7 +102,7 @@ docker:
   before_script:
     - echo $CI_JOB_TOKEN | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
   script:
-    - docker build -t $DOCKER_API_IMAGE --build-arg http_proxy=$HTTP_PROXY --build-arg https_proxy=$HTTPS_PROXY --target api -f Dockerfile-open .
+    - docker build -t $DOCKER_API_IMAGE --build-arg http_proxy=$HTTP_PROXY --build-arg https_proxy=$HTTPS_PROXY --target api -f Dockerfile-Open .
     - docker tag $DOCKER_API_IMAGE $DOCKER_API_TAG_BRANCH
     - docker push $DOCKER_API_IMAGE
     - docker push $DOCKER_API_TAG_BRANCH

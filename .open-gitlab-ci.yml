@@ -2,6 +2,7 @@ image: "glregistry.boost.open.global/boost/docker/node-toolkit:16"
 
 variables:
   DOCKER_API_IMAGE: $CI_REGISTRY_IMAGE/api:$CI_COMMIT_BRANCH-$CI_COMMIT_SHA
+  DOCKER_API_TAG_BRANCH: $CI_REGISTRY_IMAGE/api:$CI_COMMIT_BRANCH
   GIT_SSL_BACKEND: openssl
   HTTP_PROXY: ""
   HTTPS_PROXY: ""
@@ -13,11 +14,12 @@ include:
     file: 'trivy-template-job.yml'
 
 stages:  
+  - docker
   - build
   - sast
   - test
   - quality
-  - docker
+  #- docker
   - scan_docker
   - deploy
 
@@ -100,8 +102,10 @@ docker:
   before_script:
     - echo $CI_JOB_TOKEN | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
   script:
-    - docker build -t $DOCKER_API_IMAGE --build-arg http_proxy=$HTTP_PROXY --build-arg https_proxy=$HTTPS_PROXY --target api .
+    - docker build -t $DOCKER_API_IMAGE --build-arg http_proxy=$HTTP_PROXY --build-arg https_proxy=$HTTPS_PROXY --target api -f Dockerfile-open .
+    - docker tag $DOCKER_API_IMAGE $DOCKER_API_TAG_BRANCH
     - docker push $DOCKER_API_IMAGE
+    - docker push $DOCKER_API_TAG_BRANCH
   only:
     - develop
     - recette

@@ -23,4 +23,9 @@ mkdir -p ~/.ssh
 echo -e "StrictHostKeyChecking no" >> ~/.ssh/config
 
 echo "DEPLOY IN HOST : ${DEPLOY_IP}"
-ssh -t $DEPLOY_USER@$DEPLOY_IP "sudo docker login -u ${APP_DEPLOYER_USER} -p ${APP_DEPLOYER_TOKEN} ${CI_REGISTRY} &&  sudo docker-compose pull ${APP_TO_DEPLOY} && sudo docker-compose up -d --force-recreate ${APP_TO_DEPLOY}; exit"
+ssh -t "$DEPLOY_USER@$DEPLOY_IP" <<EOF
+echo '${APP_DEPLOYER_TOKEN}' | sudo docker login --username '${APP_DEPLOYER_USER}' --password-stdin '${CI_REGISTRY}'
+sudo docker-compose pull ${APP_TO_DEPLOY} && sudo docker-compose up -d --force-recreate ${APP_TO_DEPLOY}; exit
+EOF
+
+# ssh -t $DEPLOY_USER@$DEPLOY_IP "sudo docker login -u ${APP_DEPLOYER_USER} -p ${APP_DEPLOYER_TOKEN} ${CI_REGISTRY} &&  sudo docker-compose pull ${APP_TO_DEPLOY} && sudo docker-compose up -d --force-recreate ${APP_TO_DEPLOY}; exit"

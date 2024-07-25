@@ -22,5 +22,5 @@ echo "$SSH_PRIVATE_KEY" | ssh-add -
 mkdir -p ~/.ssh
 echo -e "StrictHostKeyChecking no" >> ~/.ssh/config
 
-echo "DEPLOY IN HOST : ${DEPLOY_HOST}"
-ssh -t $DEPLOY_USER@$DEPLOY_HOST "sudo docker login -u ${APP_DEPLOYER_USER} -p ${APP_DEPLOYER_TOKEN} ${CI_REGISTRY} &&  sudo docker-compose pull ${APP_TO_DEPLOY} && sudo docker-compose up -d --force-recreate ${APP_TO_DEPLOY}; exit"
+echo "DEPLOY IN HOST : ${DEPLOY_IP}"
+ssh -t $DEPLOY_USER@$DEPLOY_IP "sudo docker login -u ${APP_DEPLOYER_USER} -p ${APP_DEPLOYER_TOKEN} ${CI_REGISTRY} &&  sudo docker-compose pull ${APP_TO_DEPLOY} && sudo docker-compose up -d --force-recreate ${APP_TO_DEPLOY}; exit"

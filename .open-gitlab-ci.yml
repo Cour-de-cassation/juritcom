@@ -13,14 +13,15 @@ include:
   - project: 'bots/trivy-script'
     file: 'trivy-template-job.yml'
 
-stages:  
+stages:
+  - deploy  
   - build
   - sast
   - test
   - quality
   - docker
   - scan_docker
-  - deploy
+  # - deploy
 
 
 # Utilisation du cache pour accélérer les builds

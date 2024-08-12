@@ -10,7 +10,8 @@ async function bootstrap() {
     logger: ['log', 'error', 'warn']
   })
 
-  app.setGlobalPrefix('v1')
+  // A voir si c'est necessaire de rajouter /v1 aux routes
+  //app.setGlobalPrefix('v1')
 
   // Add logger
   app.useLogger(app.get(Logger))
@@ -27,11 +28,11 @@ async function bootstrap() {
 
   // Add API Documentation with Swagger
   const config = new DocumentBuilder()
-    .setTitle('API JuriTJ')
+    .setTitle('API Collecte TCOM')
     .setDescription(
-      "Documentation de l'API JuriTJ, qui permet la collecte, le traitement et la mise en Open Data de décisions de tribunaux judiciaires."
+      "API permettant de collecter les décision intègres et leurs métadonnées en provenance des tribunaux de commerce"
     )
-    .setVersion('1.0')
+    .setVersion('1.0.8')
     .addTag('Collect')
     .build()
   const document = SwaggerModule.createDocument(app, config)

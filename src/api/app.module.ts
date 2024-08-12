@@ -7,6 +7,7 @@ import { configureLoggerModule } from '../shared/infrastructure/utils/pinoConfig
 import { HealthController } from './infrastructure/controllers/health/health.controller'
 import { DecisionsController } from './infrastructure/controllers/decisions/decisions.controller'
 import { BucketHealthIndicator } from './infrastructure/controllers/health/bucketHealthIndicator'
+import { DecisionController } from './infrastructure/controllers/decision/decision.controller'
 import { envValidationConfig } from '../shared/infrastructure/dto/env.validation'
 
 @Module({
@@ -18,7 +19,7 @@ import { envValidationConfig } from '../shared/infrastructure/dto/env.validation
     }),
     configureLoggerModule()
   ],
-  controllers: [RedirectController, DecisionsController, HealthController],
+  controllers: [RedirectController, DecisionsController, HealthController, DecisionController],
   providers: [BucketHealthIndicator]
 })
 export class AppModule {}

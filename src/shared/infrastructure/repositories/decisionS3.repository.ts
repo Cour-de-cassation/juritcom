@@ -112,4 +112,37 @@ export class DecisionS3Repository implements DecisionRepository {
       throw new BucketError(error)
     }
   }
+
+  async saveDataDecisionIntegre(requestToS3Dto: string, originalFileName: string, jsonFileName?: string): Promise<void> {
+    const reqParams = {
+      Body: requestToS3Dto,
+      Bucket: process.env.S3_BUCKET_NAME_RAW,
+      Key: jsonFileName,
+      Metadata: {
+        originalFileName
+      }
+    };
+
+    await this.saveDecision(reqParams);
+  }
+
+  async uploadFichierDecisionIntegre(file: Express.Multer.File, originalFileName: string, pdfFileName: string): Promise<void> {
+    const params = {
+      Bucket: process.env.S3_BUCKET_NAME_RAW,
+      Key: pdfFileName,
+      Body: file.buffer,
+      ContentType: file.mimetype,
+      ACL: 'public-read',
+      Metadata: {
+        originalFileName
+      }
+    } as unknown as any;
+
+    try {
+      await this.s3Client.send(new PutObjectCommand(params));
+    } catch (error) {
+      this.logger.error({ operationName: 'putDecision', msg: error.message, data: error });
+      throw new BucketError(error);
+    }
+  }
 }

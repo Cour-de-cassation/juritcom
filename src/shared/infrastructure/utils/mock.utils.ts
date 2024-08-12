@@ -143,4 +143,63 @@ export class MockUtils {
     selection: false,
     idDecisionTJ: this.uniqueDecisionId
   }
+
+  putDecisionMetadonneesDtoMock = {
+    decisionPublique: true,
+    parties: [
+      {
+        type: 'PP',
+        role: 'PARTIE',
+        nom: 'Dupond',
+        prenom: 'Julien',
+        civilite: 'Monsieur',
+        qualite: 'I',
+        adresse: {
+          numero: '20bis',
+          type: 'rue',
+          voie: 'du Bourg',
+          codePostal: '39100',
+          localite: 'Dole'
+        }
+      }
+    ],
+    occultationsComplementaires: {
+      dateCivile: false,
+      motifsSecretAffaires: false,
+      cadastre: false,
+      adresse: true,
+      professionnelMagistratGreffier: false,
+      plaqueImmatriculation: true,
+      coordonneeElectronique: true,
+      motifsDebatsChambreConseil: true,
+      personneMorale: true,
+      conserverElement: '#dateCivile|automobile',
+      chaineNumeroIdentifiante: false,
+      personnePhysicoMoraleGeoMorale: false,
+      supprimerElement: '#magistratGreffe|120.000€'
+    },
+    interetParticulier: false,
+    idChambre: 'ID',
+    libelleMatiere: 'Demande de nullité d\'un bail',
+    composition: [
+      {
+        fonction: 'GRF',
+        nom: 'Dupond',
+        prenom: 'Henry',
+        civilite: 'Monsieur'
+      }
+    ],
+    dateDecision: '20240322',
+    libelleJuridiction: 'Tribunal judiciaire de Paris',
+    libelleProcedure: 'Libellé type affaire ',
+    numeroDossier: '08/20240',
+    idMatiere: 'code matière de la décision',
+    idJuridiction: 'TJ7500',
+    debatChambreDuConseil: false,
+    idDecision: '66177ce6e5d',
+    idProcedure: 'CODETYPEPROCEDURE',
+    libelleChambre: 'libelleChambre',
+    idGroupement: 'ABDC'
+  }
+
 }

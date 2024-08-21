@@ -51,4 +51,4 @@ COPY --from=prod --chown=node:node /home/node/dist ./dist
 # Check the contents of the dist directory in the final image
 RUN ls -al /home/node/dist
 
-CMD ["node", "dist/main"]
+CMD ["node", "dist/api/main"]

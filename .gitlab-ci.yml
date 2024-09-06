@@ -61,26 +61,26 @@ build_api:
   tags:
     - docker
 
-build_batch:
-  stage: build
-  needs: ['test']
-  variables:
-    HTTP_PROXY: $HTTP_PROXY_DEV
-    HTTPS_PROXY: $HTTPS_PROXY_DEV
-  script:
-    - echo $CI_JOB_TOKEN | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
-    - docker build
-      --build-arg http_proxy=$HTTP_PROXY
-      --build-arg https_proxy=$HTTPS_PROXY
-      --target batch
-      -t $batch_docker_image .
-    - docker push $batch_docker_image
-  only:
-    - master
-    - re7
-    - dev
-  tags:
-    - docker
+#build_batch:
+#  stage: build
+#  needs: ['test']
+#  variables:
+#    HTTP_PROXY: $HTTP_PROXY_DEV
+#    HTTPS_PROXY: $HTTPS_PROXY_DEV
+#  script:
+#    - echo $CI_JOB_TOKEN | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
+#    - docker build
+#      --build-arg http_proxy=$HTTP_PROXY
+#      --build-arg https_proxy=$HTTPS_PROXY
+#      --target batch
+#      -t $batch_docker_image .
+#    - docker push $batch_docker_image
+#  only:
+#    - master
+#    - re7
+#    - dev
+#  tags:
+#    - docker
 
 deploy_juritcom:
   stage: deploy
@@ -94,7 +94,8 @@ deploy_juritcom:
     - cat $KNOWN_HOSTS > /root/.ssh/known_hosts
     - chmod 600 /root/.ssh/id_rsa
     - chmod 600 /root/.ssh/known_hosts
-    - ansible-playbook -e juritcom_api_image=$api_docker_image -e juritcom_batch_image=$batch_docker_image -i ansible/inventory/$inventaire.yml ansible/deploy_juritcom.yml --vault-password-file=$ANSIBLE_VAULT_PASS
+#    - ansible-playbook -e juritcom_api_image=$api_docker_image -e juritcom_batch_image=$batch_docker_image -i ansible/inventory/$inventaire.yml ansible/deploy_juritcom.yml --vault-password-file=$ANSIBLE_VAULT_PASS
+    - ansible-playbook -e juritcom_api_image=$api_docker_image -i ansible/inventory/$inventaire.yml ansible/deploy_juritcom.yml --vault-password-file=$ANSIBLE_VAULT_PASS
   rules:
     - if: $CI_COMMIT_BRANCH == "master"
       when: manual

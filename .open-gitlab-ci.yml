@@ -1,0 +1,141 @@
+image: "glregistry.boost.open.global/boost/docker/node-toolkit:16"
+
+variables:
+  DOCKER_API_IMAGE: $CI_REGISTRY_IMAGE/api:$CI_COMMIT_BRANCH-$CI_COMMIT_SHA
+  DOCKER_API_TAG_BRANCH: $CI_REGISTRY_IMAGE/api:$CI_COMMIT_BRANCH
+  GIT_SSL_BACKEND: openssl
+  HTTP_PROXY: ""
+  HTTPS_PROXY: ""
+
+include:
+  - project: "boost/template-ci/pipelines/common"
+    file: "securite/oss-index/oss-index-template.yml"
+  - project: 'bots/trivy-script'
+    file: 'trivy-template-job.yml'
+
+stages:
+  - build
+  - sast
+  - test
+  - quality
+  - docker
+  - scan_docker
+  - deploy
+
+
+# Utilisation du cache pour accélérer les builds
+cache:
+  paths:
+    - node_modules/
+
+# Build du projet
+build:
+  stage: build
+  script:
+    - npm ci
+    - npm run build
+  artifacts:
+    paths:
+      - dist/
+
+# Test phase
+test-unit:
+  stage: test
+  script:
+    # - npm run test cov
+    - npm run test:cov
+  artifacts:
+    paths:
+      - coverage/
+  allow_failure: true
+
+# Sonar phase
+.sonar:
+  variables:
+    SONAR_COMMAND: "sonar-scanner -Dsonar.host.url=$SONAR_URL -Dsonar.projectKey=$SONAR_KEY$CI_PROJECT_NAME -Dsonar.login=$SONAR_TOKEN -Dsonar.name=$CI_PROJECT_NAME"
+    GIT_DEPTH: 0
+  image: glregistry.boost.open.global/boost/docker/gitlab-ant-sonar:latest
+  stage: quality
+  before_script:
+    - "curl -u ${SONAR_TOKEN}: -X POST --form name=${SONAR_KEY}${CI_PROJECT_NAME} ${SONAR_URL}/api/projects/create?project=${SONAR_KEY}${CI_PROJECT_NAME} >/dev/null || true"
+  script:
+    - export TARGET_BRANCH_NAME=${CI_COMMIT_REF_NAME}
+    - |
+      if ! [ -z "${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}" ]; then
+      export TARGET_BRANCH_NAME=${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}
+      fi
+    - >
+      curl -u ${SONAR_TOKEN}: ${SONAR_URL}/api/project_branches/list?project=${SONAR_KEY}${CI_PROJECT_NAME} | grep ${TARGET_BRANCH_NAME} ||
+      (
+      curl -u ${SONAR_TOKEN}: -X POST --form name=${TARGET_BRANCH_NAME} ${SONAR_URL}/api/project_branches/rename?project=${SONAR_KEY}${CI_PROJECT_NAME} &&
+      ${SONAR_COMMAND} -Dsonar.branch.name=${TARGET_BRANCH_NAME}
+      )
+    - ${SONAR_COMMAND} ${SONAR_BRANCH}
+
+sonar:
+  extends: .sonar
+  only:
+    - master
+
+sonar:develop:
+  extends: .sonar
+  variables:
+    SONAR_BRANCH: "-Dsonar.branch.name=${CI_COMMIT_REF_NAME}"
+  rules:
+    - if: $CI_COMMIT_BRANCH != "master" && $CI_PIPELINE_SOURCE != "web"
+
+
+sonar:feature:
+  extends: .sonar
+  variables:
+    SONAR_BRANCH: "-Dsonar.branch.name=${CI_COMMIT_REF_NAME} -Dsonar.branch.target=${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}"
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event' && $CI_COMMIT_BRANCH != "master"
+
+
+docker:
+  image: docker:stable
+  stage: docker
+  services:
+    - docker:18-dind
+  before_script:
+    - echo $CI_JOB_TOKEN | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
+  script:
+    - docker build -t $DOCKER_API_IMAGE --build-arg http_proxy=$HTTP_PROXY --build-arg https_proxy=$HTTPS_PROXY --target api -f Dockerfile-Open .
+    - docker tag $DOCKER_API_IMAGE $DOCKER_API_TAG_BRANCH
+    - docker push $DOCKER_API_IMAGE
+    - docker push $DOCKER_API_TAG_BRANCH
+  only:
+    - develop
+    - recette
+
+
+trivy:
+  extends: [".trivy-scan"]
+  stage: scan_docker
+  variables:
+    TRIVY_DOCKER_SCAN: $DOCKER_API_IMAGE
+  rules:
+    - if: $CI_COMMIT_BRANCH == "develop"
+    
+
+deploy:iaas:
+  stage: deploy
+  image: kroniak/ssh-client
+  variables:
+    APP_TO_DEPLOY: "juritcom"
+  tags:
+    - iaas
+  before_script:
+    - >
+      if [ "$CI_COMMIT_BRANCH" != "recette" ]; then
+        export ENV_DESTINATION="INTEGRATION";
+      else
+        export ENV_DESTINATION="RECETTE";
+      fi
+  script:
+    - |
+    - bash ci/deploy_app.sh ${ENV_DESTINATION}
+  only:
+    - develop
+    - recette

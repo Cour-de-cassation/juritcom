@@ -14,7 +14,7 @@ export class SaveDecisionUsecase {
    * - A date, nous pensons que la taille de l'API (relativement petite) ne nécessite pas
    * de la complexifier avec des interfaces ou des entities du domaine
    *
-   * - Le fichier de décision intègre est un élément central de l'API JuriTJ Collect, nous serons donc
+   * - Le fichier de décision intègre est un élément central de l'API JuriTCOM Collect, nous serons donc
    * fortement attentifs à toute évolution de cette librairie
    *
    * En cas d'évolution du contexte, nous créerons les interfaces et entities du domaine

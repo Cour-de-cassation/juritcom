@@ -33,7 +33,7 @@ export class MockUtils {
 
   dateNow = new Date(2023, 12, 20)
 
-  // JuriTJ Collect context
+  // JuriTCOM Collect context
   decisionAssocieeDtoMock = {
     numeroRegistre: 'A',
     numeroRoleGeneral: '01/12345',
@@ -64,7 +64,7 @@ export class MockUtils {
     debatPublic: true
   }
 
-  // JuriTJ Normalization context
+  // JuriTCOM Normalization context
   allAttributesMetadonneesDtoMock = {
     ...this.mandatoryMetadonneesDtoMock,
     parties: [this.partieDtoMock, this.partieDtoMock],
@@ -190,7 +190,7 @@ export class MockUtils {
       }
     ],
     dateDecision: '20240322',
-    libelleJuridiction: 'Tribunal judiciaire de Paris',
+    libelleJuridiction: 'Tribunal de commerce de Paris',
     libelleProcedure: 'Libellé type affaire ',
     numeroDossier: '08/20240',
     idMatiere: 'code matière de la décision',

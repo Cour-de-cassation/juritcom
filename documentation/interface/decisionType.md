@@ -112,7 +112,7 @@ class DecisionType {
 
   /**
    * Comme la chambre : le titre pour l'UI Label
-   * (ex: 'Cour de cassation', 'Cour d'appel d'Angers', 'Tribunal judiciaire de Bobigny')
+   * (ex: 'Cour de cassation', 'Cour d'appel d'Angers', 'Tribunal judiciaire de Bobigny', 'Tribunal de commerce de Paris')
    * + circuit de relecture
    */
   
@@ -238,7 +238,7 @@ class DecisionType {
   sourceId: number
 
   /**
-   * 'jurica', 'jurinet', 'juritj'
+   * 'jurica', 'jurinet', 'juritj' 'juritcom'
    */
   
   sourceName: string

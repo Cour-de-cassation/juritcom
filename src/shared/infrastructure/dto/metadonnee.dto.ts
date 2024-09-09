@@ -356,7 +356,7 @@ export class MetadonneeDto {
   @ApiProperty({
     description: 'Libellé de la juridiction émettrice propre au système d’information originel.',
     type: String,
-    example: 'Tribunal judiciaire de Paris'
+    example: 'Tribunal de commerce de Paris'
   })
   @IsString()
   libelleJuridiction: string;

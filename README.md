@@ -36,8 +36,8 @@ npm run docker:start:db
 
 3. Configurer les variables d'environnement:
 
-    - Dupliquer le fichier `docker.env.example` et le rennomer `docker.env`, adapter les variables d'environnement si besoin
-    - Dupliquer le fichier `.env.example` et le rennomer `.env`, adapter les variables d'environnement si besoin
+    - Dupliquer le fichier `docker.env.example` et le renommer `docker.env`, adapter les variables d'environnement si besoin
+    - Dupliquer le fichier `.env.example` et le renommer `.env`, adapter les variables d'environnement si besoin
 
 4. Lancer l'API:
     - Pour lancer l'API avec docker :

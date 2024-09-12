@@ -74,17 +74,19 @@ describe('SaveDecision Usecase', () => {
       filename: 'test.pdf',
       path: ''
     } as unknown as Express.Multer.File
-    const metadonnees = new MockUtils().putDecisionMetadonneesDtoMock as unknown as MetadonneeDto;
+    const metadonnees = new MockUtils().putDecisionMetadonneesDtoMock as unknown as MetadonneeDto
 
     await usecase.putDecision(fichierDecisionIntegre, 'test', metadonnees)
 
     const requestDto = {
       texteDecisionIntegre: 'test',
       metadonnees
-    };
+    }
     expect(mockDecisionRepository.saveDataDecisionIntegre).toHaveBeenCalledWith(
-      JSON.stringify(requestDto), 'test.pdf', 'test.json'
-    );
+      JSON.stringify(requestDto),
+      'test.pdf',
+      'test.json'
+    )
     const param = {
       destination: '',
       filename: 'test.pdf',
@@ -92,11 +94,11 @@ describe('SaveDecision Usecase', () => {
       originalname: 'test.pdf',
       path: '',
       size: 4
-    };
+    }
     expect(mockDecisionRepository.uploadFichierDecisionIntegre).toHaveBeenCalledWith(
       param,
       'test.pdf',
       'test-test.pdf'
-    );
-  });
+    )
+  })
 })

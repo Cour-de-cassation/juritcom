@@ -1,4 +1,4 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import {
   IsArray,
   IsBoolean,
@@ -8,12 +8,13 @@ import {
   IsNotEmptyObject,
   IsObject,
   IsOptional,
-  IsString, Length,
+  IsString,
+  Length,
   Matches,
   ValidateNested
-} from 'class-validator';
-import { Type } from 'class-transformer';
-import { QualitePartie, TypePartie } from 'dbsder-api-types';
+} from 'class-validator'
+import { Type } from 'class-transformer'
+import { QualitePartie, TypePartie } from 'dbsder-api-types'
 
 export class CompositionDto {
   @ApiPropertyOptional({
@@ -23,15 +24,15 @@ export class CompositionDto {
   })
   @IsString()
   @IsOptional()
-  fonction?: string;
+  fonction?: string
 
   @ApiProperty({
     description: 'Nom',
     type: String,
-    example: "Dupond"
+    example: 'Dupond'
   })
   @IsString()
-  nom: string;
+  nom: string
 
   @ApiPropertyOptional({
     description: 'Prénom',
@@ -40,7 +41,7 @@ export class CompositionDto {
   })
   @IsString()
   @IsOptional()
-  prenom?: string;
+  prenom?: string
 
   @ApiPropertyOptional({
     description: 'Civilité',
@@ -49,7 +50,7 @@ export class CompositionDto {
   })
   @IsString()
   @IsOptional()
-  civilite?: string;
+  civilite?: string
 }
 
 export class AdresseDto {
@@ -60,7 +61,7 @@ export class AdresseDto {
   })
   @IsString()
   @IsOptional()
-  numero?: string;
+  numero?: string
 
   @ApiPropertyOptional({
     description: "Type de voie d'adresse",
@@ -69,7 +70,7 @@ export class AdresseDto {
   })
   @IsString()
   @IsOptional()
-  type?: string;
+  type?: string
 
   @ApiPropertyOptional({
     description: "Voie d'adresse",
@@ -78,26 +79,26 @@ export class AdresseDto {
   })
   @IsString()
   @IsOptional()
-  voie?: string;
+  voie?: string
 
   @ApiPropertyOptional({
-    description: "Code postal",
+    description: 'Code postal',
     type: String,
     example: '39100'
   })
   @IsString()
   @IsOptional()
   @Matches('^[0-9]{5}$')
-  codePostal?: string;
+  codePostal?: string
 
   @ApiPropertyOptional({
-    description: "Localité",
+    description: 'Localité',
     type: String,
     example: 'Dole'
   })
   @IsString()
   @IsOptional()
-  localite?: string;
+  localite?: string
 
   @ApiPropertyOptional({
     description: "Complement d'adresse",
@@ -106,17 +107,16 @@ export class AdresseDto {
   })
   @IsString()
   @IsOptional()
-  complement?: string;
+  complement?: string
 
   @ApiPropertyOptional({
-    description: "Bureau distributeur",
+    description: 'Bureau distributeur',
     type: String,
-    example: "Bureau distributeur"
+    example: 'Bureau distributeur'
   })
   @IsString()
   @IsOptional()
-  bureau?: string;
-
+  bureau?: string
 }
 
 export class PartieDto {
@@ -126,7 +126,7 @@ export class PartieDto {
     example: TypePartie.PP
   })
   @IsEnum(TypePartie)
-  type: TypePartie;
+  type: TypePartie
 
   @ApiProperty({
     description: 'Nom du partie de la décision',
@@ -134,7 +134,7 @@ export class PartieDto {
     example: 'Dupond'
   })
   @IsString()
-  nom: string;
+  nom: string
 
   @ApiPropertyOptional({
     description: 'Nom usage du partie de la décision',
@@ -143,7 +143,7 @@ export class PartieDto {
   })
   @IsString()
   @IsOptional()
-  nomUsage?: string;
+  nomUsage?: string
 
   @ApiPropertyOptional({
     description: 'Prénom du partie de la décision',
@@ -152,7 +152,7 @@ export class PartieDto {
   })
   @IsString()
   @IsOptional()
-  prenom?: string;
+  prenom?: string
 
   @ApiPropertyOptional({
     description: 'Alias du partie de la décision',
@@ -161,7 +161,7 @@ export class PartieDto {
   })
   @IsString()
   @IsOptional()
-  alias?: string;
+  alias?: string
 
   @ApiPropertyOptional({
     description: 'Prénoms autres du partie de la décision',
@@ -170,7 +170,7 @@ export class PartieDto {
   })
   @IsString()
   @IsOptional()
-  prenomAutre?: string;
+  prenomAutre?: string
 
   @ApiPropertyOptional({
     description: 'Civilité du partie de la décision',
@@ -179,7 +179,7 @@ export class PartieDto {
   })
   @IsString()
   @IsOptional()
-  civilite?: string;
+  civilite?: string
 
   @ApiProperty({
     description: 'Qualité du partie de la décision',
@@ -187,7 +187,7 @@ export class PartieDto {
     example: QualitePartie.I
   })
   @IsEnum(QualitePartie)
-  qualite: QualitePartie;
+  qualite: QualitePartie
 
   @ApiProperty({
     description: 'Permet de factoriser la définition "Avocats", "Mandataires", "Autres"',
@@ -195,7 +195,7 @@ export class PartieDto {
     example: 'Monsieur'
   })
   @IsString()
-  role: string;
+  role: string
 
   @ApiPropertyOptional({
     description: 'Adresse',
@@ -214,7 +214,7 @@ export class PartieDto {
   @IsNotEmptyObject()
   @ValidateNested()
   @Type(() => AdresseDto)
-  adresse?: AdresseDto;
+  adresse?: AdresseDto
 }
 
 export class OccultationComplementaireDto {
@@ -224,7 +224,7 @@ export class OccultationComplementaireDto {
     example: true
   })
   @IsBoolean()
-  personneMorale: boolean;
+  personneMorale: boolean
 
   @ApiProperty({
     description: 'Personne physico-morale géo-morale',
@@ -232,7 +232,7 @@ export class OccultationComplementaireDto {
     example: false
   })
   @IsBoolean()
-  personnePhysicoMoraleGeoMorale: boolean;
+  personnePhysicoMoraleGeoMorale: boolean
 
   @ApiProperty({
     description: 'Adresse',
@@ -240,7 +240,7 @@ export class OccultationComplementaireDto {
     example: true
   })
   @IsBoolean()
-  adresse: boolean;
+  adresse: boolean
 
   @ApiProperty({
     description: 'Date civile',
@@ -248,7 +248,7 @@ export class OccultationComplementaireDto {
     example: false
   })
   @IsBoolean()
-  dateCivile: boolean;
+  dateCivile: boolean
 
   @ApiProperty({
     description: "Plaque d'immatriculation",
@@ -256,48 +256,47 @@ export class OccultationComplementaireDto {
     example: true
   })
   @IsBoolean()
-  plaqueImmatriculation: boolean;
+  plaqueImmatriculation: boolean
 
   @ApiProperty({
-    description: "Cadastre",
+    description: 'Cadastre',
     type: Boolean,
     example: false
   })
   @IsBoolean()
-  cadastre: boolean;
+  cadastre: boolean
 
   @ApiProperty({
-    description: "Chaine numéro identifiante",
+    description: 'Chaine numéro identifiante',
     type: Boolean,
     example: false
   })
   @IsBoolean()
-  chaineNumeroIdentifiante: boolean;
+  chaineNumeroIdentifiante: boolean
 
   @ApiProperty({
-    description: "Coordonnée éléctronique",
+    description: 'Coordonnée éléctronique',
     type: Boolean,
     example: true
   })
   @IsBoolean()
-  coordonneeElectronique: boolean;
+  coordonneeElectronique: boolean
 
   @ApiProperty({
-    description:
-      "Professionnel Magistrat/Gréffier",
+    description: 'Professionnel Magistrat/Gréffier',
     type: Boolean,
     example: false
   })
   @IsBoolean()
-  professionnelMagistratGreffier: boolean;
+  professionnelMagistratGreffier: boolean
 
   @ApiProperty({
-    description: "Motifs des débats de la chambre du conseil",
+    description: 'Motifs des débats de la chambre du conseil',
     type: Boolean,
     example: true
   })
   @IsBoolean()
-  motifsDebatsChambreConseil: boolean;
+  motifsDebatsChambreConseil: boolean
 
   @ApiProperty({
     description: "Motifs du secret d'affaires",
@@ -305,25 +304,25 @@ export class OccultationComplementaireDto {
     example: false
   })
   @IsBoolean()
-  motifsSecretAffaires: boolean;
+  motifsSecretAffaires: boolean
 
   @ApiPropertyOptional({
-    description: "Conserver élément",
-    type: String ,
+    description: 'Conserver élément',
+    type: String,
     example: '#dateCivile|automobile'
   })
   @IsString()
   @IsOptional()
-  conserverElement: string;
+  conserverElement: string
 
   @ApiPropertyOptional({
-    description: "Supprimer élément",
+    description: 'Supprimer élément',
     type: String,
     example: '#magistratGreffe|120.000€'
   })
   @IsString()
   @IsOptional()
-  supprimerElement: string;
+  supprimerElement: string
 }
 
 export class MetadonneeDto {
@@ -333,7 +332,7 @@ export class MetadonneeDto {
     example: '66177ce6e5d'
   })
   @IsString()
-  idDecision: string;
+  idDecision: string
 
   @ApiProperty({
     description: 'Identifiant de groupement',
@@ -342,16 +341,17 @@ export class MetadonneeDto {
   })
   @IsString()
   @Length(1, 4)
-  idGroupement: string;
+  idGroupement: string
 
   @ApiProperty({
-    description: 'Identifiant de la juridiction émettrice propre au système d’information originel. Au format ^TJ[0-9]{4}$',
+    description:
+      'Identifiant de la juridiction émettrice propre au système d’information originel. Au format ^TJ[0-9]{4}$',
     type: String,
     example: 'TJ7500'
   })
   @IsString()
   @Matches('^TJ[0-9]{4}$')
-  idJuridiction: string;
+  idJuridiction: string
 
   @ApiProperty({
     description: 'Libellé de la juridiction émettrice propre au système d’information originel.',
@@ -359,7 +359,7 @@ export class MetadonneeDto {
     example: 'Tribunal judiciaire de Paris'
   })
   @IsString()
-  libelleJuridiction: string;
+  libelleJuridiction: string
 
   @ApiProperty({
     description: 'Date de rendu de la décision. Au format : AAAAMMJJ',
@@ -369,7 +369,7 @@ export class MetadonneeDto {
   @IsString()
   @Matches('^[0-9]{8}$')
   @IsDateString()
-  dateDecision: string;
+  dateDecision: string
 
   @ApiProperty({
     description: 'Numéro du dossier au format ^[0-9]{2}/[0-9]{5}$.',
@@ -379,17 +379,18 @@ export class MetadonneeDto {
   @IsString()
   @Length(1, 20)
   @Matches('^[0-9]{2}/[0-9]{5}$')
-  numeroDossier: string;
+  numeroDossier: string
 
   @ApiPropertyOptional({
-    description: 'Identifiant de la chambre de la  juridiction émettrice au format ^[0-9a-zA-Z]{2}$',
+    description:
+      'Identifiant de la chambre de la  juridiction émettrice au format ^[0-9a-zA-Z]{2}$',
     type: String,
     example: 'ID'
   })
   @IsString()
   @IsOptional()
   @Matches('^[0-9a-zA-Z]{2}$')
-  idChambre?: string;
+  idChambre?: string
 
   @ApiPropertyOptional({
     description: 'Intitulé complet de la chambre de la juridiction émettrice',
@@ -398,7 +399,7 @@ export class MetadonneeDto {
   })
   @IsString()
   @IsOptional()
-  libelleChambre?: string;
+  libelleChambre?: string
 
   @ApiPropertyOptional({
     description: 'Code matière de la décision',
@@ -407,7 +408,7 @@ export class MetadonneeDto {
   })
   @IsString()
   @IsOptional()
-  idMatiere?: string;
+  idMatiere?: string
 
   @ApiPropertyOptional({
     description: 'Intitulé complet associé au code matière de la décision',
@@ -415,7 +416,7 @@ export class MetadonneeDto {
     example: "Demande de nullité d'un bail"
   })
   @IsString()
-  libelleMatiere?: string;
+  libelleMatiere?: string
 
   @ApiPropertyOptional({
     description: 'Code de type de procédure',
@@ -423,7 +424,7 @@ export class MetadonneeDto {
     example: 'CODETYPEPROCEDURE'
   })
   @IsString()
-  idProcedure?: string;
+  idProcedure?: string
 
   @ApiPropertyOptional({
     description: 'Intitulé complet associé au type de procédure',
@@ -431,7 +432,7 @@ export class MetadonneeDto {
     example: 'Libellé type affaire '
   })
   @IsString()
-  libelleProcedure?: string;
+  libelleProcedure?: string
 
   @ApiProperty({
     description: 'Caractère public de la décision',
@@ -439,7 +440,7 @@ export class MetadonneeDto {
     example: true
   })
   @IsBoolean()
-  decisionPublique: boolean;
+  decisionPublique: boolean
 
   @ApiProperty({
     description: 'Caractère non public des débats précédant la décision',
@@ -447,7 +448,7 @@ export class MetadonneeDto {
     example: false
   })
   @IsBoolean()
-  debatChambreDuConseil: boolean;
+  debatChambreDuConseil: boolean
 
   @ApiProperty({
     description: 'caractère "d\'intérêt particulier" de la décision',
@@ -455,23 +456,25 @@ export class MetadonneeDto {
     example: false
   })
   @IsBoolean()
-  interetParticulier: boolean;
+  interetParticulier: boolean
 
   @ApiPropertyOptional({
     description: 'Liste des compositions de la décision',
     type: [CompositionDto],
-    example: [{
-      fonction: "GRF",
-      nom: 'Dupond',
-      prenom: 'Henry',
-      civilite: 'Monsieur',
-    }]
+    example: [
+      {
+        fonction: 'GRF',
+        nom: 'Dupond',
+        prenom: 'Henry',
+        civilite: 'Monsieur'
+      }
+    ]
   })
   @IsArray()
   @IsOptional()
   @ValidateNested({ each: true })
   @Type(() => CompositionDto)
-  composition: CompositionDto[];
+  composition: CompositionDto[]
 
   @ApiProperty({
     description: 'Liste des parties de la décision',
@@ -497,25 +500,25 @@ export class MetadonneeDto {
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => PartieDto)
-  parties?: PartieDto[];
+  parties?: PartieDto[]
 
   @ApiProperty({
     description: 'Occultations complémentaires',
     type: OccultationComplementaireDto,
     example: {
-      personneMorale:true,
-      personnePhysicoMoraleGeoMorale:false,
-      adresse:true,
-      dateCivile:false,
-      plaqueImmatriculation:true,
-      cadastre:false,
-      chaineNumeroIdentifiante:false,
-      coordonneeElectronique:true,
-      professionnelMagistratGreffier:false,
-      motifsDebatsChambreConseil:true,
-      motifsSecretAffaires:false,
-      conserverElement:"#dateCivile|automobile",
-      supprimerElement:"#magistratGreffe|120.000€"
+      personneMorale: true,
+      personnePhysicoMoraleGeoMorale: false,
+      adresse: true,
+      dateCivile: false,
+      plaqueImmatriculation: true,
+      cadastre: false,
+      chaineNumeroIdentifiante: false,
+      coordonneeElectronique: true,
+      professionnelMagistratGreffier: false,
+      motifsDebatsChambreConseil: true,
+      motifsSecretAffaires: false,
+      conserverElement: '#dateCivile|automobile',
+      supprimerElement: '#magistratGreffe|120.000€'
     }
   })
   @IsDefined()
@@ -523,7 +526,5 @@ export class MetadonneeDto {
   @IsNotEmptyObject()
   @ValidateNested()
   @Type(() => OccultationComplementaireDto)
-  occultationsComplementaires?: OccultationComplementaireDto;
-
+  occultationsComplementaires?: OccultationComplementaireDto
 }
-

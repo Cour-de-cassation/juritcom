@@ -180,7 +180,7 @@ export class MockUtils {
     },
     interetParticulier: false,
     idChambre: 'ID',
-    libelleMatiere: 'Demande de nullité d\'un bail',
+    libelleMatiere: "Demande de nullité d'un bail",
     composition: [
       {
         fonction: 'GRF',
@@ -201,5 +201,4 @@ export class MockUtils {
     libelleChambre: 'libelleChambre',
     idGroupement: 'ABDC'
   }
-
 }

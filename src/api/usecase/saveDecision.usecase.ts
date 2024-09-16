@@ -40,25 +40,35 @@ export class SaveDecisionUsecase {
     return bucketFileName
   }
 
-  async putDecision(fichierDecisionIntegre: Express.Multer.File,
-                    texteDecisionIntegre: string,
-                    metadonnees: MetadonneeDto): Promise<bucketFileDto> {
-    const uuid = uuidv4();
-    const originalFileName = fichierDecisionIntegre.originalname;
-    const jsonFileName = `${uuid}.json`;
-    const pdfFileName = `${uuid}-${originalFileName}`;
+  async putDecision(
+    fichierDecisionIntegre: Express.Multer.File,
+    texteDecisionIntegre: string,
+    metadonnees: MetadonneeDto
+  ): Promise<bucketFileDto> {
+    const uuid = uuidv4()
+    const originalFileName = fichierDecisionIntegre.originalname
+    const jsonFileName = `${uuid}.json`
+    const pdfFileName = `${uuid}-${originalFileName}`
 
     const requestDto = {
       texteDecisionIntegre,
       metadonnees
-    };
+    }
 
-    await this.decisionsRepository.saveDataDecisionIntegre(JSON.stringify(requestDto), originalFileName, jsonFileName);
-    await this.decisionsRepository.uploadFichierDecisionIntegre(fichierDecisionIntegre, originalFileName, pdfFileName);
+    await this.decisionsRepository.saveDataDecisionIntegre(
+      JSON.stringify(requestDto),
+      originalFileName,
+      jsonFileName
+    )
+    await this.decisionsRepository.uploadFichierDecisionIntegre(
+      fichierDecisionIntegre,
+      originalFileName,
+      pdfFileName
+    )
 
     return {
       jsonFileName,
       pdfFileName
-    };
+    }
   }
 }

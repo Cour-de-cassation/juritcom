@@ -1,11 +1,24 @@
-import { Body, Controller, HttpCode, HttpStatus, Logger, Put, Req, UploadedFile, UseInterceptors } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  HttpCode,
+  HttpStatus,
+  Logger,
+  Put,
+  Req,
+  UploadedFile,
+  UseInterceptors
+} from '@nestjs/common'
 import {
   ApiBadRequestResponse,
   ApiBody,
   ApiConsumes,
-  ApiCreatedResponse, ApiInternalServerErrorResponse,
+  ApiCreatedResponse,
+  ApiInternalServerErrorResponse,
   ApiOperation,
-  ApiServiceUnavailableResponse, ApiTags, ApiUnauthorizedResponse
+  ApiServiceUnavailableResponse,
+  ApiTags,
+  ApiUnauthorizedResponse
 } from '@nestjs/swagger'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { ReceiveDto } from '../../../../shared/infrastructure/dto/receive.dto'
@@ -30,18 +43,19 @@ export interface DecisionResponse {
 @ApiTags('decision')
 @Controller('/decision')
 export class DecisionController {
-
-  private readonly logger = new Logger();
+  private readonly logger = new Logger()
 
   @Put()
   @ApiOperation({
     summary: 'Ressource manipulant des décisions intègres',
-    description: 'Une décision intègre au format PDF ainsi que son contenu en texte brut et ses métadonnées associées seront téléchargés dans un but de pseudonymisation et de normalisation en aval par Judilibre',
+    description:
+      'Une décision intègre au format PDF ainsi que son contenu en texte brut et ses métadonnées associées seront téléchargés dans un but de pseudonymisation et de normalisation en aval par Judilibre',
     operationId: 'putDecision'
   })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
-    description: "Les ressources pour modifier des décisions intègres sont :\n* PUT : envoi d'une décision intègre",
+    description:
+      "Les ressources pour modifier des décisions intègres sont :\n* PUT : envoi d'une décision intègre",
     type: ReceiveDto
   })
   @ApiCreatedResponse({ description: 'La requête a été acceptée et va être traitée.' })
@@ -59,25 +73,26 @@ export class DecisionController {
   })
   @HttpCode(HttpStatus.CREATED)
   @UseInterceptors(FileInterceptor('fichierDecisionIntegre'))
-  async receiveDecision(@UploadedFile() fichierDecisionIntegre: Express.Multer.File,
-                        @Body('texteDecisionIntegre') texteDecisionIntegre: string,
-                        @Body('metadonnees', new StringToJsonPipe(), new ValidateDtoPipe())
-                          metadonneeDto: MetadonneeDto,
-                        @Req() request: Request): Promise<DecisionResponse> {
-
+  async receiveDecision(
+    @UploadedFile() fichierDecisionIntegre: Express.Multer.File,
+    @Body('texteDecisionIntegre') texteDecisionIntegre: string,
+    @Body('metadonnees', new StringToJsonPipe(), new ValidateDtoPipe())
+    metadonneeDto: MetadonneeDto,
+    @Req() request: Request
+  ): Promise<DecisionResponse> {
     if (!fichierDecisionIntegre || !isPdfFile(fichierDecisionIntegre.mimetype)) {
       throw new BadFileFormatException('fichierDecisionIntegre', 'PDF')
     }
 
-    const routePath = request.method + ' ' + request.path;
-    const decisionUseCase = new SaveDecisionUsecase(new DecisionS3Repository(this.logger));
+    const routePath = request.method + ' ' + request.path
+    const decisionUseCase = new SaveDecisionUsecase(new DecisionS3Repository(this.logger))
     const formatLogs: LogsFormat = {
       operationName: 'putDecision',
       httpMethod: request.method,
       path: request.path,
       msg: `Starting ${routePath}...`,
       correlationId: request.headers['x-correlation-id']
-    };
+    }
 
     const bucketFileDto = await decisionUseCase
       .putDecision(fichierDecisionIntegre, texteDecisionIntegre, metadonneeDto)
@@ -96,11 +111,11 @@ export class DecisionController {
           statusCode: HttpStatus.INTERNAL_SERVER_ERROR
         })
         throw new UnexpectedException(error)
-      });
+      })
 
     // Suppression des données sensibles décrite dans le fichier 2024 07 29 - Convention de code - logging.md
     // Les données sensibles sont par exemple le texte d'une décision ou les parties de cette décisions.
-    delete metadonneeDto['parties'];
+    delete metadonneeDto['parties']
 
     this.logger.log({
       ...formatLogs,
@@ -108,17 +123,17 @@ export class DecisionController {
       data: {
         decision: metadonneeDto
       },
-      statusCode: HttpStatus.CREATED,
-    });
+      statusCode: HttpStatus.CREATED
+    })
 
     return {
       jsonFileName: bucketFileDto.jsonFileName,
       pdfFileName: bucketFileDto.pdfFileName,
-      body: `la décision a bien été prise en compte`,
+      body: `la décision a bien été prise en compte`
     }
   }
 }
 
 export function isPdfFile(mimeType: string): boolean {
-  return mimeType === 'application/pdf';
+  return mimeType === 'application/pdf'
 }

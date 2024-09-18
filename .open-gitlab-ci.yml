@@ -10,6 +10,8 @@ variables:
 include:
   - project: "boost/template-ci/pipelines/common"
     file: "securite/oss-index/oss-index-template.yml"
+  - project: 'boost/template-ci/pipelines/common'
+    file: '/sonar/sonar-scanner.yml'
   - project: 'bots/trivy-script'
     file: 'trivy-template-job.yml'
 
@@ -48,50 +50,6 @@ test-unit:
     paths:
       - coverage/
   allow_failure: true
-
-# Sonar phase
-.sonar:
-  variables:
-    SONAR_COMMAND: "sonar-scanner -Dsonar.host.url=$SONAR_URL -Dsonar.projectKey=$SONAR_KEY$CI_PROJECT_NAME -Dsonar.login=$SONAR_TOKEN -Dsonar.name=$CI_PROJECT_NAME"
-    GIT_DEPTH: 0
-  image: glregistry.boost.open.global/boost/docker/gitlab-ant-sonar:latest
-  stage: quality
-  before_script:
-    - "curl -u ${SONAR_TOKEN}: -X POST --form name=${SONAR_KEY}${CI_PROJECT_NAME} ${SONAR_URL}/api/projects/create?project=${SONAR_KEY}${CI_PROJECT_NAME} >/dev/null || true"
-  script:
-    - export TARGET_BRANCH_NAME=${CI_COMMIT_REF_NAME}
-    - |
-      if ! [ -z "${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}" ]; then
-      export TARGET_BRANCH_NAME=${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}
-      fi
-    - >
-      curl -u ${SONAR_TOKEN}: ${SONAR_URL}/api/project_branches/list?project=${SONAR_KEY}${CI_PROJECT_NAME} | grep ${TARGET_BRANCH_NAME} ||
-      (
-      curl -u ${SONAR_TOKEN}: -X POST --form name=${TARGET_BRANCH_NAME} ${SONAR_URL}/api/project_branches/rename?project=${SONAR_KEY}${CI_PROJECT_NAME} &&
-      ${SONAR_COMMAND} -Dsonar.branch.name=${TARGET_BRANCH_NAME}
-      )
-    - ${SONAR_COMMAND} ${SONAR_BRANCH}
-
-sonar:
-  extends: .sonar
-  only:
-    - master
-
-sonar:develop:
-  extends: .sonar
-  variables:
-    SONAR_BRANCH: "-Dsonar.branch.name=${CI_COMMIT_REF_NAME}"
-  rules:
-    - if: $CI_COMMIT_BRANCH != "master" && $CI_PIPELINE_SOURCE != "web"
-
-
-sonar:feature:
-  extends: .sonar
-  variables:
-    SONAR_BRANCH: "-Dsonar.branch.name=${CI_COMMIT_REF_NAME} -Dsonar.branch.target=${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}"
-  rules:
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event' && $CI_COMMIT_BRANCH != "master"
-
 
 docker:
   image: docker:stable

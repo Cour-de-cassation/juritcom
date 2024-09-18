@@ -1,5 +1,5 @@
 import { QualitePartie, TypePartie } from 'dbsder-api-types'
-import { AdresseDto, CompositionDto, PartieDto } from '../dto/metadonnee.dto'
+import { AdresseDto, CompositionDto, MetadonneeDto, PartieDto } from '../dto/metadonnee.dto'
 
 export class MockUtils {
   // Shared context
@@ -31,7 +31,8 @@ export class MockUtils {
     adresse: this.adresseDtoMock
   }
 
-  mandatoryMetadonneesDtoMock = {
+  mandatoryMetadonneesDtoMock: MetadonneeDto = {
+    composition: [],
     idDecision: 'TJ00001',
     idGroupement: 'ABDC',
     libelleJuridiction: 'Tribunal judiciaire de Paris',
@@ -40,7 +41,6 @@ export class MockUtils {
     dateDecision: '20240120',
     decisionPublique: true,
     interetParticulier: false,
-    debatPublic: true,
     debatChambreDuConseil: false
   }
 

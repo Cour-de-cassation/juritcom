@@ -436,10 +436,8 @@ describe('Validate MetadonneeDTO format', () => {
     })
     it('succeeds when adresse property has all elements', async () => {
       // GIVEN
-      const partiesWithMandatoryFields: PartieDto[] = [mockUtils.partieDtoMock]
       const metadonneesWithParties = {
-        ...someValidMetaDonneeDto,
-        parties: partiesWithMandatoryFields
+        ...mockUtils.mandatoryMetadonneesDtoMock
       }
 
       // WHEN
@@ -451,15 +449,16 @@ describe('Validate MetadonneeDTO format', () => {
 
     it('throws an error when codePostal property on parties does not have valid value', async () => {
       // GIVEN
-      let invalidPartieDto = mockUtils.partieDtoMock
-      invalidPartieDto.adresse.codePostal = '391000'
+      let invalidPartieDto: PartieDto = { ...mockUtils.partieDtoMock }
+      invalidPartieDto['adresse'] = mockUtils.adresseDtoMock
+      invalidPartieDto.adresse.codePostal = "390000"
       const partiesWithMandatoryFields: PartieDto[] = [invalidPartieDto]
 
       const invalidMetadonnee = {
         ...someValidMetaDonneeDto,
         parties: partiesWithMandatoryFields
       }
-      console.log(invalidMetadonnee)
+
       // WHEN
       await expect(async () => await target.transform(invalidMetadonnee, metadata))
         // THEN

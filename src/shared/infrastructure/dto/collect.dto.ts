@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { MetadonneesDto } from './metadonnees.dto'
+import { MetadonneeDto } from './metadonnee.dto'
 
 export class CollectDto {
   @ApiProperty({
@@ -12,5 +12,5 @@ export class CollectDto {
   @ApiProperty({
     description: 'Metadonnées associées à la décision intègre.'
   })
-  metadonnees: MetadonneesDto
+  metadonnee: MetadonneeDto
 }

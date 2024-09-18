@@ -5,7 +5,6 @@ import { TerminusModule } from '@nestjs/terminus'
 import { RedirectController } from './app.controller'
 import { configureLoggerModule } from '../shared/infrastructure/utils/pinoConfig.utils'
 import { HealthController } from './infrastructure/controllers/health/health.controller'
-import { DecisionsController } from './infrastructure/controllers/decisions/decisions.controller'
 import { BucketHealthIndicator } from './infrastructure/controllers/health/bucketHealthIndicator'
 import { DecisionController } from './infrastructure/controllers/decision/decision.controller'
 import { envValidationConfig } from '../shared/infrastructure/dto/env.validation'
@@ -19,7 +18,7 @@ import { envValidationConfig } from '../shared/infrastructure/dto/env.validation
     }),
     configureLoggerModule()
   ],
-  controllers: [RedirectController, DecisionsController, HealthController, DecisionController],
+  controllers: [RedirectController, HealthController, DecisionController],
   providers: [BucketHealthIndicator]
 })
 export class AppModule {}

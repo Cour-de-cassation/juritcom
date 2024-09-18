@@ -1,6 +1,6 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { MetadonneeDto } from './metadonnee.dto';
-import { IsString } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger'
+import { MetadonneeDto } from './metadonnee.dto'
+import { IsString } from 'class-validator'
 
 export class ReceiveDto {
   @ApiProperty({
@@ -8,7 +8,7 @@ export class ReceiveDto {
     format: 'binary',
     description: 'Décision intègre au format PDF.'
   })
-  fichierDecisionIntegre: Express.Multer.File;
+  fichierDecisionIntegre: Express.Multer.File
 
   @ApiProperty({
     description: 'Texte de la décision intègre',
@@ -16,15 +16,15 @@ export class ReceiveDto {
     example: 'Texte de la décision'
   })
   @IsString()
-  texteDecisionIntegre: string;
+  texteDecisionIntegre: string
 
   @ApiProperty({
     description: 'Metadonnées associées à la décision intègre.'
   })
-  metadonnees: MetadonneeDto;
+  metadonnees: MetadonneeDto
 }
 
 export class bucketFileDto {
-  jsonFileName: string;
-  pdfFileName: string;
+  jsonFileName: string
+  pdfFileName: string
 }

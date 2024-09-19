@@ -8,6 +8,7 @@ import { isPdfFile } from './decision.controller'
 import * as request from 'supertest'
 import { MetadonneeDto } from '../../../../shared/infrastructure/dto/metadonnee.dto'
 import { MockUtils } from '../../../../shared/infrastructure/utils/mock.utils'
+import { UnexpectedException } from '../../../../shared/infrastructure/exceptions/unexpected.exception'
 
 describe('Decision Controller', () => {
   let app: INestApplication
@@ -15,7 +16,10 @@ describe('Decision Controller', () => {
 
   const testFile = Buffer.from('test file')
   const pdfFilename = 'filename.pdf'
-  const metadonnees = new MockUtils().metadonneeDtoMock as unknown as MetadonneeDto
+  const metadonnee = new MockUtils().metadonneeDtoMock as MetadonneeDto
+  const username = process.env.DOC_LOGIN
+  const password = process.env.DOC_PASSWORD
+  const basicAuth = Buffer.from(`${username}:${password}`).toString('base64')
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -48,9 +52,10 @@ describe('Decision Controller', () => {
       it('Metadonnées correctes et fichier pdf correct/présent', async () => {
         const res = await request(app.getHttpServer())
           .put('/decision')
+          .set('Authorization', `Basic ${basicAuth}`)
           .attach('fichierDecisionIntegre', testFile, pdfFilename)
           .field('texteDecisionIntegre', 'texte décision intègre')
-          .field('metadonnees', JSON.stringify(metadonnees))
+          .field('metadonnees', JSON.stringify(metadonnee))
 
         expect(res.statusCode).toEqual(HttpStatus.CREATED)
         expect(res.body).toBeDefined()
@@ -67,7 +72,8 @@ describe('Decision Controller', () => {
       it('Pas de fichier', async () => {
         const res = await request(app.getHttpServer())
           .put('/decision')
-          .send({ metadonnees: metadonnees })
+          .set('Authorization', 'authorization')
+          .send({ metadonnees: metadonnee })
 
         expect(res.statusCode).toEqual(HttpStatus.BAD_REQUEST)
       })
@@ -75,11 +81,12 @@ describe('Decision Controller', () => {
       it('Mauvais format du fichier', async () => {
         const res = await request(app.getHttpServer())
           .put('/decision')
+          .set('Authorization', `Basic ${basicAuth}`)
           .attach('fichierDecisionIntegre', testFile, {
             filename: 'filename.txt',
             contentType: 'application/txt'
           })
-          .field('metadonnees', JSON.stringify(metadonnees))
+          .field('metadonnees', JSON.stringify(metadonnee))
 
         expect(res.statusCode).toEqual(HttpStatus.BAD_REQUEST)
       })
@@ -87,6 +94,7 @@ describe('Decision Controller', () => {
       it('Pas de metadonnées', async () => {
         const res = await request(app.getHttpServer())
           .put('/decision')
+          .set('Authorization', `Basic ${basicAuth}`)
           .attach('fichierDecisionIntegre', testFile, {
             filename: pdfFilename,
             contentType: 'application/pdf'
@@ -99,11 +107,39 @@ describe('Decision Controller', () => {
         mockS3.on(PutObjectCommand).rejects(new Error('Erreurs S3'))
         const res = await request(app.getHttpServer())
           .put('/decision')
+          .set('Authorization', `Basic ${basicAuth}`)
           .attach('fichierDecisionIntegre', testFile, pdfFilename)
           .field('texteDecisionIntegre', 'texteDecisionIntegre')
-          .field('metadonnees', JSON.stringify(metadonnees))
+          .field('metadonnees', JSON.stringify(metadonnee))
 
         expect(res.statusCode).toEqual(HttpStatus.SERVICE_UNAVAILABLE)
+      })
+    })
+
+    describe('return 500', () => {
+      it('S3 unexpected error', async () => {
+        mockS3.on(PutObjectCommand).rejects(new UnexpectedException('Erreurs S3'))
+        const res = await request(app.getHttpServer())
+          .put('/decision')
+          .set('Authorization', `Basic ${basicAuth}`)
+          .attach('fichierDecisionIntegre', testFile, pdfFilename)
+          .field('texteDecisionIntegre', 'texteDecisionIntegre')
+          .field('metadonnees', JSON.stringify(metadonnee))
+
+        expect(res.statusCode).toEqual(HttpStatus.SERVICE_UNAVAILABLE)
+      })
+    })
+
+    describe('return 401', () => {
+      it('401 when wrong no credentials are sent', async () => {
+        mockS3.on(PutObjectCommand).rejects(new UnexpectedException('Erreurs S3'))
+        const res = await request(app.getHttpServer())
+          .put('/decision')
+          .attach('fichierDecisionIntegre', testFile, pdfFilename)
+          .field('texteDecisionIntegre', 'texteDecisionIntegre')
+          .field('metadonnees', JSON.stringify(metadonnee))
+
+        expect(res.statusCode).toEqual(HttpStatus.UNAUTHORIZED)
       })
     })
   })

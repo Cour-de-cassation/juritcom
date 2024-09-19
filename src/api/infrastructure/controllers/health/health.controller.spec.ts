@@ -5,6 +5,7 @@ import { ListObjectsV2Command, S3Client } from '@aws-sdk/client-s3'
 import { mockClient, AwsClientStub } from 'aws-sdk-client-mock'
 import { AppModule } from '../../../app.module'
 import { RequestLoggerInterceptor } from '../../interceptors/request-logger.interceptor'
+import { LoggingInterceptor } from '../../interceptors/logging.interceptor'
 
 describe('HealthController', () => {
   let app: INestApplication
@@ -17,7 +18,7 @@ describe('HealthController', () => {
 
     // Disable logs for Integration tests
     app = moduleFixture.createNestApplication({ logger: false })
-    app.useGlobalInterceptors(new RequestLoggerInterceptor())
+    app.useGlobalInterceptors(new RequestLoggerInterceptor(), new LoggingInterceptor())
 
     await app.init()
   })

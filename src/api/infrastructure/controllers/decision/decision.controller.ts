@@ -33,6 +33,7 @@ import { InfrastructureExpection } from '../../../../shared/infrastructure/excep
 import { UnexpectedException } from '../../../../shared/infrastructure/exceptions/unexpected.exception'
 import { SaveDecisionUsecase } from '../../../usecase/saveDecision.usecase'
 import { DecisionS3Repository } from '../../../../shared/infrastructure/repositories/decisionS3.repository'
+import { ClientNotAuthorizedException } from '../../../../shared/infrastructure/exceptions/clientNotAuthorized.exception'
 
 export interface DecisionResponse {
   jsonFileName: string | void
@@ -80,6 +81,9 @@ export class DecisionController {
     metadonneeDto: MetadonneeDto,
     @Req() request: Request
   ): Promise<DecisionResponse> {
+
+    checkBasicAuth(request)
+
     if (!fichierDecisionIntegre || !isPdfFile(fichierDecisionIntegre.mimetype)) {
       throw new BadFileFormatException('fichierDecisionIntegre', 'PDF')
     }
@@ -136,4 +140,25 @@ export class DecisionController {
 
 export function isPdfFile(mimeType: string): boolean {
   return mimeType === 'application/pdf'
+}
+
+export function checkBasicAuth(req: Request) {
+  let users = {
+    [process.env.DOC_LOGIN]: process.env.DOC_PASSWORD
+  }
+  const authHeader = req.headers.authorization
+  if (!authHeader) {
+    throw new ClientNotAuthorizedException('Authorization header missing')
+  }
+  const [scheme, credentials] = authHeader.split(' ')
+
+  if (scheme !== 'Basic' || !credentials) {
+    throw new ClientNotAuthorizedException('Invalid authorization scheme')
+  }
+
+  const [username, password] = Buffer.from(credentials, 'base64').toString().split(':')
+
+  if (users[username] !== password) {
+    throw new ClientNotAuthorizedException('Invalid credentials')
+  }
 }

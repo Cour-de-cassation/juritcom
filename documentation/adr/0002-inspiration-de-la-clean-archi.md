@@ -8,7 +8,7 @@ Date : 30/11/2022
 
 ## Contexte
 
-JuriTJ est une nouvelle brique applicative. Nous avons la liberté de choisir l'architecture applicative qui nous semble la plus pertinente pour répondre aux enjeux fonctionnels. Notre choix s'est intuitivement porté sur la Clean Architecture, mais avant de valider un tel choix, nous avons voulu la comparer à l'architecture orientée services. 
+Juritcom est une nouvelle brique applicative. Nous avons la liberté de choisir l'architecture applicative qui nous semble la plus pertinente pour répondre aux enjeux fonctionnels. Notre choix s'est intuitivement porté sur la Clean Architecture, mais avant de valider un tel choix, nous avons voulu la comparer à l'architecture orientée services. 
 
 ### La Clean Architecture, c'est quoi ? 
 

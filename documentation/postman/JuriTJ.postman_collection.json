@@ -1,10 +1,9 @@
 {
 	"info": {
-		"_postman_id": "5f40f175-4ddf-4f87-8af1-a2fab2a4faf8",
+		"_postman_id": "d77fdc66-5251-4124-9f82-9ad9ebb777f0",
 		"name": "JuriTJ",
-		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
-		"_exporter_id": "13592912",
-		"_collection_link": "https://grey-spaceship-298416.postman.co/workspace/Judilibre~828b28c6-eaba-44c4-b963-f6155ff2c3e8/collection/13592912-5f40f175-4ddf-4f87-8af1-a2fab2a4faf8?action=share&creator=13592912&source=collection_link"
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "37618049"
 	},
 	"item": [
 		{
@@ -24,7 +23,8 @@
 									"    pm.expect(pm.response.json().body).to.eql(\"Nous avons bien reçu la décision intègre et ses métadonnées.\");\r",
 									"});"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -33,24 +33,48 @@
 						"strictSSL": false
 					},
 					"request": {
-						"method": "POST",
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "{{pwd_doc}}",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "{{login_doc}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
 						"header": [],
 						"body": {
 							"mode": "formdata",
 							"formdata": [
 								{
 									"key": "metadonnees",
-									"value": "{   \"idJuridiction\": \"TJ75011\",  \"nomJuridiction\": \"toto\", \"codeJuridiction\": \"Code juridiction\",  \"numeroRegistre\": \"A\",  \"numeroRoleGeneral\": \"01/12345\",  \"numeroMesureInstruction\": [    \"AZERTYUIOP\"  ],  \"codeService\": \"0A\",  \"libelleService\": \"Libelle de service\",  \"dateDecision\": \"20230801\",  \"codeDecision\": \"0aA\",  \"libelleCodeDecision\": \"some libelle code decision\",  \"president\": {    \"fonction\": \"president\",    \"nom\": \"Nom Presidente\",    \"prenom\": \"Prenom Presidente\",    \"civilite\": \"Mme.\"  },  \"decisionAssociee\": {    \"numeroRegistre\": \"A\",    \"numeroRoleGeneral\": \"01/12345\",    \"idJuridiction\": \"TJ00000\",    \"date\": \"20221121\"  },  \"parties\": [    {      \"type\": \"PP\",      \"nom\": \"nom Partie\"    },    {      \"type\": \"PP\",      \"nom\": \"nom Partie\"    }  ],  \"sommaire\": \"Exemple de sommaire\",  \"codeNAC\": \"11F\",  \"libelleNAC\": \"Demande en dommages-intérêts contre un organisme\",  \"codeNature\": \"6C\",  \"libelleNature\": \"Autres demandes en matière de frais et dépens\",  \"decisionPublique\": true,  \"recommandationOccultation\": \"aucune\",  \"occultationComplementaire\": \"Exemple d'occultation complémentaire\",  \"selection\": false,  \"matiereDeterminee\": true,  \"pourvoiLocal\": false,  \"pourvoiCourDeCassation\": false,  \"debatPublic\": true, \"indicateurQPC\": true}",
+									"value": "{\n  \"idDecision\": \"66177ce6e5d\",\n  \"idGroupement\": \"ABDC\",\n  \"idJuridiction\": \"TJ7500\",\n  \"libelleJuridiction\": \"Tribunal judiciaire de Paris\",\n  \"dateDecision\": \"20240322\",\n  \"numeroDossier\": \"08/20240\",\n  \"idChambre\": \"ID\",\n  \"libelleChambre\": \"libelleChambre\",\n  \"idMatiere\": \"code matière de la décision\",\n  \"libelleMatiere\": \"Demande de nullité d'un bail\",\n  \"idProcedure\": \"CODETYPEPROCEDURE\",\n  \"libelleProcedure\": \"Libellé type affaire\",\n  \"decisionPublique\": true,\n  \"debatChambreDuConseil\": false,\n  \"interetParticulier\": false,\n  \"composition\": [\n    {\n      \"fonction\": \"GRF\",\n      \"nom\": \"Dupond\",\n      \"prenom\": \"Henry\",\n      \"civilite\": \"Monsieur\"\n    }\n  ],\n  \"parties\": [\n    {\n      \"type\": \"PP\",\n      \"role\": \"PARTIE\",\n      \"nom\": \"Dupond\",\n      \"prenom\": \"Julien\",\n      \"civilite\": \"Monsieur\",\n      \"qualite\": \"I\",\n      \"adresse\": {\n        \"numero\": \"20bis\",\n        \"type\": \"rue\",\n        \"voie\": \"du Bourg\",\n        \"codePostal\": \"39100\",\n        \"localite\": \"Dole\"\n      }\n    }\n  ],\n  \"occultationsComplementaires\": {\n    \"personneMorale\": true,\n    \"personnePhysicoMoraleGeoMorale\": false,\n    \"adresse\": true,\n    \"dateCivile\": false,\n    \"plaqueImmatriculation\": true,\n    \"cadastre\": false,\n    \"chaineNumeroIdentifiante\": false,\n    \"coordonneeElectronique\": true,\n    \"professionnelMagistratGreffier\": false,\n    \"motifsDebatsChambreConseil\": true,\n    \"motifsSecretAffaires\": false,\n    \"conserverElement\": \"#dateCivile|automobile\",\n    \"supprimerElement\": \"#magistratGreffe|120.000€\"\n  }\n}\n",
 									"type": "text"
 								},
 								{
-									"key": "decisionIntegre",
+									"key": "fichierDecisionIntegre",
 									"type": "file",
-									"src": "/Users/ritchie.elloumi/Desktop/juritj/documentation/postman/fichier-exemples/business_plan.wpd"
+									"src": "/U:/CASSATION-LAB/20 - Produit/07 - Qualification/RATP.pdf"
 								}
 							]
 						},
-						"url": "{{HOSTNAME}}/{{VERSION}}/decisions"
+						"url": {
+							"raw": "{{HOSTNAME}}/{{VERSION}}/decision",
+							"host": [
+								"{{HOSTNAME}}"
+							],
+							"path": [
+								"{{VERSION}}",
+								"decision"
+							]
+						}
 					},
 					"response": []
 				},
@@ -68,7 +92,8 @@
 									"    pm.expect(pm.response.json().message).to.eql(\"Vous devez fournir un fichier 'decisionIntegre' au format Wordperfect.\");\r",
 									"});"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -76,19 +101,43 @@
 						"disabledSystemHeaders": {}
 					},
 					"request": {
-						"method": "POST",
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "{{pwd_doc}}",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "{{login_doc}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
 						"header": [],
 						"body": {
 							"mode": "formdata",
 							"formdata": [
 								{
 									"key": "metadonnees",
-									"value": "{   \"idJuridiction\": \"TJ75011\",  \"nomJuridiction\": \"toto\", \"codeJuridiction\": \"Code juridiction\",  \"numeroRegistre\": \"A\",  \"numeroRoleGeneral\": \"01/12345\",  \"numeroMesureInstruction\": [    \"AZERTYUIOP\"  ],  \"codeService\": \"0A\",  \"libelleService\": \"Libelle de service\",  \"dateDecision\": \"20230801\",  \"codeDecision\": \"0aA\",  \"libelleCodeDecision\": \"some libelle code decision\",  \"president\": {    \"fonction\": \"president\",    \"nom\": \"Nom Presidente\",    \"prenom\": \"Prenom Presidente\",    \"civilite\": \"Mme.\"  },  \"decisionAssociee\": {    \"numeroRegistre\": \"A\",    \"numeroRoleGeneral\": \"01/12345\",    \"idJuridiction\": \"TJ00000\",    \"date\": \"20221121\"  },  \"parties\": [    {      \"type\": \"PP\",      \"nom\": \"nom Partie\"    },    {      \"type\": \"PP\",      \"nom\": \"nom Partie\"    }  ],  \"sommaire\": \"Exemple de sommaire\",  \"codeNAC\": \"11F\",  \"libelleNAC\": \"Demande en dommages-intérêts contre un organisme\",  \"codeNature\": \"6C\",  \"libelleNature\": \"Autres demandes en matière de frais et dépens\",  \"decisionPublique\": true,  \"recommandationOccultation\": \"aucune\",  \"occultationComplementaire\": \"Exemple d'occultation complémentaire\",  \"selection\": false,  \"matiereDeterminee\": true,  \"pourvoiLocal\": false,  \"pourvoiCourDeCassation\": false,  \"debatPublic\": true}",
+									"value": "{\n  \"idDecision\": \"66177ce6e5d\",\n  \"idGroupement\": \"ABDC\",\n  \"idJuridiction\": \"TJ7500\",\n  \"libelleJuridiction\": \"Tribunal judiciaire de Paris\",\n  \"dateDecision\": \"20240322\",\n  \"numeroDossier\": \"08/20240\",\n  \"idChambre\": \"ID\",\n  \"libelleChambre\": \"libelleChambre\",\n  \"idMatiere\": \"code matière de la décision\",\n  \"libelleMatiere\": \"Demande de nullité d'un bail\",\n  \"idProcedure\": \"CODETYPEPROCEDURE\",\n  \"libelleProcedure\": \"Libellé type affaire\",\n  \"decisionPublique\": true,\n  \"debatChambreDuConseil\": false,\n  \"interetParticulier\": false,\n  \"composition\": [\n    {\n      \"fonction\": \"GRF\",\n      \"nom\": \"Dupond\",\n      \"prenom\": \"Henry\",\n      \"civilite\": \"Monsieur\"\n    }\n  ],\n  \"parties\": [\n    {\n      \"type\": \"PP\",\n      \"role\": \"PARTIE\",\n      \"nom\": \"Dupond\",\n      \"prenom\": \"Julien\",\n      \"civilite\": \"Monsieur\",\n      \"qualite\": \"I\",\n      \"adresse\": {\n        \"numero\": \"20bis\",\n        \"type\": \"rue\",\n        \"voie\": \"du Bourg\",\n        \"codePostal\": \"39100\",\n        \"localite\": \"Dole\"\n      }\n    }\n  ],\n  \"occultationsComplementaires\": {\n    \"personneMorale\": true,\n    \"personnePhysicoMoraleGeoMorale\": false,\n    \"adresse\": true,\n    \"dateCivile\": false,\n    \"plaqueImmatriculation\": true,\n    \"cadastre\": false,\n    \"chaineNumeroIdentifiante\": false,\n    \"coordonneeElectronique\": true,\n    \"professionnelMagistratGreffier\": false,\n    \"motifsDebatsChambreConseil\": true,\n    \"motifsSecretAffaires\": false,\n    \"conserverElement\": \"#dateCivile|automobile\",\n    \"supprimerElement\": \"#magistratGreffe|120.000€\"\n  }\n}\n",
 									"type": "text"
 								}
 							]
 						},
-						"url": "{{HOSTNAME}}/{{VERSION}}/decisions"
+						"url": {
+							"raw": "{{HOSTNAME}}/{{VERSION}}/decision",
+							"host": [
+								"{{HOSTNAME}}"
+							],
+							"path": [
+								"{{VERSION}}",
+								"decision"
+							]
+						}
 					},
 					"response": []
 				},
@@ -106,7 +155,8 @@
 									"    pm.expect(pm.response.json().message).to.eql(\"Vous devez fournir un fichier 'decisionIntegre' au format Wordperfect.\");\r",
 									"});"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -114,24 +164,48 @@
 						"disabledSystemHeaders": {}
 					},
 					"request": {
-						"method": "POST",
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "{{pwd_doc}}",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "{{login_doc}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
 						"header": [],
 						"body": {
 							"mode": "formdata",
 							"formdata": [
 								{
 									"key": "metadonnees",
-									"value": "{   \"idJuridiction\": \"TJ75011\",  \"nomJuridiction\": \"toto\", \"codeJuridiction\": \"Code juridiction\",  \"numeroRegistre\": \"A\",  \"numeroRoleGeneral\": \"01/12345\",  \"numeroMesureInstruction\": [    \"AZERTYUIOP\"  ],  \"codeService\": \"0A\",  \"libelleService\": \"Libelle de service\",  \"dateDecision\": \"20230801\",  \"codeDecision\": \"0aA\",  \"libelleCodeDecision\": \"some libelle code decision\",  \"president\": {    \"fonction\": \"president\",    \"nom\": \"Nom Presidente\",    \"prenom\": \"Prenom Presidente\",    \"civilite\": \"Mme.\"  },  \"decisionAssociee\": {    \"numeroRegistre\": \"A\",    \"numeroRoleGeneral\": \"01/12345\",    \"idJuridiction\": \"TJ00000\",    \"date\": \"20221121\"  },  \"parties\": [    {      \"type\": \"PP\",      \"nom\": \"nom Partie\"    },    {      \"type\": \"PP\",      \"nom\": \"nom Partie\"    }  ],  \"sommaire\": \"Exemple de sommaire\",  \"codeNAC\": \"11F\",  \"libelleNAC\": \"Demande en dommages-intérêts contre un organisme\",  \"codeNature\": \"6C\",  \"libelleNature\": \"Autres demandes en matière de frais et dépens\",  \"decisionPublique\": true,  \"recommandationOccultation\": \"aucune\",  \"occultationComplementaire\": \"Exemple d'occultation complémentaire\",  \"selection\": false,  \"matiereDeterminee\": true,  \"pourvoiLocal\": false,  \"pourvoiCourDeCassation\": false,  \"debatPublic\": true}",
+									"value": "{\n  \"idDecision\": \"66177ce6e5d\",\n  \"idGroupement\": \"ABDC\",\n  \"idJuridiction\": \"TJ7500\",\n  \"libelleJuridiction\": \"Tribunal judiciaire de Paris\",\n  \"dateDecision\": \"20240322\",\n  \"numeroDossier\": \"08/20240\",\n  \"idChambre\": \"ID\",\n  \"libelleChambre\": \"libelleChambre\",\n  \"idMatiere\": \"code matière de la décision\",\n  \"libelleMatiere\": \"Demande de nullité d'un bail\",\n  \"idProcedure\": \"CODETYPEPROCEDURE\",\n  \"libelleProcedure\": \"Libellé type affaire\",\n  \"decisionPublique\": true,\n  \"debatChambreDuConseil\": false,\n  \"interetParticulier\": false,\n  \"composition\": [\n    {\n      \"fonction\": \"GRF\",\n      \"nom\": \"Dupond\",\n      \"prenom\": \"Henry\",\n      \"civilite\": \"Monsieur\"\n    }\n  ],\n  \"parties\": [\n    {\n      \"type\": \"PP\",\n      \"role\": \"PARTIE\",\n      \"nom\": \"Dupond\",\n      \"prenom\": \"Julien\",\n      \"civilite\": \"Monsieur\",\n      \"qualite\": \"I\",\n      \"adresse\": {\n        \"numero\": \"20bis\",\n        \"type\": \"rue\",\n        \"voie\": \"du Bourg\",\n        \"codePostal\": \"39100\",\n        \"localite\": \"Dole\"\n      }\n    }\n  ],\n  \"occultationsComplementaires\": {\n    \"personneMorale\": true,\n    \"personnePhysicoMoraleGeoMorale\": false,\n    \"adresse\": true,\n    \"dateCivile\": false,\n    \"plaqueImmatriculation\": true,\n    \"cadastre\": false,\n    \"chaineNumeroIdentifiante\": false,\n    \"coordonneeElectronique\": true,\n    \"professionnelMagistratGreffier\": false,\n    \"motifsDebatsChambreConseil\": true,\n    \"motifsSecretAffaires\": false,\n    \"conserverElement\": \"#dateCivile|automobile\",\n    \"supprimerElement\": \"#magistratGreffe|120.000€\"\n  }\n}\n",
 									"type": "text"
 								},
 								{
-									"key": "decisionIntegre",
+									"key": "fichierDecisionIntegre",
 									"type": "file",
 									"src": "./fichier-exemples/octoLogo.png"
 								}
 							]
 						},
-						"url": "{{HOSTNAME}}/{{VERSION}}/decisions"
+						"url": {
+							"raw": "{{HOSTNAME}}/{{VERSION}}/decision",
+							"host": [
+								"{{HOSTNAME}}"
+							],
+							"path": [
+								"{{VERSION}}",
+								"decision"
+							]
+						}
 					},
 					"response": []
 				},
@@ -149,7 +223,8 @@
 									"    pm.expect(pm.response.json().message).to.eql('Vous devez fournir le champ: metadonnees');\r",
 									"});"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -157,19 +232,43 @@
 						"disabledSystemHeaders": {}
 					},
 					"request": {
-						"method": "POST",
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "{{pwd_doc}}",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "{{login_doc}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
 						"header": [],
 						"body": {
 							"mode": "formdata",
 							"formdata": [
 								{
-									"key": "decisionIntegre",
+									"key": "fichierDecisionIntegre",
 									"type": "file",
 									"src": "./fichier-exemples/business_plan.wpd"
 								}
 							]
 						},
-						"url": "{{HOSTNAME}}/{{VERSION}}/decisions"
+						"url": {
+							"raw": "{{HOSTNAME}}/{{VERSION}}/decision",
+							"host": [
+								"{{HOSTNAME}}"
+							],
+							"path": [
+								"{{VERSION}}",
+								"decision"
+							]
+						}
 					},
 					"response": []
 				},
@@ -187,7 +286,8 @@
 									"    pm.expect(pm.response.json().message).to.eql('Une ou plusieurs erreurs ont été trouvées sur les propriétés suivantes : idJuridiction');\r",
 									"});"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -195,7 +295,22 @@
 						"disabledSystemHeaders": {}
 					},
 					"request": {
-						"method": "POST",
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "{{pwd_doc}}",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "{{login_doc}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
 						"header": [],
 						"body": {
 							"mode": "formdata",
@@ -206,13 +321,22 @@
 									"type": "text"
 								},
 								{
-									"key": "decisionIntegre",
+									"key": "fichierDecisionIntegre",
 									"type": "file",
-									"src": "./fichier-exemples/business_plan.wpd"
+									"src": "/U:/CASSATION-LAB/20 - Produit/07 - Qualification/RATP.pdf"
 								}
 							]
 						},
-						"url": "{{HOSTNAME}}/{{VERSION}}/decisions"
+						"url": {
+							"raw": "{{HOSTNAME}}/{{VERSION}}/decision",
+							"host": [
+								"{{HOSTNAME}}"
+							],
+							"path": [
+								"{{VERSION}}",
+								"decision"
+							]
+						}
 					},
 					"response": []
 				},
@@ -238,10 +362,18 @@
 					"request": {
 						"auth": {
 							"type": "basic",
-							"basic": {
-								"password": "{{pwd_doc}}",
-								"username": "{{login_doc}}"
-							}
+							"basic": [
+								{
+									"key": "password",
+									"value": "{{pwd_doc}}",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "{{login_doc}}",
+									"type": "string"
+								}
+							]
 						},
 						"method": "GET",
 						"header": [],
@@ -249,7 +381,15 @@
 							"mode": "formdata",
 							"formdata": []
 						},
-						"url": "{{HOSTNAME}}/doc-json"
+						"url": {
+							"raw": "{{HOSTNAME}}/doc-json",
+							"host": [
+								"{{HOSTNAME}}"
+							],
+							"path": [
+								"doc-json"
+							]
+						}
 					},
 					"response": []
 				},
@@ -274,10 +414,18 @@
 					"request": {
 						"auth": {
 							"type": "basic",
-							"basic": {
-								"password": "{{pwd_doc}}",
-								"username": "{{login_doc}}"
-							}
+							"basic": [
+								{
+									"key": "password",
+									"value": "{{pwd_doc}}",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "{{login_doc}}",
+									"type": "string"
+								}
+							]
 						},
 						"method": "GET",
 						"header": [],
@@ -285,7 +433,16 @@
 							"mode": "formdata",
 							"formdata": []
 						},
-						"url": "{{HOSTNAME}}/{{VERSION}}/health"
+						"url": {
+							"raw": "{{HOSTNAME}}/{{VERSION}}/health",
+							"host": [
+								"{{HOSTNAME}}"
+							],
+							"path": [
+								"{{VERSION}}",
+								"health"
+							]
+						}
 					},
 					"response": []
 				}

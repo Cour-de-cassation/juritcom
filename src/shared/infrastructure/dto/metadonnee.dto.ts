@@ -359,6 +359,7 @@ export class MetadonneeDto {
     example: 'Tribunal judiciaire de Paris'
   })
   @IsString()
+  @Length(2,42)
   libelleJuridiction: string
 
   @ApiProperty({
@@ -416,6 +417,7 @@ export class MetadonneeDto {
     example: "Demande de nullité d'un bail"
   })
   @IsString()
+  @IsOptional()
   libelleMatiere?: string
 
   @ApiPropertyOptional({
@@ -424,6 +426,7 @@ export class MetadonneeDto {
     example: 'CODETYPEPROCEDURE'
   })
   @IsString()
+  @IsOptional()
   idProcedure?: string
 
   @ApiPropertyOptional({
@@ -432,6 +435,7 @@ export class MetadonneeDto {
     example: 'Libellé type affaire '
   })
   @IsString()
+  @IsOptional()
   libelleProcedure?: string
 
   @ApiProperty({
@@ -500,6 +504,7 @@ export class MetadonneeDto {
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => PartieDto)
+  @IsOptional()
   parties?: PartieDto[]
 
   @ApiProperty({
@@ -526,5 +531,6 @@ export class MetadonneeDto {
   @IsNotEmptyObject()
   @ValidateNested()
   @Type(() => OccultationComplementaireDto)
+  @IsOptional()
   occultationsComplementaires?: OccultationComplementaireDto
 }

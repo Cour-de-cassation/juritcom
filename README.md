@@ -28,27 +28,24 @@ Pour démarrer l'application:
 npm run docker:build
 ```
 
-2. Lancer l'image docker mongodb:
-
-```bash
-npm run docker:start:db
-```
-
-3. Configurer les variables d'environnement:
+2. Configurer les variables d'environnement:
 
     - Dupliquer le fichier `docker.env.example` et le rennomer `docker.env`, adapter les variables d'environnement si besoin
     - Dupliquer le fichier `.env.example` et le rennomer `.env`, adapter les variables d'environnement si besoin
 
 4. Lancer l'API:
+    - Pour lancer l'API en local :
+          ```bash
+          npm run start:dev
+          ```
     - Pour lancer l'API avec docker :
       ```bash
       npm run docker:start
       ```
-    - Pour lancer l'API en phase de développement et afin de disposer d'une mise à jour à chaud du serveur à chaque changement:
+    - Pour lancer le bucket S3 en phase de développement:
       ```bash
-      npm run docker:start:db
-      npm run start:dev
-      ```
+      npm run docker:start:s3
+      ```    
 
 ### Tests
 

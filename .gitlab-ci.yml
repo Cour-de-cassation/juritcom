@@ -7,8 +7,7 @@ variables:
   re7: preprod
   master: prod
   api_docker_image: '$CI_REGISTRY/cour-de-cassation/juritcom/api:$CI_COMMIT_BRANCH-$CI_COMMIT_SHORT_SHA'
-  batch_docker_image: '$CI_REGISTRY/cour-de-cassation/juritcom/batch:$CI_COMMIT_BRANCH-$CI_COMMIT_SHORT_SHA'
-
+ 
 stages:
   - test
   - build
@@ -61,27 +60,6 @@ build_api:
   tags:
     - docker
 
-#build_batch:
-#  stage: build
-#  needs: ['test']
-#  variables:
-#    HTTP_PROXY: $HTTP_PROXY_DEV
-#    HTTPS_PROXY: $HTTPS_PROXY_DEV
-#  script:
-#    - echo $CI_JOB_TOKEN | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
-#    - docker build
-#      --build-arg http_proxy=$HTTP_PROXY
-#      --build-arg https_proxy=$HTTPS_PROXY
-#      --target batch
-#      -t $batch_docker_image .
-#    - docker push $batch_docker_image
-#  only:
-#    - master
-#    - re7
-#    - dev
-#  tags:
-#    - docker
-
 deploy_juritcom:
   stage: deploy
   image: alpine/ansible:2.16.1
@@ -105,4 +83,3 @@ deploy_juritcom:
     - docker
   needs:
     - build_api
-    - build_batch

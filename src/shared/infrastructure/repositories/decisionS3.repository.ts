@@ -48,7 +48,7 @@ export class DecisionS3Repository implements DecisionRepository {
     const reqParams = {
       Body: requestToS3Dto,
       Bucket: process.env.S3_BUCKET_NAME_RAW,
-      Key: jsonFileName,
+      Key: `${process.env.S3_BUCKET_METADATA_PATH}${jsonFileName}`,
       Metadata: {
         originalFileName
       }
@@ -64,7 +64,7 @@ export class DecisionS3Repository implements DecisionRepository {
   ): Promise<void> {
     const params = {
       Bucket: process.env.S3_BUCKET_NAME_RAW,
-      Key: pdfFileName,
+      Key: `${process.env.S3_BUCKET_PDF_PATH}${pdfFileName}`,
       Body: file.buffer,
       ContentType: file.mimetype,
       ACL: 'public-read',

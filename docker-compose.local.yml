@@ -36,25 +36,8 @@ services:
       target: api
     env_file:
       - docker.env
-    expose: 
-      - 3009
     ports:
       - 3009:3000
-
-  batch: 
-    build:
-      context: ./
-      target: batch
-    env_file:
-      - docker.env
-    networks:
-      - default
-      - dbsder-external-network
-
-networks:
-  default:
-  dbsder-external-network:
-    external: true
 
 volumes:
   bucket-storage:

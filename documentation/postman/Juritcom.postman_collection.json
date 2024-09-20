@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "d77fdc66-5251-4124-9f82-9ad9ebb777f0",
+		"_postman_id": "a6d13193-d8e4-46b4-96c5-a62323a7e82c",
 		"name": "Juritcom",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "37618049"
@@ -61,7 +61,7 @@
 								{
 									"key": "fichierDecisionIntegre",
 									"type": "file",
-									"src": "/U:/CASSATION-LAB/20 - Produit/07 - Qualification/RATP.pdf"
+									"src": "///wsl$/Debian/home/dachi/juritcom/documentation/postman/fichier-exemples/business_plan.pdf"
 								}
 							]
 						},
@@ -255,7 +255,7 @@
 								{
 									"key": "fichierDecisionIntegre",
 									"type": "file",
-									"src": "./fichier-exemples/business_plan.wpd"
+									"src": "///wsl$/Debian/home/dachi/juritcom/documentation/postman/fichier-exemples/business_plan.pdf"
 								}
 							]
 						},
@@ -323,7 +323,7 @@
 								{
 									"key": "fichierDecisionIntegre",
 									"type": "file",
-									"src": "/U:/CASSATION-LAB/20 - Produit/07 - Qualification/RATP.pdf"
+									"src": "///wsl$/Debian/home/dachi/juritcom/documentation/postman/fichier-exemples/business_plan.pdf"
 								}
 							]
 						},

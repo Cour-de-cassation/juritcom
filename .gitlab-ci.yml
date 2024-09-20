@@ -72,7 +72,6 @@ deploy_juritcom:
     - cat $KNOWN_HOSTS > /root/.ssh/known_hosts
     - chmod 600 /root/.ssh/id_rsa
     - chmod 600 /root/.ssh/known_hosts
-#    - ansible-playbook -e juritcom_api_image=$api_docker_image -e juritcom_batch_image=$batch_docker_image -i ansible/inventory/$inventaire.yml ansible/deploy_juritcom.yml --vault-password-file=$ANSIBLE_VAULT_PASS
     - ansible-playbook -e juritcom_api_image=$api_docker_image -i ansible/inventory/$inventaire.yml ansible/deploy_juritcom.yml --vault-password-file=$ANSIBLE_VAULT_PASS
   rules:
     - if: $CI_COMMIT_BRANCH == "master"

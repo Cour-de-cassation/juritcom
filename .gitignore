@@ -160,4 +160,4 @@ dist
 
 # Secrets
 /secrets/
-!/secrets/dev/generate-keys.sh
+!secrets/dev/generate-keys.sh

@@ -15,7 +15,7 @@ async function bootstrap() {
           cert: fs.readFileSync(process.env.PATH_SERVER_CERT),
           ca: [
             fs.readFileSync(process.env.PATH_CA_CERT),
-            fs.readFileSync(process.env.PATH_WINCI_CA_CERT)
+            fs.readFileSync(process.env.PATH_TCOM_CA_CERT)
           ], // Optionnel, si vous utilisez une CA personnalisée
           requestCert: true
         }

@@ -40,15 +40,6 @@ COPY --from=prod --chown=node:node /home/node/package*.json ./
 COPY --from=prod --chown=node:node /home/node/node_modules/ ./node_modules/
 COPY --from=prod --chown=node:node /home/node/dist/shared ./dist/shared
 
-# --- Base final image with batch dist content --- #
-FROM shared as batch
-
-USER node
-COPY --from=prod --chown=node:node /home/node/dist/batch ./dist/batch
-COPY --chown=node:node batch_docker_entrypoint.sh batch_docker_entrypoint.sh
-
-ENTRYPOINT ["/bin/sh", "batch_docker_entrypoint.sh"]
-
 # --- Base final image with api dist content --- #
 FROM shared as api
 
@@ -56,23 +47,4 @@ USER node
 COPY --from=prod --chown=node:node /home/node/dist/api ./dist/api
 COPY --from=prod --chown=node:node /home/node/secrets/dev ./secrets/dev
 
-CMD ["node", "dist/api/main"]
-
-
-# --- DEBUG / TESTING PURPOSE --- #
-FROM node:18-bullseye as debug 
-
-ENV NODE_ENV production
-
-USER node
-WORKDIR /home/node
-
-ENTRYPOINT ["/bin/sh", "batch_docker_entrypoint.sh"]
-COPY --from=prod --chown=node:node /home/node/package*.json ./
-COPY --from=prod --chown=node:node /home/node/node_modules/ ./node_modules/
-COPY --from=prod --chown=node:node /home/node/dist ./dist
-COPY --chown=node:node batch_docker_entrypoint.sh batch_docker_entrypoint.sh
-RUN chmod +x batch_docker_entrypoint.sh
-
-USER node
 CMD ["node", "dist/api/main"]

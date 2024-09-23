@@ -327,7 +327,7 @@ export class OccultationComplementaireDto {
 
 export class MetadonneeDto {
   @ApiProperty({
-    description: 'Identifiant de la décision dans le système source WinCI-TGI',
+    description: 'Identifiant de la décision dans le système source TCOM',
     type: String,
     example: '66177ce6e5d'
   })

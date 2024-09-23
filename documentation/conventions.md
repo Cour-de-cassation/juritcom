@@ -47,7 +47,7 @@ Pour la `portée` nous nous réfèrerons au numéro du ticket.
 
 Pour le `sujet`, nous décrirons ce qui a été fait et pourquoi ça a été fait au présent.
 
-Par exemple : `feat(292): add POST /decisions to allow WinCI TGI to send decisons`
+Par exemple : `feat(292): add POST /decisions to allow Infogreffe to send decisons`
 
 ## Merge
 Nous utilisons l'option `Rebase and merge` sur [github](https://github.com/Cour-de-cassation) afin d'ajouter les commits à merger directement sur la branche `master`, et éviter les effets "colines" avec les commits de merge

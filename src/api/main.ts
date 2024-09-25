@@ -8,18 +8,13 @@ import * as fs from 'fs'
 import { NestApplicationOptions } from '@nestjs/common/interfaces/nest-application-options.interface'
 
 async function bootstrap() {
-  const httpsOptions =
-    process.env.NODE_ENV === 'local'
-      ? {
-          key: fs.readFileSync(process.env.PATH_SERVER_KEY),
-          cert: fs.readFileSync(process.env.PATH_SERVER_CERT),
-          ca: [
-            fs.readFileSync(process.env.PATH_CA_CERT),
-            fs.readFileSync(process.env.PATH_TCOM_CA_CERT)
-          ], // Optionnel, si vous utilisez une CA personnalisée
-          requestCert: true
-        }
-      : null
+
+  const httpsOptions = process.env.NODE_ENV !== 'local' ? {
+    key: fs.readFileSync(process.env.PATH_SERVER_KEY),
+    cert: fs.readFileSync(process.env.PATH_SERVER_CERT),
+    ca: [fs.readFileSync(process.env.PATH_CA_CERT), fs.readFileSync(process.env.PATH_WINCI_CA_CERT),], // Optionnel, si vous utilisez une CA personnalisée
+    requestCert: true,
+  } : null;
 
   const appOptions = {
     logger: ['log', 'error', 'warn'],

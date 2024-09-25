@@ -359,7 +359,7 @@ export class MetadonneeDto {
     example: 'Tribunal judiciaire de Paris'
   })
   @IsString()
-  @Length(2,42)
+  @Length(2, 42)
   libelleJuridiction: string
 
   @ApiProperty({

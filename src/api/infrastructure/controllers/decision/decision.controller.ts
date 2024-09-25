@@ -81,7 +81,6 @@ export class DecisionController {
     metadonneeDto: MetadonneeDto,
     @Req() request: Request
   ): Promise<DecisionResponse> {
-
     checkBasicAuth(request)
 
     if (!fichierDecisionIntegre || !isPdfFile(fichierDecisionIntegre.mimetype)) {
@@ -143,7 +142,7 @@ export function isPdfFile(mimeType: string): boolean {
 }
 
 export function checkBasicAuth(req: Request) {
-  let users = {
+  const users = {
     [process.env.DOC_LOGIN]: process.env.DOC_PASSWORD
   }
   const authHeader = req.headers.authorization

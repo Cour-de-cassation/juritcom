@@ -8,8 +8,6 @@ import { BucketError } from '../../domain/errors/bucket.error'
 describe('DecisionS3Repository', () => {
   let repository: DecisionS3Repository
   const mockS3: AwsClientStub<S3Client> = mockClient(S3Client)
-  const fakeBucketName = 'fake-bucket-name'
-  const filename = 'test.pdf'
 
   beforeEach(() => {
     mockS3.reset()

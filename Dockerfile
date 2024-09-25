@@ -48,3 +48,36 @@ COPY --from=prod --chown=node:node /home/node/dist/api ./dist/api
 COPY --from=prod --chown=node:node /home/node/secrets/dev ./secrets/dev
 
 CMD ["node", "dist/api/main"]
+
+
+# --- DEBUG / TESTING PURPOSE --- #
+FROM node:18-bullseye as debug 
+
+ENV NODE_ENV production
+
+USER node
+WORKDIR /home/node
+
+ENTRYPOINT ["/bin/sh", "batch_docker_entrypoint.sh"]
+COPY --from=prod --chown=node:node /home/node/package*.json ./
+COPY --from=prod --chown=node:node /home/node/node_modules/ ./node_modules/
+COPY --from=prod --chown=node:node /home/node/dist ./dist
+COPY --chown=node:node batch_docker_entrypoint.sh batch_docker_entrypoint.sh
+RUN chmod +x batch_docker_entrypoint.sh
+
+USER node
+CMD ["node", "dist/api/main"]
+
+# --- ONLY USED TO LAUNCH DOCKER IN LOCAL WITH HOT-RELOAD: ---#
+
+# --- Base image with only shared content --- #
+FROM node:18-alpine as api-local
+
+ENV NODE_ENV local
+
+USER node
+WORKDIR /home/node
+
+COPY --chown=node:node . .
+
+CMD ["npm", "run", "start:dev"]

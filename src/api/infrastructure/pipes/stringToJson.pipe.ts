@@ -6,12 +6,12 @@ import { BadFieldFormatException } from '../exceptions/badFieldFormat.exception'
 export class StringToJsonPipe implements PipeTransform {
   transform(value: string) {
     if (!value) {
-      throw new MissingFieldException('metadonnees')
+      throw new MissingFieldException('metadonnee')
     }
     try {
       return JSON.parse(value)
-    } catch (error) {
-      throw new BadFieldFormatException('JSON', 'metadonnees')
+    } catch (_) {
+      throw new BadFieldFormatException('JSON', 'metadonnee')
     }
   }
 }

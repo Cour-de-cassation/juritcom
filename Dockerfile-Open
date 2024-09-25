@@ -17,9 +17,6 @@ COPY --chown=node:node . .
 # Build the application
 RUN npm run build
 
-# Check the contents of the dist directory after build
-RUN ls -al /home/node/dist
-
 # --- Only prod dependencies --- #
 FROM builder as prod
 
@@ -47,8 +44,5 @@ USER node
 WORKDIR /home/node
 
 COPY --from=prod --chown=node:node /home/node/dist ./dist
-
-# Check the contents of the dist directory in the final image
-RUN ls -al /home/node/dist
 
 CMD ["node", "dist/api/main"]

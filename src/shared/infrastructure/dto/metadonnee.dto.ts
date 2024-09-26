@@ -313,7 +313,7 @@ export class OccultationComplementaireDto {
   })
   @IsString()
   @IsOptional()
-  conserverElement: string
+  conserverElement?: string
 
   @ApiPropertyOptional({
     description: 'Supprimer élément',
@@ -322,7 +322,7 @@ export class OccultationComplementaireDto {
   })
   @IsString()
   @IsOptional()
-  supprimerElement: string
+  supprimerElement?: string
 }
 
 export class MetadonneeDto {
@@ -478,7 +478,7 @@ export class MetadonneeDto {
   @IsOptional()
   @ValidateNested({ each: true })
   @Type(() => CompositionDto)
-  composition: CompositionDto[]
+  composition?: CompositionDto[]
 
   @ApiProperty({
     description: 'Liste des parties de la décision',

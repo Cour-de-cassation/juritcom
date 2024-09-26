@@ -14,7 +14,7 @@
         entryPoints:
           - web
         routes:
-          - match: "Host(`{{ juritcom_private_name }}`) && PathPrefix(`/api`)"
+          - match: "Host(`{{ juritcom_private_name }}`) && PathPrefix(`/doc`)"
             kind: Rule
             services:
               - name: "{{ api_service }}"
@@ -42,7 +42,7 @@
         namespace: "{{ juritcom_namespace }}"
       spec:
         replacePathRegex:
-          regex: /api(/|$)(.*)
+          regex: /doc(/|$)(.*)
           replacement: /$2
 
 - name: Creation Middleware bucket

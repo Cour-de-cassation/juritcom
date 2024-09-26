@@ -313,7 +313,7 @@ export class OccultationComplementaireDto {
   })
   @IsString()
   @IsOptional()
-  conserverElement: string
+  conserverElement?: string
 
   @ApiPropertyOptional({
     description: 'Supprimer élément',
@@ -322,7 +322,7 @@ export class OccultationComplementaireDto {
   })
   @IsString()
   @IsOptional()
-  supprimerElement: string
+  supprimerElement?: string
 }
 
 export class MetadonneeDto {
@@ -345,18 +345,18 @@ export class MetadonneeDto {
 
   @ApiProperty({
     description:
-      'Identifiant de la juridiction émettrice propre au système d’information originel. Au format ^TJ[0-9]{4}$',
+      'Identifiant de la juridiction émettrice propre au système d’information originel. Au format ^[0-9]{4}$',
     type: String,
-    example: 'TJ7500'
+    example: '7500'
   })
   @IsString()
-  @Matches('^TJ[0-9]{4}$')
+  @Matches('^[0-9]{4}$')
   idJuridiction: string
 
   @ApiProperty({
     description: 'Libellé de la juridiction émettrice propre au système d’information originel.',
     type: String,
-    example: 'Tribunal judiciaire de Paris'
+    example: 'Tribunal de commerce de Paris'
   })
   @IsString()
   @Length(2, 42)
@@ -478,7 +478,7 @@ export class MetadonneeDto {
   @IsOptional()
   @ValidateNested({ each: true })
   @Type(() => CompositionDto)
-  composition: CompositionDto[]
+  composition?: CompositionDto[]
 
   @ApiProperty({
     description: 'Liste des parties de la décision',

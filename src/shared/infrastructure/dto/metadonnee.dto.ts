@@ -345,18 +345,18 @@ export class MetadonneeDto {
 
   @ApiProperty({
     description:
-      'Identifiant de la juridiction émettrice propre au système d’information originel. Au format ^TJ[0-9]{4}$',
+      'Identifiant de la juridiction émettrice propre au système d’information originel. Au format ^[0-9]{4}$',
     type: String,
-    example: 'TJ7500'
+    example: '7500'
   })
   @IsString()
-  @Matches('^TJ[0-9]{4}$')
+  @Matches('^[0-9]{4}$')
   idJuridiction: string
 
   @ApiProperty({
     description: 'Libellé de la juridiction émettrice propre au système d’information originel.',
     type: String,
-    example: 'Tribunal judiciaire de Paris'
+    example: 'Tribunal de commerce de Paris'
   })
   @IsString()
   @Length(2, 42)

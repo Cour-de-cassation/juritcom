@@ -61,7 +61,7 @@
 								{
 									"key": "fichierDecisionIntegre",
 									"type": "file",
-									"src": "///wsl$/Debian/home/dachi/juritcom/documentation/postman/fichier-exemples/business_plan.pdf"
+									"src": "/home/juritcom/documentation/postman/fichier-exemples/decision.pdf"
 								}
 							]
 						},
@@ -255,7 +255,7 @@
 								{
 									"key": "fichierDecisionIntegre",
 									"type": "file",
-									"src": "///wsl$/Debian/home/dachi/juritcom/documentation/postman/fichier-exemples/business_plan.pdf"
+									"src": "/home/juritcom/documentation/postman/fichier-exemples/decision.pdf"
 								}
 							]
 						},
@@ -323,7 +323,7 @@
 								{
 									"key": "fichierDecisionIntegre",
 									"type": "file",
-									"src": "///wsl$/Debian/home/dachi/juritcom/documentation/postman/fichier-exemples/business_plan.pdf"
+									"src": "/home/juritcom/documentation/postman/fichier-exemples/decision.pdf"
 								}
 							]
 						},

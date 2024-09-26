@@ -19,4 +19,4 @@ Pour l'importer, se référer au tutoriel précédent
 Au premier import de la collection, les requêtes ayant un fichier indiqué dans le `body` ne fonctionnent pas : le fichier n'est pas trouvé par postman. 
 Il faut donc le ré-importer depuis le dossier `fichier-exemples` : 
 - Le scénario `Envoie d'une décision avec un fichier au mauvais format` s'appuie sur le fichier `CCLogo.png`
-- Pour les autres scénarios ayant besoin d'un fichier, utiliser le fichier `business_plan.pdf`
+- Pour les autres scénarios ayant besoin d'un fichier, utiliser le fichier `decision.pdf`

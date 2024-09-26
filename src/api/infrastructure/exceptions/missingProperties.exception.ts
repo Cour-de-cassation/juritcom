@@ -5,14 +5,8 @@ export class BadPropertiesException extends HttpException {
     super(
       JSON.stringify({
         missingProperties: missingProperties,
-        codeJuridiction: value.codeJuridiction,
         idJuridiction: value.idJuridiction,
-        nomJuridiction: value.nomJuridiction,
-        codeService: value.codeService,
-        codeNature: value.codeNature,
         dateDecision: value.dateDecision,
-        numeroRoleGeneral: value.numeroRoleGeneral,
-        numeroRegistre: value.numeroRegistre
       }),
       HttpStatus.BAD_REQUEST
     )

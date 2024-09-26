@@ -29,35 +29,4 @@
 #            middlewares:
 #              - name: "{{ bucket_stripprefix }}"
 
-- name: Creation Middleware api
-  k8s:
-    apply: true
-    state: present
-    verify_ssl: true
-    definition:
-      apiVersion: traefik.containo.us/v1alpha1
-      kind: Middleware
-      metadata:
-        name: "{{ api_stripprefix }}"
-        namespace: "{{ juritcom_namespace }}"
-      spec:
-        replacePathRegex:
-          regex: /doc(/|$)(.*)
-          replacement: /$2
-
-- name: Creation Middleware bucket
-  k8s:
-    apply: true
-    state: present
-    verify_ssl: true
-    definition:
-      apiVersion: traefik.containo.us/v1alpha1
-      kind: Middleware
-      metadata:
-        name: "{{ bucket_stripprefix }}"
-        namespace: "{{ juritcom_namespace }}"
-      spec:
-        replacePathRegex:
-          regex: /bucket(/|$)(.*)
-          replacement: /$2
 ...

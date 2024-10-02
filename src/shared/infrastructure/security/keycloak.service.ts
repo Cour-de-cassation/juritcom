@@ -7,17 +7,16 @@ import { Algorithm } from 'jsonwebtoken'
 
 @Injectable()
 export class KeycloakService {
-  private keycloakUrl = /*process.env.KEYCLOAK_URL ||*/ 'http://opn2vmla123:80'
-  private realm = /*process.env.KEYCLOAK_REALM ||*/ 'juritcom'
-  private clientId = /*process.env.KEYCLOAK_CLIENT_ID ||*/ 'juritcom'
-  private clientSecret = /*process.env.KEYCLOAK_CLIENT_SECRET ||*/ 'm633usfnhB010OqsY04gwe7YHWqEEEdE'
+  private keycloakUrl = process.env.KEYCLOAK_URL || 'http://opn2vmla123:80/realms/juritcom'
+  private realm = process.env.KEYCLOAK_REALM || 'juritcom'
+  private clientId = process.env.KEYCLOAK_CLIENT_ID || 'juritcom'
+  private clientSecret = process.env.KEYCLOAK_CLIENT_SECRET || 'm633usfnhB010OqsY04gwe7YHWqEEEdE'
 
   constructor( private jwtService: JwtService) {
   }
 
 
   async validateToken(token: string): Promise<boolean> {
-    const keycloakUrl = 'http://localhost:8080';
 
     try {
       if (!token) {
@@ -27,7 +26,7 @@ export class KeycloakService {
       const decodedToken = jwt.decode(token, {complete: true});
 
       const publicKeyResponse = await axios.get(
-        `http://opn2vmla123:80/realms/juritcom/protocol/openid-connect/certs`);
+        `${this.keycloakUrl}/protocol/openid-connect/certs`);
       const signingKey = publicKeyResponse.data.keys.find(
         key => key.use === 'sig' && key.alg === 'RS256');
 
@@ -39,7 +38,7 @@ export class KeycloakService {
       const pemEnd = '\n-----END CERTIFICATE-----';
       const pem = pemStart + signingKey.x5c[0] + pemEnd;
 
-      if (decodedToken.payload['iss'] !== `${keycloakUrl}/realms/${this.realm}`) {
+      if (decodedToken.payload['iss'] !== `${this.keycloakUrl}`) {
         return false;  // Invalid issuer
       }
 
@@ -60,22 +59,4 @@ export class KeycloakService {
     }
   }
 
-  async verifyToken(token: string) {
-    try {
-      const publicKey = await this.getPublicKey();
-      console.log('publicKey ... ', publicKey);
-      const algorithms = 'RS256' as unknown as any;
-      return await this.jwtService.verify(token, {publicKey, algorithms})
-    } catch (error) {
-      throw new UnauthorizedException('Invalid token : '+error.message)
-    }
-  }
-
-  private async getPublicKey() {
-    const response = await axios.get(
-      `${this.keycloakUrl}/realms/${this.realm}/protocol/openid-connect/certs`
-    )
-    const key = response.data.keys[0] // Assuming you use the first key for simplicity.
-    return key.n // Decode the public key for verification
-  }
 }

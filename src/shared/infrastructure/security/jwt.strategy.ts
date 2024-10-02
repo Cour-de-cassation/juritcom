@@ -1,4 +1,3 @@
-// src/auth/jwt.strategy.ts
 import { Injectable, UnauthorizedException } from '@nestjs/common'
 import { ExtractJwt, Strategy } from 'passport-jwt'
 import { PassportStrategy } from '@nestjs/passport'
@@ -11,9 +10,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(token: string) {
-    // Here, you might want to verify the token with Keycloak
-
-    console.log(token)
     const decodedToken = await this.keycloakService.validateToken(token)
     if (!decodedToken) {
       throw new UnauthorizedException()

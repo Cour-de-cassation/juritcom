@@ -1,24 +1,24 @@
-// src/auth/auth.guard.ts
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common'
-import { AuthGuard } from '@nestjs/passport';
-import { Observable } from 'rxjs';
 import { AuthService } from './auth.service'
 
 @Injectable()
-export class JwtAuthGuard implements CanActivate /*AuthGuard('bearer')*/ {
+export class JwtAuthGuard implements CanActivate  {
   async canActivate(
     context: ExecutionContext,
   )  {
     const request = context.switchToHttp().getRequest();
     const value = await this.validateRequest(request);
-    console.log(' value ', value)
-    return new Promise<boolean>(resolve => resolve(true));
+    return new Promise<boolean>(resolve => resolve(value));
   }
 
   constructor(private authService: AuthService) {}
 
   async validateRequest(request: any) {
-    const token = request.headers.authorization;
-    return await this.authService.validateToken(token.split('Bearer ')[1]);
+    const autorization = request.headers.authorization;
+    const token = autorization?.split('Bearer ')[1];
+    if(!token) {
+      return false;
+    }
+    return await this.authService.validateToken(token);
   }
 }

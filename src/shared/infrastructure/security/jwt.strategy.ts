@@ -7,14 +7,14 @@ import { KeycloakService } from './keycloak.service'
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(private readonly keycloakService: KeycloakService) {
-    super({ jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),secretOrKey: 'my' })
+    super({ jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(), secretOrKey: 'my' })
   }
 
   async validate(token: string) {
     // Here, you might want to verify the token with Keycloak
 
-    console.log(token);
-    const decodedToken = await this.keycloakService.verifyToken(token)
+    console.log(token)
+    const decodedToken = await this.keycloakService.validateToken(token)
     if (!decodedToken) {
       throw new UnauthorizedException()
     }

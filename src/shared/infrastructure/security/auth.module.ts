@@ -8,6 +8,6 @@ import { AuthService } from './auth.service'
 @Module({
   imports: [KeycloakModule],
   providers: [AuthService, JwtStrategy,JwtAuthGuard],
-  exports: [],
+  exports: [AuthService],
 })
 export class AuthModule {}

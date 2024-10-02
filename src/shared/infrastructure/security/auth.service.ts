@@ -8,6 +8,6 @@ export class AuthService {
 
 
   async validateToken(token: string) {
-    return this.keycloakService.verifyToken(token);
+    return this.keycloakService.validateToken(token);
   }
 }

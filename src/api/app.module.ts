@@ -19,6 +19,7 @@ import {
 import { APP_GUARD } from '@nestjs/core'
 import { KeycloakModule } from '../shared/infrastructure/security/keycloak.module'
 import { AuthModule } from '../shared/infrastructure/security/auth.module'
+import { PassportModule } from '@nestjs/passport'
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { AuthModule } from '../shared/infrastructure/security/auth.module'
       logger: false
     }),
     configureLoggerModule(),
+    PassportModule.register({ defaultStrategy: 'jwt', session: true }),
     KeycloakModule,
     AuthModule,
     // KeycloakConnectModule.register({

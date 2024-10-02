@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken'
 
 @Injectable()
 export class KeycloakService {
-  private keycloakUrl = process.env.KEYCLOAK_URL || 'http://localhost:8080/auth'
+  private keycloakUrl = process.env.KEYCLOAK_URL || 'http://opn2vmla123:8Ho'
   private realm = process.env.KEYCLOAK_REALM || 'juritcom'
   private clientId = process.env.KEYCLOAK_CLIENT_ID || 'juritcom'
   private clientSecret = process.env.KEYCLOAK_CLIENT_SECRET || 'm633usfnhB010OqsY04gwe7YHWqEEEdE'

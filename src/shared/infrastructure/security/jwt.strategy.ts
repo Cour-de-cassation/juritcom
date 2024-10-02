@@ -12,6 +12,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   async validate(token: string) {
     // Here, you might want to verify the token with Keycloak
+
+    console.log(token);
     const decodedToken = await this.keycloakService.verifyToken(token)
     if (!decodedToken) {
       throw new UnauthorizedException()

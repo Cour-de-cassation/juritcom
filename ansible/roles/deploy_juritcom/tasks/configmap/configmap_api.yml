@@ -16,5 +16,6 @@
         DOC_LOGIN: "{{ doc_login }}"
         DBSDER_API_URL: "{{ dbsder_api_url }}"
         NO_COLOR: "{{ no_color }}"
+        PORT: "{{ api_port }}"
 
 ...

@@ -14,17 +14,7 @@
         entryPoints:
           - web
         routes:
-          - match: "Host(`{{ juritcom_private_name }}`) && PathPrefix(`/v1`)"
-            kind: Rule
-            services:
-              - name: "{{ api_service }}"
-                port: api
-          - match: "Host(`{{ juritcom_private_name }}`) && PathPrefix(`/v1/health`)"
-            kind: Rule
-            services:
-              - name: "{{ api_service }}"
-                port: api
-          - match: "Host(`{{ juritcom_private_name }}`) && PathPrefix(`/v1/decision`)" 
+          - match: "Host(`{{ juritcom_private_name }}`)"
             kind: Rule
             services:
               - name: "{{ api_service }}"

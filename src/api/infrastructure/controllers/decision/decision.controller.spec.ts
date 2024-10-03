@@ -9,17 +9,17 @@ import * as request from 'supertest'
 import { MetadonneeDto } from '../../../../shared/infrastructure/dto/metadonnee.dto'
 import { MockUtils } from '../../../../shared/infrastructure/utils/mock.utils'
 import { UnexpectedException } from '../../../../shared/infrastructure/exceptions/unexpected.exception'
+import { OauthService } from '../../../../shared/infrastructure/security/oauth.service'
 
 describe('Decision Controller', () => {
   let app: INestApplication
   const mockS3: AwsClientStub<S3Client> = mockClient(S3Client)
 
+  const oauthService = new OauthService()
+  let token = ''
   const testFile = Buffer.from('test file')
   const pdfFilename = 'filename.pdf'
   const metadonnee = new MockUtils().metadonneeDtoMock as MetadonneeDto
-  const username = process.env.DOC_LOGIN
-  const password = process.env.DOC_PASSWORD
-  const basicAuth = Buffer.from(`${username}:${password}`).toString('base64')
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -31,6 +31,7 @@ describe('Decision Controller', () => {
     app.useGlobalInterceptors(new RequestLoggerInterceptor())
 
     await app.init()
+    token = await oauthService.getToken();
   })
 
   beforeEach(() => {
@@ -52,7 +53,7 @@ describe('Decision Controller', () => {
       it('Metadonnées correctes et fichier pdf correct/présent', async () => {
         const res = await request(app.getHttpServer())
           .put('/decision')
-          .set('Authorization', `Basic ${basicAuth}`)
+          .set('Authorization', `Bearer ${token}`)
           .attach('fichierDecisionIntegre', testFile, pdfFilename)
           .field('texteDecisionIntegre', 'texte décision intègre')
           .field('metadonnees', JSON.stringify(metadonnee))
@@ -72,7 +73,7 @@ describe('Decision Controller', () => {
       it('Pas de fichier', async () => {
         const res = await request(app.getHttpServer())
           .put('/decision')
-          .set('Authorization', 'authorization')
+          .set('Authorization', `Bearer ${token}`)
           .send({ metadonnees: metadonnee })
 
         expect(res.statusCode).toEqual(HttpStatus.BAD_REQUEST)
@@ -81,7 +82,7 @@ describe('Decision Controller', () => {
       it('Mauvais format du fichier', async () => {
         const res = await request(app.getHttpServer())
           .put('/decision')
-          .set('Authorization', `Basic ${basicAuth}`)
+          .set('Authorization', `Bearer ${token}`)
           .attach('fichierDecisionIntegre', testFile, {
             filename: 'filename.txt',
             contentType: 'application/txt'
@@ -94,7 +95,7 @@ describe('Decision Controller', () => {
       it('Pas de metadonnées', async () => {
         const res = await request(app.getHttpServer())
           .put('/decision')
-          .set('Authorization', `Basic ${basicAuth}`)
+          .set('Authorization', `Bearer ${token}`)
           .attach('fichierDecisionIntegre', testFile, {
             filename: pdfFilename,
             contentType: 'application/pdf'
@@ -107,7 +108,7 @@ describe('Decision Controller', () => {
         mockS3.on(PutObjectCommand).rejects(new Error('Erreurs S3'))
         const res = await request(app.getHttpServer())
           .put('/decision')
-          .set('Authorization', `Basic ${basicAuth}`)
+          .set('Authorization', `Bearer ${token}`)
           .attach('fichierDecisionIntegre', testFile, pdfFilename)
           .field('texteDecisionIntegre', 'texteDecisionIntegre')
           .field('metadonnees', JSON.stringify(metadonnee))
@@ -121,7 +122,7 @@ describe('Decision Controller', () => {
         mockS3.on(PutObjectCommand).rejects(new UnexpectedException('Erreurs S3'))
         const res = await request(app.getHttpServer())
           .put('/decision')
-          .set('Authorization', `Basic ${basicAuth}`)
+          .set('Authorization', `Bearer ${token}`)
           .attach('fichierDecisionIntegre', testFile, pdfFilename)
           .field('texteDecisionIntegre', 'texteDecisionIntegre')
           .field('metadonnees', JSON.stringify(metadonnee))
@@ -147,4 +148,7 @@ describe('Decision Controller', () => {
   afterAll(async () => {
     await app.close()
   })
+
 })
+
+

@@ -13,7 +13,6 @@ export class OauthService {
       const decodedToken = jwt.decode(token, { complete: true })
 
       const signingKey = await this.getPublicKey()
-
       if (!signingKey) {
         return false // Signing key not found
       }
@@ -35,17 +34,37 @@ export class OauthService {
         return false // Token expired
       }
 
-      jwt.verify(token, pem, { algorithms: ['RS256'] })
+      jwt.verify(token, pem, {
+        algorithms: [process.env.OAUTH_ALGORITHM as unknown as jwt.Algorithm]
+      })
       return true
     } catch (error) {
       return false // Error in validating token
     }
   }
 
+  async getToken() {
+    let config = {
+      method: 'post',
+      maxBodyLength: Infinity,
+      url: process.env.OAUTH_TOKEN_URL,
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      data: {
+        client_id: process.env.OAUTH_CLIENT_ID,
+        client_secret: process.env.OAUTH_CLIENT_SECRET,
+        grant_type: 'client_credentials'
+      }
+    }
+    const tokenResponse = await axios.request(config)
+    return tokenResponse.data.access_token;
+  }
+
   async getPublicKey() {
-    const publicKeyResponse = await axios.get(
-      `${process.env.OAUTH_PROVIDER_URL}/protocol/openid-connect/certs`
+    const publicKeyResponse = await axios.get(`${process.env.OAUTH_PROVIDER_CERT_URL}`)
+    return publicKeyResponse.data.keys.find(
+      (key) => key.use === 'sig' && key.alg === process.env.OAUTH_ALGORITHM
     )
-    return publicKeyResponse.data.keys.find((key) => key.use === 'sig' && key.alg === 'RS256')
   }
 }

@@ -10,7 +10,7 @@ export class StringToJsonPipe implements PipeTransform {
     }
     try {
       return JSON.parse(value)
-    } catch (error) {
+    } catch (_) {
       throw new BadFieldFormatException('JSON', 'metadonnee')
     }
   }

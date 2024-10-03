@@ -327,7 +327,7 @@ export class OccultationComplementaireDto {
 
 export class MetadonneeDto {
   @ApiProperty({
-    description: 'Identifiant de la décision dans le système source WinCI-TGI',
+    description: 'Identifiant de la décision dans le système source TCOM',
     type: String,
     example: '66177ce6e5d'
   })
@@ -359,7 +359,7 @@ export class MetadonneeDto {
     example: 'Tribunal judiciaire de Paris'
   })
   @IsString()
-  @Length(2,42)
+  @Length(2, 42)
   libelleJuridiction: string
 
   @ApiProperty({

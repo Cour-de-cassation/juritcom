@@ -16,7 +16,7 @@ export class BucketHealthIndicator extends HealthIndicator {
     try {
       await decisionS3Repository.getDecisionList()
       return this.getStatus(this.key, true)
-    } catch (error) {
+    } catch (_) {
       throw new HealthCheckError('Bucket call failed', this.getStatus(this.key, false))
     }
   }

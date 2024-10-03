@@ -3,7 +3,3 @@ juritcom_namespace: juritcom
 juritcom_application: juritcom
 
 api_app_id: api
-bucket_app_id: bucket
-
-api_stripprefix: api-stripprefix
-bucket_stripprefix: bucket-stripprefix

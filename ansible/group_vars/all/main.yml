@@ -4,9 +4,7 @@ ansible_python_interpreter: "/home/{{ ansible_user }}/ansible_venv/bin/python"
 
 api_service: "api-service"
 bucket_service: "bucket-service"
-#juritcom_private_name: "tcm.judilibre-prive.local"
-
-juritcom_private_name: "svf.preprod.opj.cour-de-cassation.justice.fr"
+juritcom_private_name: "tcm.judilibre-prive.local"
 
 api_port: "3000"
 doc_login: "root"

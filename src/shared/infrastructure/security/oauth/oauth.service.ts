@@ -57,7 +57,7 @@ export class OauthService {
       }
     }
     const tokenResponse = await axios.request(config)
-    return tokenResponse.data.access_token
+    return tokenResponse.data.access_token;
   }
 
   async getPublicKey() {

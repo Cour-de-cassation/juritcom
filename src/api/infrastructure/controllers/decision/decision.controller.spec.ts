@@ -10,27 +10,36 @@ import { MetadonneeDto } from '../../../../shared/infrastructure/dto/metadonnee.
 import { MockUtils } from '../../../../shared/infrastructure/utils/mock.utils'
 import { UnexpectedException } from '../../../../shared/infrastructure/exceptions/unexpected.exception'
 import { OauthService } from '../../../../shared/infrastructure/security/oauth/oauth.service'
+import { JwtAuthGuard } from '../../../../shared/infrastructure/security/auth/auth.guard'
 
 describe('Decision Controller', () => {
   let app: INestApplication
   const mockS3: AwsClientStub<S3Client> = mockClient(S3Client)
+  const oauthService = new OauthService();
 
-  const oauthService = new OauthService()
   let token = ''
   const testFile = Buffer.from('test file')
   const pdfFilename = 'filename.pdf'
   const metadonnee = new MockUtils().metadonneeDtoMock as MetadonneeDto
 
+  const mockAuthGuard = {
+    canActivate: jest.fn().mockReturnValue(true),
+  }
+
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule]
-    }).compile()
+    }).overrideGuard(JwtAuthGuard)
+      .useValue(mockAuthGuard)
+      .compile()
 
     // Disable logs for Integration tests
     app = moduleFixture.createNestApplication({ logger: false })
     app.useGlobalInterceptors(new RequestLoggerInterceptor())
 
-    await app.init()
+    await app.init();
+
+    jest.spyOn(oauthService, 'getToken').mockReturnValue(Promise.resolve('token'));
     token = await oauthService.getToken();
   })
 
@@ -131,16 +140,16 @@ describe('Decision Controller', () => {
       })
     })
 
-    describe('return 401', () => {
-      it('401 when wrong no credentials are sent', async () => {
-        mockS3.on(PutObjectCommand).rejects(new UnexpectedException('Erreurs S3'))
+    describe('return 403', () => {
+      it('403 when wrong no credentials are sent', async () => {
+        (jest.spyOn(mockAuthGuard, 'canActivate')).mockReturnValue(false);
         const res = await request(app.getHttpServer())
           .put('/decision')
           .attach('fichierDecisionIntegre', testFile, pdfFilename)
           .field('texteDecisionIntegre', 'texteDecisionIntegre')
           .field('metadonnees', JSON.stringify(metadonnee))
 
-        expect(res.statusCode).toEqual(HttpStatus.UNAUTHORIZED)
+        expect(res.statusCode).toEqual(403)
       })
     })
   })

@@ -14,19 +14,19 @@
         entryPoints:
           - web
         routes:
-          - match: "Host(`{{ juritcom_private_name }}`) && PathPrefix(`/`)"
+          - match: "Host(`{{ juritcom_private_name }}`) && PathPrefix(`/v1`)"
             kind: Rule
             services:
               - name: "{{ api_service }}"
                 port: api
-#            middlewares:
-#              - name: "{{ api_stripprefix }}"
-#          - match: "Host(`{{ juritcom_private_name }}`) && PathPrefix(`/bucket`)"
-#            kind: Rule
-#            services:
-#              - name: "{{ bucket_service}}"
-#                port: console
-#            middlewares:
-#              - name: "{{ bucket_stripprefix }}"
-
+          - match: "Host(`{{ juritcom_private_name }}`) && PathPrefix(`/v1/health`)"
+            kind: Rule
+            services:
+              - name: "{{ api_service }}"
+                port: api
+          - match: "Host(`{{ juritcom_private_name }}`) && PathPrefix(`/v1/decision`)" 
+            kind: Rule
+            services:
+              - name: "{{ api_service }}"
+                port: api
 ...

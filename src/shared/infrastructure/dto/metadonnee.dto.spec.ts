@@ -210,7 +210,7 @@ describe('Validate MetadonneeDTO format', () => {
 
     it('throws an error when type property on parties does not have valid value', async () => {
       // GIVEN
-      let invalidPartieMock = mockUtils.partieDtoMock
+      const invalidPartieMock = mockUtils.partieDtoMock
       invalidPartieMock.type = 'A' as TypePartie
       const partiesWithMandatoryFields = [invalidPartieMock]
 
@@ -226,7 +226,7 @@ describe('Validate MetadonneeDTO format', () => {
     })
     it('throws an error when qualite property on parties does not have valid value', async () => {
       // GIVEN
-      let invalidPartieMock = mockUtils.partieDtoMock
+      const invalidPartieMock = mockUtils.partieDtoMock
       invalidPartieMock.qualite = 'A' as QualitePartie
       const partiesWithMandatoryFields = [invalidPartieMock]
 
@@ -422,7 +422,7 @@ describe('Validate MetadonneeDTO format', () => {
     it('throws an error when adresse is not an object', async () => {
       // GIVEN
       const invalidAdresse = 12345
-      let invalidPartieDto = mockUtils.partieDtoMock
+      const invalidPartieDto = mockUtils.partieDtoMock
       invalidPartieDto.adresse = invalidAdresse as AdresseDto
       const invalidMetadonnee = {
         ...someValidMetaDonneeDto,
@@ -449,9 +449,9 @@ describe('Validate MetadonneeDTO format', () => {
 
     it('throws an error when codePostal property on parties does not have valid value', async () => {
       // GIVEN
-      let invalidPartieDto: PartieDto = { ...mockUtils.partieDtoMock }
+      const invalidPartieDto: PartieDto = { ...mockUtils.partieDtoMock }
       invalidPartieDto['adresse'] = mockUtils.adresseDtoMock
-      invalidPartieDto.adresse.codePostal = "390000"
+      invalidPartieDto.adresse.codePostal = '390000'
       const partiesWithMandatoryFields: PartieDto[] = [invalidPartieDto]
 
       const invalidMetadonnee = {

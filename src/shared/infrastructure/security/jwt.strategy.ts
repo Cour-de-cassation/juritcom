@@ -1,16 +1,16 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common'
 import { ExtractJwt, Strategy } from 'passport-jwt'
 import { PassportStrategy } from '@nestjs/passport'
-import { KeycloakService } from './keycloak.service'
+import { OauthService } from './oauth.service'
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(private readonly keycloakService: KeycloakService) {
+  constructor(private readonly oauthService: OauthService) {
     super({ jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(), secretOrKey: 'my' })
   }
 
   async validate(token: string) {
-    const decodedToken = await this.keycloakService.validateToken(token)
+    const decodedToken = await this.oauthService.validateToken(token)
     if (!decodedToken) {
       throw new UnauthorizedException()
     }

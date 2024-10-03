@@ -1,13 +1,12 @@
-// src/auth/auth.service.ts
 import { Injectable } from '@nestjs/common';
-import { KeycloakService } from './keycloak.service'
+import { OauthService } from './oauth.service'
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly keycloakService: KeycloakService) {}
+  constructor(private readonly oauthService: OauthService) {}
 
 
   async validateToken(token: string) {
-    return this.keycloakService.validateToken(token);
+    return this.oauthService.validateToken(token);
   }
 }

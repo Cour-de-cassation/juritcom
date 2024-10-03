@@ -1,4 +1,4 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common'
+import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common'
 import { AuthService } from './auth.service'
 
 @Injectable()
@@ -8,6 +8,9 @@ export class JwtAuthGuard implements CanActivate  {
   )  {
     const request = context.switchToHttp().getRequest();
     const value = await this.validateRequest(request);
+    if(!value){
+      throw new UnauthorizedException('You are not authorized to access this resource.')
+    }
     return new Promise<boolean>(resolve => resolve(value));
   }
 

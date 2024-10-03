@@ -17,7 +17,7 @@ import {
   PolicyEnforcementMode
 } from 'nest-keycloak-connect'
 import { APP_GUARD } from '@nestjs/core'
-import { KeycloakModule } from '../shared/infrastructure/security/keycloak.module'
+import { OauthModule } from '../shared/infrastructure/security/oauth.module'
 import { AuthModule } from '../shared/infrastructure/security/auth.module'
 import { PassportModule } from '@nestjs/passport'
 
@@ -30,7 +30,7 @@ import { PassportModule } from '@nestjs/passport'
     }),
     configureLoggerModule(),
     PassportModule.register({ defaultStrategy: 'jwt', session: true }),
-    KeycloakModule,
+    OauthModule,
     AuthModule,
     // KeycloakConnectModule.register({
     //   authServerUrl: 'http://opn2vmla123:80/auth',

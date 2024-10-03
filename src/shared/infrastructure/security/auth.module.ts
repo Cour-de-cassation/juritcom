@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { JwtAuthGuard } from './auth.guard'
-import { KeycloakModule } from './keycloak.module'
+import { OauthModule } from './oauth.module'
 import { AuthService } from './auth.service'
 
 @Module({
-  imports: [KeycloakModule],
+  imports: [OauthModule],
   providers: [AuthService,JwtAuthGuard],
   exports: [AuthService],
 })

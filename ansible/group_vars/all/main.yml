@@ -8,7 +8,7 @@ bucket_service: "bucket-service"
 
 juritcom_private_name: "svf.preprod.opj.cour-de-cassation.justice.fr"
 
-api_port: 3000
+api_port: "3000"
 doc_login: "root"
 s3_url: "http://{{ bucket_service }}:9000"
 s3_region: "eu-west-paris-1"

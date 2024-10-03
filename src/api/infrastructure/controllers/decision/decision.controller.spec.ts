@@ -9,7 +9,7 @@ import * as request from 'supertest'
 import { MetadonneeDto } from '../../../../shared/infrastructure/dto/metadonnee.dto'
 import { MockUtils } from '../../../../shared/infrastructure/utils/mock.utils'
 import { UnexpectedException } from '../../../../shared/infrastructure/exceptions/unexpected.exception'
-import { OauthService } from '../../../../shared/infrastructure/security/oauth.service'
+import { OauthService } from '../../../../shared/infrastructure/security/oauth/oauth.service'
 
 describe('Decision Controller', () => {
   let app: INestApplication

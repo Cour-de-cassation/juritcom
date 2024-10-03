@@ -35,9 +35,7 @@ import { InfrastructureExpection } from '../../../../shared/infrastructure/excep
 import { UnexpectedException } from '../../../../shared/infrastructure/exceptions/unexpected.exception'
 import { SaveDecisionUsecase } from '../../../usecase/saveDecision.usecase'
 import { DecisionS3Repository } from '../../../../shared/infrastructure/repositories/decisionS3.repository'
-import { ClientNotAuthorizedException } from '../../../../shared/infrastructure/exceptions/clientNotAuthorized.exception'
-import { AuthGuard } from '@nestjs/passport'
-import { JwtAuthGuard } from '../../../../shared/infrastructure/security/auth.guard'
+import { JwtAuthGuard } from '../../../../shared/infrastructure/security/auth/auth.guard'
 
 export interface DecisionResponse {
   jsonFileName: string | void

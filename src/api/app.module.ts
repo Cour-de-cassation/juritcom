@@ -8,9 +8,8 @@ import { HealthController } from './infrastructure/controllers/health/health.con
 import { BucketHealthIndicator } from './infrastructure/controllers/health/bucketHealthIndicator'
 import { DecisionController } from './infrastructure/controllers/decision/decision.controller'
 import { envValidationConfig } from '../shared/infrastructure/dto/env.validation'
-import { OauthModule } from '../shared/infrastructure/security/oauth.module'
-import { AuthModule } from '../shared/infrastructure/security/auth.module'
-import { PassportModule } from '@nestjs/passport'
+import { OauthModule } from '../shared/infrastructure/security/oauth/oauth.module'
+import { AuthModule } from '../shared/infrastructure/security/auth/auth.module'
 
 @Module({
   imports: [
@@ -20,7 +19,6 @@ import { PassportModule } from '@nestjs/passport'
       logger: false
     }),
     configureLoggerModule(),
-    PassportModule.register({ defaultStrategy: 'jwt', session: true }),
     OauthModule,
     AuthModule,
   ],

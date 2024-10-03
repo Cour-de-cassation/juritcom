@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import axios from 'axios'
 import * as jwt from 'jsonwebtoken'
-import * as process from 'node:process'
 
 @Injectable()
 export class OauthService {
@@ -58,7 +57,7 @@ export class OauthService {
       }
     }
     const tokenResponse = await axios.request(config)
-    return tokenResponse.data.access_token;
+    return tokenResponse.data.access_token
   }
 
   async getPublicKey() {

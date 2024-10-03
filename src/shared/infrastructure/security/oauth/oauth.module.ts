@@ -1,9 +1,8 @@
 import { Module } from '@nestjs/common'
-import { JwtService } from '@nestjs/jwt'
 import { OauthService } from './oauth.service'
 
 @Module({
-  providers: [OauthService, JwtService],
-  exports: [OauthService, JwtService]
+  providers: [OauthService],
+  exports: [OauthService]
 })
 export class OauthModule {}

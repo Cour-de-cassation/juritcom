@@ -46,3 +46,15 @@ WORKDIR /home/node
 COPY --from=prod --chown=node:node /home/node/dist ./dist
 
 CMD ["node", "dist/api/main"]
+
+# --- Base image with api content --- #
+FROM node:18-alpine as api-local
+
+USER node
+WORKDIR /home/node
+
+COPY --chown=node:node . .
+RUN npm i
+
+CMD ["npm", "run", "start:dev"]
+

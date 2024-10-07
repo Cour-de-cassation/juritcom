@@ -1,6 +1,5 @@
-# Source : https://github.com/nestjs/awesome-nestjs#resources boilerplates
 # --- Builder --- #
-FROM node:18-alpine as builder
+FROM node:20-alpine as builder
 
 ENV NODE_ENV build
 
@@ -15,21 +14,20 @@ RUN npm ci
 
 COPY --chown=node:node . .
 
-
-# --- Dev dependencies for testing --- #
-FROM builder as test
-
+# Build the application
 RUN npm run build
-
 
 # --- Only prod dependencies --- #
 FROM builder as prod
 
-RUN npm run build && npm prune --production
+# Remove dev dependencies
+RUN npm prune --production
 
+# Check the contents of the dist directory in the prod stage
+RUN ls -al /home/node/dist
 
 # --- Base final image with only shared dist content --- #
-FROM node:18-alpine as shared
+FROM node:20-alpine as shared
 
 ENV NODE_ENV production
 
@@ -38,46 +36,25 @@ WORKDIR /home/node
 
 COPY --from=prod --chown=node:node /home/node/package*.json ./
 COPY --from=prod --chown=node:node /home/node/node_modules/ ./node_modules/
-COPY --from=prod --chown=node:node /home/node/dist/shared ./dist/shared
 
 # --- Base final image with api dist content --- #
 FROM shared as api
 
 USER node
-COPY --from=prod --chown=node:node /home/node/dist/api ./dist/api
-COPY --from=prod --chown=node:node /home/node/secrets/dev ./secrets/dev
-
-CMD ["node", "dist/api/main"]
-
-
-# --- DEBUG / TESTING PURPOSE --- #
-FROM node:18-bullseye as debug 
-
-ENV NODE_ENV production
-
-USER node
 WORKDIR /home/node
 
-ENTRYPOINT ["/bin/sh", "batch_docker_entrypoint.sh"]
-COPY --from=prod --chown=node:node /home/node/package*.json ./
-COPY --from=prod --chown=node:node /home/node/node_modules/ ./node_modules/
 COPY --from=prod --chown=node:node /home/node/dist ./dist
-COPY --chown=node:node batch_docker_entrypoint.sh batch_docker_entrypoint.sh
-RUN chmod +x batch_docker_entrypoint.sh
 
-USER node
 CMD ["node", "dist/api/main"]
 
-# --- ONLY USED TO LAUNCH DOCKER IN LOCAL WITH HOT-RELOAD: ---#
-
-# --- Base image with only shared content --- #
+# --- Base image with api content --- #
 FROM node:18-alpine as api-local
-
-ENV NODE_ENV local
 
 USER node
 WORKDIR /home/node
 
 COPY --chown=node:node . .
+RUN npm i
 
 CMD ["npm", "run", "start:dev"]
+

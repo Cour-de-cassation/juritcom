@@ -3,7 +3,7 @@ import { AdresseDto, CompositionDto, JusticeFunction, JusticeRole, MetadonneeDto
 
 export class MockUtils {
   // Shared context
-  uniqueDecisionId = `TJ75011A01-1234520240120`
+  uniqueDecisionId = `TCOM75011A01-1234520240120`
 
   mandatoryPartieDtoMock = {
     nom: 'some valid name',
@@ -33,10 +33,10 @@ export class MockUtils {
 
   mandatoryMetadonneesDtoMock: MetadonneeDto = {
     composition: [],
-    idDecision: 'TJ00001',
+    idDecision: '00001',
     idGroupement: 'ABDC',
-    libelleJuridiction: 'Tribunal judiciaire de Paris',
-    idJuridiction: 'TJ7501',
+    libelleJuridiction: 'Tribunal de commerce de Paris',
+    idJuridiction: '7501',
     numeroDossier: '08/20240',
     dateDecision: '20240120',
     decisionPublique: true,

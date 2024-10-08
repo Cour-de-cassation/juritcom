@@ -2,6 +2,7 @@ import { DecisionRepository } from '../domain/decisions/repositories/decision.re
 import { v4 as uuidv4 } from 'uuid'
 import { MetadonneeDto } from '../../shared/infrastructure/dto/metadonnee.dto'
 import { bucketFileDto } from '../../shared/infrastructure/dto/receive.dto'
+import { CollectDto } from 'src/shared/infrastructure/dto/collect.dto'
 
 export class SaveDecisionUsecase {
   constructor(private decisionsRepository: DecisionRepository) {}
@@ -16,7 +17,7 @@ export class SaveDecisionUsecase {
     const jsonFileName = `${uuid}.json`
     const pdfFileName = `${uuid}-${originalFileName}`
 
-    const requestDto = {
+    const requestDto: CollectDto = {
       texteDecisionIntegre,
       metadonnees
     }

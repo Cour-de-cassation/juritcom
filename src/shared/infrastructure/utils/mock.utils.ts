@@ -37,7 +37,7 @@ export class MockUtils {
     idGroupement: 'ABDC',
     libelleJuridiction: 'Tribunal de commerce de Paris',
     idJuridiction: '7501',
-    numeroDossier: '08/20240',
+    numeroDossier: '2021F00123',
     dateDecision: '20240120',
     decisionPublique: true,
     interetParticulier: false,

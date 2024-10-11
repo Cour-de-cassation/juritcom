@@ -373,24 +373,22 @@ export class MetadonneeDto {
   dateDecision: string
 
   @ApiProperty({
-    description: 'Numéro du dossier au format ^[0-9]{2}/[0-9]{5}$.',
+    description: 'Numéro du dossier entre 1 et 20 caractères.',
     type: String,
-    example: '08/20240'
+    example: '2021F00123'
   })
   @IsString()
   @Length(1, 20)
-  @Matches('^[0-9]{2}/[0-9]{5}$')
   numeroDossier: string
 
   @ApiPropertyOptional({
     description:
-      'Identifiant de la chambre de la  juridiction émettrice au format ^[0-9a-zA-Z]{2}$',
+      'Identifiant de la chambre de la  juridiction émettrice',
     type: String,
     example: 'ID'
   })
   @IsString()
   @IsOptional()
-  @Matches('^[0-9a-zA-Z]{2}$')
   idChambre?: string
 
   @ApiPropertyOptional({

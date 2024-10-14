@@ -493,6 +493,7 @@ export class MetadonneeDto {
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => CompositionDto)
+  @IsOptional()
   composition?: CompositionDto[]
 
   @ApiProperty({
@@ -519,6 +520,7 @@ export class MetadonneeDto {
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => PartieDto)
+  @IsOptional()
   parties?: PartieDto[]
 
   @ApiProperty({
@@ -545,5 +547,6 @@ export class MetadonneeDto {
   @IsNotEmptyObject()
   @ValidateNested()
   @Type(() => OccultationComplementaireDto)
+  @IsOptional()
   occultationsComplementaires?: OccultationComplementaireDto
 }

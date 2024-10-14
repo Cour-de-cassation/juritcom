@@ -164,7 +164,7 @@ export class PartieDto {
   nom: string
 
   @ApiPropertyOptional({
-    description: 'Nom d\'usage de la partie',
+    description: "Nom d'usage de la partie",
     type: String,
     example: 'Nom usage'
   })
@@ -401,8 +401,7 @@ export class MetadonneeDto {
   numeroDossier: string
 
   @ApiPropertyOptional({
-    description:
-      'Identifiant unique de la chambre de la juridiction émettrice',
+    description: 'Identifiant unique de la chambre de la juridiction émettrice',
     type: String,
     example: 'ID'
   })

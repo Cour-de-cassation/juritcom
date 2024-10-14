@@ -1,59 +1,34 @@
-import { LabelStatus, Sources, DecisionTJDTO, DecisionAssociee } from 'dbsder-api-types'
+import { LabelStatus, Sources, DecisionDTO } from 'dbsder-api-types'
 import { hashDecisionId } from '../../../shared/infrastructure/utils/hash.utils'
-import {
-  MetadonneeDto
-} from '../../../shared/infrastructure/dto/metadonnee.dto'
+import { MetadonneeDto } from '../../../shared/infrastructure/dto/metadonnee.dto'
 
 export function mapDecisionNormaliseeToDecisionDto(
   generatedId: string,
   decisionContent: string,
   metadonnees: MetadonneeDto,
   filename: string
-): DecisionTJDTO {
+): DecisionDTO {
   return {
-    endCaseCode: "", // metadonnees.codeDecision,
-    NPCode: "", // metadonnees.codeNature,
-    codeService: "", // metadonnees.codeService,
-    debatPublic: false, //metadonnees.debatPublic,
-    decisionAssociee: formatDecisionAssociee(metadonnees.decisionAssociee),
-    libelleEndCaseCode: "", // metadonnees.libelleCodeDecision,
-    libelleNAC: "", // metadonnees.libelleNAC,
-    libelleNatureParticuliere: "", // metadonnees.libelleNature,
-    libelleService: "", // metadonnees.libelleService,
-    matiereDeterminee: false, // metadonnees.matiereDeterminee,
-    numeroRoleGeneral: "", // metadonnees.numeroRoleGeneral,
-    pourvoiCourDeCassation: false, // metadonnees.pourvoiCourDeCassation,
-    pourvoiLocal: false, // metadonnees.pourvoiLocal,
-    president: null,// metadonnees.president,
-    recommandationOccultation: null, // metadonnees.recommandationOccultation,
-    selection: false, // metadonnees.selection,
-    sommaire: "", // metadonnees.sommaire,
-    NACCode: "", // metadonnees.codeNAC,
-    appeals: [], // metadonnees.numeroMesureInstruction ?? [],
-    blocOccultation: 0,
-    chamberId: '',
-    chamberName: '',
+    appeals: [], // Non trouvé,
+    chamberId: metadonnees.idChambre,
+    chamberName: metadonnees.libelleChambre,
     dateCreation: new Date().toISOString(),
     dateDecision: parseDate(metadonnees.dateDecision).toISOString(),
-    idDecisionTJ: generatedId,
-    jurisdictionCode: "", // metadonnees.codeJuridiction,
-    jurisdictionId: "", // metadonnees.idJuridiction,
-    jurisdictionName: "", // metadonnees.nomJuridiction,
+    jurisdictionCode: '', // Non trouvé,
+    jurisdictionId: metadonnees.idJuridiction,
+    jurisdictionName: metadonnees.libelleJuridiction,
     labelStatus: LabelStatus.TOBETREATED,
     occultation: {
-      additionalTerms: '', // metadonnees.occultationComplementaire ?? '',
+      // @TODO
+      additionalTerms: '',
       categoriesToOmit: [],
       motivationOccultation: undefined
     },
     originalText: decisionContent,
-    public: metadonnees.decisionPublique,
-    registerNumber: "", // metadonnees.numeroRegistre,
+    registerNumber: '', // Non trouvé
     sourceId: hashDecisionId(generatedId),
     sourceName: Sources.TCOM,
-    filenameSource: filename,
-    parties: metadonnees.parties,
-    indicateurQPC: false, // metadonnees.indicateurQPC,
-    idDecisionWinci: metadonnees.idDecision
+    blocOccultation: 0
   }
 }
 
@@ -63,10 +38,4 @@ function parseDate(dateDecision: string) {
     date = dateDecision.substring(6, 8)
 
   return new Date(parseInt(year), parseInt(month) - 1, parseInt(date))
-}
-
-function formatDecisionAssociee(providedDecisionAssociee: DecisionAssocieeDto): DecisionAssociee {
-  if (!providedDecisionAssociee) return undefined
-  const { idDecision, ...decisionAssociee } = providedDecisionAssociee
-  return { ...decisionAssociee, idDecisionWinci: idDecision }
 }

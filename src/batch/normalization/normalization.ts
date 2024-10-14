@@ -41,7 +41,7 @@ export async function normalizationJob(): Promise<ConvertedDecisionWithMetadonne
         })
 
         // Step 3: Generating unique id for decision
-        const _id = decision.metadonnees.idDecision 
+        const _id = decision.metadonnees.idDecision
         // generateUniqueId(decision.metadonnees) (à réévaluer avec les premiers lots de test), cf. [generateUniqueId.ts](https://github.com/Cour-de-cassation/juritj/blob/dev/src/batch/normalization/services/generateUniqueId.ts)
         normalizationFormatLogs.data = { decisionId: _id }
         logger.info({ ...normalizationFormatLogs, msg: 'Generated unique id for decision' })
@@ -55,12 +55,12 @@ export async function normalizationJob(): Promise<ConvertedDecisionWithMetadonne
         })
 
         // Step 5: Removing or replace (by other thing) unnecessary characters from decision
-        // const cleanedDecision = removeOrReplaceUnnecessaryCharacters(decisionContent) (là aussi, à réévaluer avec les premiers lots de test)
+        const cleanedDecision = removeOrReplaceUnnecessaryCharacters(decisionContent) // (là aussi, à réévaluer avec les premiers lots de test)
 
         // Step 6: Map decision to DBSDER API Type to save it in database
         const decisionToSave = mapDecisionNormaliseeToDecisionDto(
           _id,
-          decisionContent,
+          cleanedDecision,
           decision.metadonnees,
           decisionFilename
         )
@@ -100,7 +100,7 @@ export async function normalizationJob(): Promise<ConvertedDecisionWithMetadonne
         })
         listConvertedDecision.push({
           metadonnees: decisionToSave,
-          decisionNormalisee: decisionContent
+          decisionNormalisee: cleanedDecision
         })
       } catch (error) {
         logger.error({

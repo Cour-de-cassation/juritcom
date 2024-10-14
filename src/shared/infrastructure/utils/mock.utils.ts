@@ -1,5 +1,12 @@
 import { QualitePartie, TypePartie } from 'dbsder-api-types'
-import { AdresseDto, CompositionDto, JusticeFunction, JusticeRole, MetadonneeDto, PartieDto } from '../dto/metadonnee.dto'
+import {
+  AdresseDto,
+  CompositionDto,
+  JusticeFunction,
+  JusticeRole,
+  MetadonneeDto,
+  PartieDto
+} from '../dto/metadonnee.dto'
 
 export class MockUtils {
   // Shared context

@@ -23,7 +23,10 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express'
 import { ReceiveDto } from '../../../../shared/infrastructure/dto/receive.dto'
 import { MetadonneeDto } from '../../../../shared/infrastructure/dto/metadonnee.dto'
-import { BadFileFormatException, BadFileSizeException } from '../../exceptions/badFileFormat.exception'
+import {
+  BadFileFormatException,
+  BadFileSizeException
+} from '../../exceptions/badFileFormat.exception'
 import { StringToJsonPipe } from '../../pipes/stringToJson.pipe'
 import { ValidateDtoPipe } from '../../pipes/validateDto.pipe'
 import { LogsFormat } from '../../../../shared/infrastructure/utils/logsFormat.utils'
@@ -85,7 +88,6 @@ export class DecisionController {
     metadonneeDto: MetadonneeDto,
     @Req() request: Request
   ): Promise<DecisionResponse> {
-
     if (!fichierDecisionIntegre || !isPdfFile(fichierDecisionIntegre.mimetype)) {
       throw new BadFileFormatException('fichierDecisionIntegre', 'PDF')
     }

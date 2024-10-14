@@ -4,7 +4,8 @@ import {
   PutObjectCommand,
   ListObjectsV2CommandInput,
   _Object,
-  ListObjectsV2Command
+  ListObjectsV2Command,
+  DeleteObjectCommand
 } from '@aws-sdk/client-s3'
 import { Logger } from '@nestjs/common'
 import { PinoLogger } from 'nestjs-pino'
@@ -54,6 +55,16 @@ export class DecisionS3Repository implements DecisionRepository {
       Metadata: {
         originalFileName
       }
+    }
+
+    await this.saveDecision(reqParams)
+  }
+
+  async saveDecisionNormalisee(requestToS3Dto: string, filename: string) {
+    const reqParams = {
+      Body: requestToS3Dto,
+      Bucket: process.env.S3_BUCKET_NAME_NORMALIZED,
+      Key: filename
     }
 
     await this.saveDecision(reqParams)
@@ -116,6 +127,20 @@ export class DecisionS3Repository implements DecisionRepository {
       return decisionListFromS3.Contents ? decisionListFromS3.Contents : []
     } catch (error) {
       this.logger.error({ operationName: 'getDecisionList', msg: error.message, data: error })
+      throw new BucketError(error)
+    }
+  }
+
+  async deleteDecision(filename: string, bucketName: string): Promise<void> {
+    const reqParams = {
+      Bucket: bucketName,
+      Key: filename
+    }
+
+    try {
+      await this.s3Client.send(new DeleteObjectCommand(reqParams))
+    } catch (error) {
+      this.logger.error({ operationName: 'deleteDecision', msg: error.message, data: error })
       throw new BucketError(error)
     }
   }

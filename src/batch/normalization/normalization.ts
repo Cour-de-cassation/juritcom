@@ -19,7 +19,9 @@ export async function normalizationJob(): Promise<ConvertedDecisionWithMetadonne
   const listConvertedDecision: ConvertedDecisionWithMetadonneesDto[] = []
   const s3Repository = new DecisionS3Repository(logger)
 
-  let decisionList = await fetchDecisionListFromS3(s3Repository)
+  let decisionList = (await fetchDecisionListFromS3(s3Repository)).filter((name) =>
+    name.endsWith('.json')
+  )
 
   while (decisionList.length > 0) {
     for (const decisionFilename of decisionList) {
@@ -39,7 +41,8 @@ export async function normalizationJob(): Promise<ConvertedDecisionWithMetadonne
         })
 
         // Step 3: Generating unique id for decision
-        const _id = generateUniqueId(decision.metadonnees)
+        const _id = decision.metadonnees.idDecision 
+        // generateUniqueId(decision.metadonnees) (à réévaluer avec les premiers lots de test), cf. [generateUniqueId.ts](https://github.com/Cour-de-cassation/juritj/blob/dev/src/batch/normalization/services/generateUniqueId.ts)
         normalizationFormatLogs.data = { decisionId: _id }
         logger.info({ ...normalizationFormatLogs, msg: 'Generated unique id for decision' })
 
@@ -51,23 +54,21 @@ export async function normalizationJob(): Promise<ConvertedDecisionWithMetadonne
           msg: 'Decision conversion finished. Removing unnecessary characters'
         })
 
-        console.log(decisionContent)
-
         // Step 5: Removing or replace (by other thing) unnecessary characters from decision
-        const cleanedDecision = removeOrReplaceUnnecessaryCharacters(decisionContent)
+        // const cleanedDecision = removeOrReplaceUnnecessaryCharacters(decisionContent) (là aussi, à réévaluer avec les premiers lots de test)
 
         // Step 6: Map decision to DBSDER API Type to save it in database
         const decisionToSave = mapDecisionNormaliseeToDecisionDto(
           _id,
-          cleanedDecision,
+          decisionContent,
           decision.metadonnees,
           decisionFilename
         )
         decisionToSave.labelStatus = computeLabelStatus(decisionToSave)
         decisionToSave.occultation = computeOccultation(
-          decision.metadonnees.recommandationOccultation,
-          decision.metadonnees.occultationComplementaire,
-          decision.metadonnees.debatPublic
+          '', // decision.metadonnees.recommandationOccultation,
+          '', // decision.metadonnees.occultationComplementaires,
+          false // decision.metadonnees.debatPublic
         )
 
         // Step 7: Save decision in database
@@ -85,22 +86,22 @@ export async function normalizationJob(): Promise<ConvertedDecisionWithMetadonne
           msg: 'Decision saved in normalized bucket. Deleting decision in raw bucket'
         })
 
-        // logger.info({
-        //   ...normalizationFormatLogs,
-        //   msg: 'Decision saved in normalized bucket. Deleting decision in raw bucket'
-        // })
+        logger.info({
+          ...normalizationFormatLogs,
+          msg: 'Decision saved in normalized bucket. Deleting decision in raw bucket'
+        })
 
         // Step 9: Delete decision in raw bucket
-        // await s3Repository.deleteDecision(decisionFilename, bucketNameIntegre)
+        await s3Repository.deleteDecision(decisionFilename, bucketNameIntegre)
 
-        // logger.info({
-        //   ...normalizationFormatLogs,
-        //   msg: 'Successful normalization of' + decisionFilename
-        // })
-        // listConvertedDecision.push({
-        //   metadonnees: decisionToSave,
-        //   decisionNormalisee: cleanedDecision
-        // })
+        logger.info({
+          ...normalizationFormatLogs,
+          msg: 'Successful normalization of' + decisionFilename
+        })
+        listConvertedDecision.push({
+          metadonnees: decisionToSave,
+          decisionNormalisee: decisionContent
+        })
       } catch (error) {
         logger.error({
           ...normalizationFormatLogs,
@@ -114,8 +115,8 @@ export async function normalizationJob(): Promise<ConvertedDecisionWithMetadonne
         continue
       }
     }
-    // const lastTreatedDecisionFileName = decisionList[decisionList.length - 1]
-    // decisionList = await fetchDecisionListFromS3(s3Repository, lastTreatedDecisionFileName)
+    const lastTreatedDecisionFileName = decisionList[decisionList.length - 1]
+    decisionList = await fetchDecisionListFromS3(s3Repository, lastTreatedDecisionFileName)
   }
 
   if (listConvertedDecision.length == 0) {

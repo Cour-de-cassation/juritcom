@@ -18,7 +18,7 @@ describe('updateLabelStatus', () => {
       const dateDecember2023 = new Date(2023, 11, 31)
       const dateMarch2024 = new Date(2024, 2, 29)
       const mockDecisionLabel = {
-        ...mockUtils.decisionTJMock,
+        ...mockUtils.decisionMock,
         dateDecision: dateDecember2023.toISOString(),
         dateCreation: dateMarch2024.toISOString(),
         public: true
@@ -35,7 +35,7 @@ describe('updateLabelStatus', () => {
     it(`when decision endCaseCode (codeDecision) is not in bloqued codeDecision list`, () => {
       // GIVEN
       const mockDecisionLabel = {
-        ...mockUtils.decisionTJMock,
+        ...mockUtils.decisionMock,
         endCaseCode: '33A'
       }
       const expectedLabelStatus = LabelStatus.TOBETREATED
@@ -55,7 +55,7 @@ describe('updateLabelStatus', () => {
         const dateDecisionInTheFuture = new Date(2023, 7, 20)
         const dateCreation = new Date(2023, 6, 20)
         const mockDecisionLabel = {
-          ...mockUtils.decisionTJMock,
+          ...mockUtils.decisionMock,
           dateDecision: dateDecisionInTheFuture.toISOString(),
           dateCreation: dateCreation.toISOString(),
           public: true
@@ -73,7 +73,7 @@ describe('updateLabelStatus', () => {
     it('returns ignored_codeDecisionBloqueCC when endCaseCode (codeDecision) is in the list of bloqued codeDecision', () => {
       // GIVEN
       const mockDecisionLabel = {
-        ...new MockUtils().decisionTJMock,
+        ...new MockUtils().decisionMock,
         endCaseCode: '11D'
       }
       const expectedLabelStatus = LabelStatus.IGNORED_CODE_DECISION_BLOQUE_CC
@@ -90,7 +90,7 @@ describe('updateLabelStatus', () => {
         // GIVEN
         const dateDecisionBeforeMiseEnService = new Date(2023, 11, 13)
         const mockDecisionLabel = {
-          ...new MockUtils().decisionTJMock,
+          ...new MockUtils().decisionMock,
           dateDecision: dateDecisionBeforeMiseEnService.toISOString()
         }
         const expectedLabelStatus = LabelStatus.IGNORED_DATE_AVANT_MISE_EN_SERVICE
@@ -107,7 +107,7 @@ describe('updateLabelStatus', () => {
         const dateJanuary2023 = new Date(2023, 0, 15)
         const dateJuly2023 = new Date(2023, 6, 20)
         const mockDecisionLabel = {
-          ...mockUtils.decisionTJMock,
+          ...mockUtils.decisionMock,
           dateDecision: dateJanuary2023.toISOString(),
           dateCreation: dateJuly2023.toISOString()
         }
@@ -125,7 +125,7 @@ describe('updateLabelStatus', () => {
         const dateSeptember2022 = new Date(2022, 8, 20)
         const dateMarch2023 = new Date(2023, 2, 25)
         const mockDecisionLabel = {
-          ...mockUtils.decisionTJMock,
+          ...mockUtils.decisionMock,
           dateDecision: dateSeptember2022.toISOString(),
           dateCreation: dateMarch2023.toISOString()
         }
@@ -144,7 +144,7 @@ describe('updateLabelStatus', () => {
         // GIVEN
 
         const mockDecisionLabel = {
-          ...mockUtils.decisionTJMock,
+          ...mockUtils.decisionMock,
           originalText:
             'la somme de 66. 224, 25 €, après imputation de la créance des tiers payeurs et déduction faite des provisions à hauteur de 9. 000 སྒྱ, en réparation de son préjudice corporel, consécutif à l’accident survenu le'
         }

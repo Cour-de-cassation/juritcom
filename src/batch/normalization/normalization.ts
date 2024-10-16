@@ -1,16 +1,13 @@
 import { v4 as uuidv4 } from 'uuid'
-import { generateUniqueId } from './services/generateUniqueId'
 import { removeOrReplaceUnnecessaryCharacters } from './services/removeOrReplaceUnnecessaryCharacters'
 import { ConvertedDecisionWithMetadonneesDto } from '../../shared/infrastructure/dto/convertedDecisionWithMetadonnees.dto'
 import { logger } from './index'
 import { fetchDecisionListFromS3 } from './services/fetchDecisionListFromS3'
 import { DecisionS3Repository } from '../../shared/infrastructure/repositories/decisionS3.repository'
 import { mapDecisionNormaliseeToDecisionDto } from './infrastructure/decision.dto'
-import { CollectDto } from '../../shared/infrastructure/dto/collect.dto'
 import { computeLabelStatus } from './services/computeLabelStatus'
 import { DbSderApiGateway } from './repositories/gateways/dbsderApi.gateway'
 import { normalizationFormatLogs } from './index'
-import { computeOccultation } from './services/computeOccultation'
 
 const dbSderApiGateway = new DbSderApiGateway()
 const bucketNameIntegre = process.env.S3_BUCKET_NAME_RAW
@@ -30,7 +27,7 @@ export async function normalizationJob(): Promise<ConvertedDecisionWithMetadonne
         normalizationFormatLogs.correlationId = jobId
 
         // Step 1: Fetch decision from S3
-        const decision: CollectDto = await s3Repository.getDecisionByFilename(decisionFilename)
+        const decision = await s3Repository.getDecisionByFilename(decisionFilename)
 
         // // Step 2: Cloning decision to save it in normalized bucket
         const decisionFromS3Clone = JSON.parse(JSON.stringify(decision))
@@ -65,11 +62,11 @@ export async function normalizationJob(): Promise<ConvertedDecisionWithMetadonne
           decisionFilename
         )
         decisionToSave.labelStatus = computeLabelStatus(decisionToSave)
-        decisionToSave.occultation = computeOccultation(
-          '', // decision.metadonnees.recommandationOccultation,
-          '', // decision.metadonnees.occultationComplementaires,
-          false // decision.metadonnees.debatPublic
-        )
+        // decisionToSave.occultation = computeOccultation(
+        //   decision.metadonnees.recommandationOccultation,
+        //   decision.metadonnees.occultationComplementaires,
+        //   decision.metadonnees.debatPublic
+        // ) // @TODO not ready
 
         // Step 7: Save decision in database
         await dbSderApiGateway.saveDecision(decisionToSave)

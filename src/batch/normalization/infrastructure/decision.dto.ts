@@ -10,8 +10,8 @@ export function mapDecisionNormaliseeToDecisionDto(
 ): DecisionDTO {
   return {
     appeals: [], // Non trouvé,
-    chamberId: metadonnees.idChambre,
-    chamberName: metadonnees.libelleChambre,
+    chamberId: metadonnees.idChambre ?? '', // @TODO Optionnel dans le swagger, mandatory dans dbsder-api ?
+    chamberName: metadonnees.libelleChambre ?? '', // @TODO Optionnel dans le swagger, mandatory dans dbsder-api ?
     dateCreation: new Date().toISOString(),
     dateDecision: parseDate(metadonnees.dateDecision).toISOString(),
     jurisdictionCode: '', // Non trouvé,
@@ -28,7 +28,8 @@ export function mapDecisionNormaliseeToDecisionDto(
     registerNumber: '', // Non trouvé
     sourceId: hashDecisionId(generatedId),
     sourceName: Sources.TCOM,
-    blocOccultation: 0
+    blocOccultation: 0,
+    filenameSource: filename
   }
 }
 

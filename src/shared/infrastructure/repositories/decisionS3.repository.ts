@@ -94,7 +94,7 @@ export class DecisionS3Repository implements DecisionRepository {
     }
   }
 
-  async getDecisionByFilename(filename: string): Promise<CollectDto> {
+  async getDecisionByFilename(filename: string): Promise<CollectDto & { _id: string }> {
     const reqParams = {
       Bucket: process.env.S3_BUCKET_NAME_RAW,
       Key: filename

@@ -1,4 +1,4 @@
-import { QualitePartie, TypePartie } from 'dbsder-api-types'
+import { DecisionDTO, LabelStatus, QualitePartie, Sources, TypePartie } from 'dbsder-api-types'
 import {
   AdresseDto,
   CompositionDto,
@@ -10,7 +10,13 @@ import {
 
 export class MockUtils {
   // Shared context
-  uniqueDecisionId = `TCOM75011A01-1234520240120`
+  uniqueDecisionId = `TCOM75011`
+  dateNow = new Date()
+
+  decisionContentToNormalize =
+    '\tLe contenu de ma décision avec    des espaces     et des backslash multiples \r\n \t'
+  decisionContentNormalized =
+    ' Le contenu de ma décision avec des espaces et des backslash multiples \n '
 
   mandatoryPartieDtoMock = {
     nom: 'some valid name',
@@ -39,16 +45,15 @@ export class MockUtils {
   }
 
   mandatoryMetadonneesDtoMock: MetadonneeDto = {
-    composition: [],
-    idDecision: '00001',
+    idDecision: this.uniqueDecisionId,
     idGroupement: 'ABDC',
+    idJuridiction: '7500',
     libelleJuridiction: 'Tribunal de commerce de Paris',
-    idJuridiction: '7501',
-    numeroDossier: '08/20240',
-    dateDecision: '20240120',
-    decisionPublique: true,
-    interetParticulier: false,
-    debatChambreDuConseil: false
+    dateDecision: '20240322',
+    numeroDossier: '2021F00123',
+    decisionPublique: false,
+    debatChambreDuConseil: false,
+    interetParticulier: false
   }
 
   compositionDtoMock: CompositionDto = {
@@ -59,23 +64,30 @@ export class MockUtils {
   }
 
   metadonneeDtoMock = {
-    ...this.mandatoryMetadonneesDtoMock,
-    parties: [this.partieDtoMock],
-    occultationsComplementaires: {
-      dateCivile: false,
-      motifsSecretAffaires: false,
-      cadastre: false,
-      adresse: true,
-      professionnelMagistratGreffier: false,
-      plaqueImmatriculation: true,
-      coordonneeElectronique: true,
-      motifsDebatsChambreConseil: true,
-      personneMorale: true,
-      conserverElement: '#dateCivile|automobile',
-      chaineNumeroIdentifiante: false,
-      personnePhysicoMoraleGeoMorale: false,
-      supprimerElement: '#magistratGreffe|120.000€'
+    ...this.mandatoryMetadonneesDtoMock
+  }
+
+  // End of normalization context
+  decisionMock: DecisionDTO = {
+    appeals: [],
+    chamberId: '',
+    chamberName: '',
+    dateCreation: this.dateNow.toISOString(),
+    dateDecision: new Date(parseInt('2024'), parseInt('03') - 1, parseInt('22')).toISOString(),
+    jurisdictionCode: '', // Non trouvé,
+    jurisdictionId: this.mandatoryMetadonneesDtoMock.idJuridiction,
+    jurisdictionName: this.mandatoryMetadonneesDtoMock.libelleJuridiction,
+    labelStatus: LabelStatus.TOBETREATED,
+    occultation: {
+      // @TODO
+      additionalTerms: '',
+      categoriesToOmit: [],
+      motivationOccultation: undefined
     },
-    composition: [this.compositionDtoMock]
+    originalText: this.decisionContentNormalized,
+    registerNumber: '', // Non trouvé
+    sourceId: 1845940738,
+    sourceName: Sources.TCOM,
+    blocOccultation: 0
   }
 }

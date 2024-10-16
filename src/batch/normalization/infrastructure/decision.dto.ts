@@ -22,7 +22,7 @@ export function mapDecisionNormaliseeToDecisionDto(
       // @TODO
       additionalTerms: '',
       categoriesToOmit: [],
-      motivationOccultation: undefined
+      motivationOccultation: false
     },
     originalText: decisionContent,
     registerNumber: '', // Non trouvé

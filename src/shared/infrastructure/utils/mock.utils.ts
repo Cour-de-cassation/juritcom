@@ -82,7 +82,7 @@ export class MockUtils {
       // @TODO
       additionalTerms: '',
       categoriesToOmit: [],
-      motivationOccultation: undefined
+      motivationOccultation: false
     },
     originalText: this.decisionContentNormalized,
     registerNumber: '', // Non trouvé

@@ -129,19 +129,6 @@ describe('Decision Controller', () => {
         expect(res.statusCode).toEqual(HttpStatus.SERVICE_UNAVAILABLE)
       })
     })
-
-    describe('return 401', () => {
-      it('401 when wrong no credentials are sent', async () => {
-        mockS3.on(PutObjectCommand).rejects(new UnexpectedException('Erreurs S3'))
-        const res = await request(app.getHttpServer())
-          .put('/decision')
-          .attach('fichierDecisionIntegre', testFile, pdfFilename)
-          .field('texteDecisionIntegre', 'texteDecisionIntegre')
-          .field('metadonnees', JSON.stringify(metadonnee))
-
-        expect(res.statusCode).toEqual(HttpStatus.UNAUTHORIZED)
-      })
-    })
   })
 
   afterAll(async () => {

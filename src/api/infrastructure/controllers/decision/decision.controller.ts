@@ -23,7 +23,10 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express'
 import { ReceiveDto } from '../../../../shared/infrastructure/dto/receive.dto'
 import { MetadonneeDto } from '../../../../shared/infrastructure/dto/metadonnee.dto'
-import { BadFileFormatException } from '../../exceptions/badFileFormat.exception'
+import {
+  BadFileFormatException,
+  BadFileSizeException
+} from '../../exceptions/badFileFormat.exception'
 import { StringToJsonPipe } from '../../pipes/stringToJson.pipe'
 import { ValidateDtoPipe } from '../../pipes/validateDto.pipe'
 import { LogsFormat } from '../../../../shared/infrastructure/utils/logsFormat.utils'
@@ -33,6 +36,11 @@ import { InfrastructureExpection } from '../../../../shared/infrastructure/excep
 import { UnexpectedException } from '../../../../shared/infrastructure/exceptions/unexpected.exception'
 import { SaveDecisionUsecase } from '../../../usecase/saveDecision.usecase'
 import { DecisionS3Repository } from '../../../../shared/infrastructure/repositories/decisionS3.repository'
+
+const FILE_MAX_SIZE = {
+  size: 10000000,
+  readSize: '10Mo'
+} as const
 
 export interface DecisionResponse {
   jsonFileName: string | void
@@ -80,9 +88,11 @@ export class DecisionController {
     metadonneeDto: MetadonneeDto,
     @Req() request: Request
   ): Promise<DecisionResponse> {
-
     if (!fichierDecisionIntegre || !isPdfFile(fichierDecisionIntegre.mimetype)) {
       throw new BadFileFormatException('fichierDecisionIntegre', 'PDF')
+    }
+    if (fichierDecisionIntegre.size >= FILE_MAX_SIZE.size) {
+      throw new BadFileSizeException(FILE_MAX_SIZE.readSize)
     }
 
     const routePath = request.method + ' ' + request.path
@@ -116,7 +126,8 @@ export class DecisionController {
 
     // Suppression des données sensibles décrite dans le fichier 2024 07 29 - Convention de code - logging.md
     // Les données sensibles sont par exemple le texte d'une décision ou les parties de cette décisions.
-    delete metadonneeDto['parties']
+    delete metadonneeDto.parties
+    delete metadonneeDto.composition
 
     this.logger.log({
       ...formatLogs,

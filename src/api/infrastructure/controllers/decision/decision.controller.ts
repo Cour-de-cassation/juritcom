@@ -102,7 +102,7 @@ export class DecisionController {
       statusCode: HttpStatus.NO_CONTENT
     })
 
-    return `La décision ${decisionId} a été supprimée.`
+    return `L'ordre de suppression de la décision ${decisionId} a bien été reçu, mais aucune suppression n'est réellement effectuée pour l'instant.`
   }
 
   @Put()

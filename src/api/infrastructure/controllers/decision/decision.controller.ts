@@ -61,14 +61,18 @@ export class DecisionController {
   @Delete(':decisionId')
   @ApiOperation({
     summary: 'Supprimer une décision intègre',
-    description: 'Une décision intègre sera supprimée et, le cas échéant, dépubliée de Judilibre',
+    description:
+      "Une décision intègre sera supprimée et, le cas échéant, dépubliée de Judilibre (fonctionnalité non implémentée pour l'instant)",
     operationId: 'deleteDecision'
   })
   @ApiParam({
     name: 'decisionId',
     type: 'string'
   })
-  @ApiNoContentResponse({ description: 'La décision a bien été supprimée' })
+  @ApiNoContentResponse({
+    description:
+      "L'ordre de suppression de la décision a bien été reçu, mais la suppression n'est pas encore implémentée pour l'instant."
+  })
   @ApiNotFoundResponse({ description: 'La décision est introuvable' })
   @ApiBadRequestResponse({
     description: "La requête n'est pas correcte"
@@ -102,7 +106,7 @@ export class DecisionController {
       statusCode: HttpStatus.NO_CONTENT
     })
 
-    return `L'ordre de suppression de la décision ${decisionId} a bien été reçu, mais aucune suppression n'est réellement effectuée pour l'instant.`
+    return `L'ordre de suppression de la décision ${decisionId} a bien été reçu, mais la suppression n'est pas encore implémentée pour l'instant.`
   }
 
   @Put()

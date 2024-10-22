@@ -5,14 +5,19 @@ import {
   HttpStatus,
   Logger,
   Put,
+  Delete,
   Req,
+  Param,
   UploadedFile,
   UseInterceptors
 } from '@nestjs/common'
 import {
   ApiBadRequestResponse,
   ApiBody,
+  ApiParam,
   ApiConsumes,
+  ApiNoContentResponse,
+  ApiNotFoundResponse,
   ApiCreatedResponse,
   ApiInternalServerErrorResponse,
   ApiOperation,
@@ -52,6 +57,53 @@ export interface DecisionResponse {
 @Controller('/decision')
 export class DecisionController {
   private readonly logger = new Logger()
+
+  @Delete(':decisionId')
+  @ApiOperation({
+    summary: 'Supprimer une décision intègre',
+    description: 'Une décision intègre sera supprimée et, le cas échéant, dépubliée de Judilibre',
+    operationId: 'deleteDecision'
+  })
+  @ApiParam({
+    name: 'decisionId',
+    type: 'string'
+  })
+  @ApiNoContentResponse({ description: 'La décision a bien été supprimée' })
+  @ApiNotFoundResponse({ description: 'La décision est introuvable' })
+  @ApiBadRequestResponse({
+    description: "La requête n'est pas correcte"
+  })
+  @ApiInternalServerErrorResponse({
+    description: "Une erreur interne s'est produite"
+  })
+  @ApiUnauthorizedResponse({
+    description: "La requête n'est pas autorisée"
+  })
+  @ApiServiceUnavailableResponse({
+    description: "Une erreur inattendue liée à une dépendance de l'API a été rencontrée. "
+  })
+  @HttpCode(HttpStatus.NO_CONTENT)
+  deleteDecision(@Param('decisionId') decisionId: string, @Req() request: Request) {
+    const routePath = request.method + ' ' + request.path
+    const formatLogs: LogsFormat = {
+      operationName: 'deleteDecision',
+      httpMethod: request.method,
+      path: request.path,
+      msg: `Starting ${routePath}...`,
+      correlationId: request.headers['x-correlation-id']
+    }
+
+    this.logger.log({
+      ...formatLogs,
+      msg: routePath + ' returns ' + HttpStatus.NO_CONTENT,
+      data: {
+        decisionId: decisionId
+      },
+      statusCode: HttpStatus.NO_CONTENT
+    })
+
+    return `La décision ${decisionId} a été supprimée.`
+  }
 
   @Put()
   @ApiOperation({

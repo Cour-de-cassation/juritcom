@@ -6,7 +6,7 @@ export interface DecisionRepository {
   ): Promise<void>
 
   uploadFichierDecisionIntegre(
-    fichierDecisionIntegre: Express.Multer.File,
+    fichierDecisionIntegre: Express.Multer.File | Buffer,
     originalFileName: string,
     pdfFileName: string
   ): Promise<void>

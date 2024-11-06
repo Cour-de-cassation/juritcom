@@ -10,6 +10,8 @@ import { DecisionController } from './infrastructure/controllers/decision/decisi
 import { envValidationConfig } from '../shared/infrastructure/dto/env.validation'
 import { OauthModule } from '../shared/infrastructure/security/oauth/oauth.module'
 import { AuthModule } from '../shared/infrastructure/security/auth/auth.module'
+import { FileModule } from '../shared/infrastructure/files/file.module'
+import { BatchModule } from '../batch/batch.module'
 
 @Module({
   imports: [
@@ -21,6 +23,8 @@ import { AuthModule } from '../shared/infrastructure/security/auth/auth.module'
     configureLoggerModule(),
     OauthModule,
     AuthModule,
+    FileModule,
+    BatchModule,
   ],
   controllers: [RedirectController, HealthController, DecisionController],
   providers: [

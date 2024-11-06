@@ -11,11 +11,30 @@ import { MockUtils } from '../../../../shared/infrastructure/utils/mock.utils'
 import { UnexpectedException } from '../../../../shared/infrastructure/exceptions/unexpected.exception'
 import { OauthService } from '../../../../shared/infrastructure/security/oauth/oauth.service'
 import { JwtAuthGuard } from '../../../../shared/infrastructure/security/auth/auth.guard'
+import { FileService } from '../../../../shared/infrastructure/files/file.service'
+import * as fs from 'fs'
+import { BatchService } from '../../../../batch/batch.service'
+
+const fileService = {
+  saveFile: jest.fn().mockReturnValue({
+    filename: 'uniqueFilename',
+    path: 'fullPath'
+  })
+}
+
+process.env.AV_PDF_PATH = 'test_AV_PDF_PATH'
+process.env.S3_ARCHIVE_SCHEDULE = '0 */5 * * * *'
+
+const batchService = {
+  onModuleInit: jest.fn().mockImplementation(() => 'on init module'),
+  addCronJob: jest.fn().mockImplementation(() => 'add cron job'),
+  archiveFilesToS3: jest.fn().mockImplementation(() => 'move pdf from disk/volume to S3')
+}
 
 describe('Decision Controller', () => {
   let app: INestApplication
   const mockS3: AwsClientStub<S3Client> = mockClient(S3Client)
-  const oauthService = new OauthService();
+  const oauthService = new OauthService()
 
   let token = ''
   const testFile = Buffer.from('test file')
@@ -23,7 +42,7 @@ describe('Decision Controller', () => {
   const metadonnee = new MockUtils().metadonneeDtoMock as MetadonneeDto
 
   const mockAuthGuard = {
-    canActivate: jest.fn().mockReturnValue(true),
+    canActivate: jest.fn().mockReturnValue(true)
   }
 
   beforeAll(async () => {
@@ -31,16 +50,20 @@ describe('Decision Controller', () => {
       imports: [AppModule]
     }).overrideGuard(JwtAuthGuard)
       .useValue(mockAuthGuard)
+      .overrideProvider(FileService)
+      .useValue(fileService)
+      .overrideProvider(BatchService)
+      .useValue(batchService)
       .compile()
 
     // Disable logs for Integration tests
     app = moduleFixture.createNestApplication({ logger: false })
     app.useGlobalInterceptors(new RequestLoggerInterceptor())
 
-    await app.init();
+    await app.init()
 
-    jest.spyOn(oauthService, 'getToken').mockReturnValue(Promise.resolve('token'));
-    token = await oauthService.getToken();
+    jest.spyOn(oauthService, 'getToken').mockReturnValue(Promise.resolve('token'))
+    token = await oauthService.getToken()
   })
 
   beforeEach(() => {
@@ -60,6 +83,8 @@ describe('Decision Controller', () => {
   describe('PUT /decision', () => {
     describe('return 201', () => {
       it('Metadonnées correctes et fichier pdf correct/présent', async () => {
+        jest.spyOn(fs, 'writeFileSync').mockImplementation(() => 'write file')
+        jest.spyOn(fs, 'mkdirSync').mockImplementation(() => 'make directory')
         const res = await request(app.getHttpServer())
           .put('/decision')
           .set('Authorization', `Bearer ${token}`)
@@ -142,7 +167,7 @@ describe('Decision Controller', () => {
 
     describe('return 403', () => {
       it('403 when wrong no credentials are sent', async () => {
-        (jest.spyOn(mockAuthGuard, 'canActivate')).mockReturnValue(false);
+        (jest.spyOn(mockAuthGuard, 'canActivate')).mockReturnValue(false)
         const res = await request(app.getHttpServer())
           .put('/decision')
           .attach('fichierDecisionIntegre', testFile, pdfFilename)
@@ -155,9 +180,9 @@ describe('Decision Controller', () => {
   })
 
   afterAll(async () => {
+    jest.clearAllMocks()
     await app.close()
+
   })
-
 })
-
 

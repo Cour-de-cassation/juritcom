@@ -1,11 +1,20 @@
 import * as request from 'supertest'
-import { INestApplication, HttpStatus } from '@nestjs/common'
+import { HttpStatus, INestApplication } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { ListObjectsV2Command, S3Client } from '@aws-sdk/client-s3'
-import { mockClient, AwsClientStub } from 'aws-sdk-client-mock'
+import { AwsClientStub, mockClient } from 'aws-sdk-client-mock'
 import { AppModule } from '../../../app.module'
 import { RequestLoggerInterceptor } from '../../interceptors/request-logger.interceptor'
 import { LoggingInterceptor } from '../../interceptors/logging.interceptor'
+import { BatchService } from '../../../../batch/batch.service'
+
+process.env.S3_ARCHIVE_SCHEDULE = '0 */5 * * * *'
+
+const batchService = {
+  onModuleInit: jest.fn().mockImplementation(() => 'on init module'),
+  addCronJob: jest.fn().mockImplementation(() => 'add cron job'),
+  archiveFilesToS3: jest.fn().mockImplementation(() => 'move pdf from disk/volume to S3')
+}
 
 describe('HealthController', () => {
   let app: INestApplication
@@ -14,7 +23,9 @@ describe('HealthController', () => {
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule]
-    }).compile()
+    }).overrideProvider(BatchService)
+      .useValue(batchService)
+      .compile()
 
     // Disable logs for Integration tests
     app = moduleFixture.createNestApplication({ logger: false })

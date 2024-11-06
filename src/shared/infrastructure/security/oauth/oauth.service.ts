@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, Logger } from '@nestjs/common'
 import axios from 'axios'
 import * as jwt from 'jsonwebtoken'
 
@@ -39,6 +39,7 @@ export class OauthService {
       jwt.verify(token, pem, {
         algorithms: [process.env.OAUTH_ALGORITHM as unknown as jwt.Algorithm]
       })
+
       return true
     } catch (error) {
       return false // Error in validating token
@@ -60,13 +61,21 @@ export class OauthService {
       }
     }
     const tokenResponse = await axios.request(config)
-    return tokenResponse.data.access_token;
+    return tokenResponse.data.access_token
   }
 
-  async getPublicKey() {
-    const publicKeyResponse = await axios.get(`${process.env.OAUTH_PROVIDER_CERT_URL}`)
-    return publicKeyResponse.data.keys.find(
-      (key) => key.use === 'sig' && key.alg === process.env.OAUTH_ALGORITHM
-    )
+  getPublicKey() {
+    return axios
+      .get(`${process.env.OAUTH_PROVIDER_CERT_URL}`)
+      .then((publicKeyResponse) => {
+
+        return publicKeyResponse.data.keys.find(
+          (key) => key.use === 'sig' && key.alg === process.env.OAUTH_ALGORITHM
+        )
+      })
+      .catch((error) => {
+        this.logger.error({ operationName: 'getPublicKey', msg: error.message })
+        throw error
+      })
   }
 }

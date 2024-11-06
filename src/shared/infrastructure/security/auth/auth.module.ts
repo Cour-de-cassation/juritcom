@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module } from '@nestjs/common'
 import { JwtAuthGuard } from './auth.guard'
 import { OauthModule } from '../oauth/oauth.module'
 import { AuthService } from './auth.service'

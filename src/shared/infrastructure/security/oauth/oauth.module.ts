@@ -5,4 +5,5 @@ import { OauthService } from './oauth.service'
   providers: [OauthService],
   exports: [OauthService]
 })
-export class OauthModule {}
+export class OauthModule {
+}

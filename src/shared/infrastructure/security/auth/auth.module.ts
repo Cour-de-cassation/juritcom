@@ -5,7 +5,8 @@ import { AuthService } from './auth.service'
 
 @Module({
   imports: [OauthModule],
-  providers: [AuthService,JwtAuthGuard],
-  exports: [AuthService],
+  providers: [AuthService, JwtAuthGuard],
+  exports: [AuthService]
 })
-export class AuthModule {}
+export class AuthModule {
+}

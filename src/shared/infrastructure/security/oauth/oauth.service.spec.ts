@@ -135,10 +135,10 @@ describe('OauthService', () => {
   describe('getPublicKey', () => {
     it('should fetch the public signing key', async () => {
       const mockResponse = {
-        data: {
-          keys: [{ use: 'sig', alg: process.env.OAUTH_ALGORITHM, x5c: ['mock-cert'] }]
+          data: {
+            keys: [{ use: 'sig', alg: process.env.OAUTH_ALGORITHM, x5c: ['mock-cert'] }]
+          }
         }
-      }
       ;(axios.get as jest.Mock).mockResolvedValue(mockResponse)
 
       const result = await oauthService.getPublicKey()

@@ -4,6 +4,8 @@ import * as jwt from 'jsonwebtoken'
 
 @Injectable()
 export class OauthService {
+  private readonly logger: Logger = new Logger(OauthService.name)
+
   async validateToken(token: string): Promise<boolean> {
     try {
       if (!token) {
@@ -12,6 +14,7 @@ export class OauthService {
       const decodedToken = jwt.decode(token, { complete: true })
 
       const signingKey = await this.getPublicKey()
+
       if (!signingKey) {
         return false // Signing key not found
       }

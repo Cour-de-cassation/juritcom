@@ -1,9 +1,9 @@
 import {
-  S3Client,
-  PutObjectCommand,
-  ListObjectsV2CommandInput,
   _Object,
-  ListObjectsV2Command
+  ListObjectsV2Command,
+  ListObjectsV2CommandInput,
+  PutObjectCommand,
+  S3Client
 } from '@aws-sdk/client-s3'
 import { Logger } from '@nestjs/common'
 import { PinoLogger } from 'nestjs-pino'
@@ -48,7 +48,7 @@ export class DecisionS3Repository implements DecisionRepository {
     const reqParams = {
       Body: requestToS3Dto,
       Bucket: process.env.S3_BUCKET_NAME_RAW,
-      Key: `${process.env.S3_BUCKET_METADATA_PATH}${jsonFileName}`,
+      Key: `${jsonFileName}`,
       Metadata: {
         originalFileName
       }
@@ -63,8 +63,8 @@ export class DecisionS3Repository implements DecisionRepository {
     pdfFileName: string
   ): Promise<void> {
     const params = {
-      Bucket: process.env.S3_BUCKET_NAME_RAW,
-      Key: `${process.env.S3_BUCKET_PDF_PATH}${pdfFileName}`,
+      Bucket: process.env.S3_BUCKET_NAME_PDF,
+      Key: `${pdfFileName}`,
       Body: file.buffer,
       ContentType: file.mimetype,
       ACL: 'public-read',

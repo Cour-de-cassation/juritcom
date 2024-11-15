@@ -1,13 +1,13 @@
 export interface DecisionRepository {
   saveDataDecisionIntegre(
     jsonToString: string,
-    originalFileName: string,
-    jsonFileName?: string
+    originalPdfFileName: string,
+    jsonS3Key: string
   ): Promise<void>
 
   uploadFichierDecisionIntegre(
     fichierDecisionIntegre: Express.Multer.File | Buffer,
-    originalFileName: string,
-    pdfFileName: string
+    archivePdfFileName: string,
+    pdfS3Key: string
   ): Promise<void>
 }

@@ -26,7 +26,7 @@ describe('BatchService', () => {
   let schedulerRegistry: jest.Mocked<SchedulerRegistry>
 
   const mockFolderPath = '/mock-folder'
-  const mockFileNames = ['file1.pdf', 'file2.pdf']
+  const mockFileNames = ['file1', 'file2']
   const mockFileData = Buffer.from('mock file data')
 
   beforeEach(() => {
@@ -85,7 +85,7 @@ describe('BatchService', () => {
       expect(decisionRepository.uploadFichierDecisionIntegre).toHaveBeenCalledWith(
         mockFileData,
         filename,
-        filename
+        `${filename}.pdf`
       )
       expect(fs.unlinkSync).toHaveBeenCalledWith(`${mockFolderPath}/${filename}`)
     })

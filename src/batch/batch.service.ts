@@ -10,6 +10,7 @@ import { CronJob } from 'cron'
 @Injectable()
 export class BatchService implements OnModuleInit {
   private readonly folderPath = process.env.AV_PDF_PATH
+  private readonly separator = process.env.S3_PDF_FILE_NAME_SEPARATOR
   private readonly logger: Logger = new Logger(BatchService.name)
   private readonly decisionsRepository: DecisionRepository = new DecisionS3Repository(this.logger)
 
@@ -30,11 +31,13 @@ export class BatchService implements OnModuleInit {
         const stats = fs.statSync(filePath)
 
         if (stats.isFile()) {
-          const originalFileName = filename.split(process.env.S3_PDF_FILE_NAME_SEPARATOR)
+          const pattern = new RegExp(`^[^${this.separator}]+`)
+          const match = filename.match(pattern)
+          const pdfS3Key = match ? `${match[0]}.pdf` : filename
           this.decisionsRepository.uploadFichierDecisionIntegre(
             fs.readFileSync(filePath),
-            originalFileName.length > 1 ? originalFileName[1] : filename,
-            filename
+            filename,
+            pdfS3Key
           )
         }
       })

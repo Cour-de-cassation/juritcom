@@ -7,7 +7,7 @@ export interface DecisionRepository {
 
   uploadFichierDecisionIntegre(
     fichierDecisionIntegre: Express.Multer.File | Buffer,
-    archivePdfFileName: string,
+    originalPdfFileName: string,
     pdfS3Key: string
   ): Promise<void>
 }

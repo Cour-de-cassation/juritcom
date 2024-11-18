@@ -59,7 +59,7 @@ export class DecisionS3Repository implements DecisionRepository {
 
   async uploadFichierDecisionIntegre(
     file: Express.Multer.File,
-    archivePdfFileName: string,
+    originalPdfFileName: string,
     pdfS3Key: string
   ): Promise<void> {
     const params = {
@@ -69,7 +69,7 @@ export class DecisionS3Repository implements DecisionRepository {
       ContentType: file.mimetype,
       ACL: 'public-read',
       Metadata: {
-        archivePdfFileName
+        originalPdfFileName
       }
     } as unknown as any
 

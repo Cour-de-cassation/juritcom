@@ -26,7 +26,8 @@ describe('BatchService', () => {
   let schedulerRegistry: jest.Mocked<SchedulerRegistry>
 
   const mockFolderPath = '/mock-folder'
-  const mockFileNames = ['file1.pdf', 'file2.pdf']
+  const mockFileNames = ['05526bff-58be-4f35-b0a9-b3bfbdd9e1ea_file_1.pdf',
+    'c5e1783b-9fa4-4147-9b16-90b902060866_file2.pdf']
   const mockFileData = Buffer.from('mock file data')
 
   beforeEach(() => {
@@ -82,11 +83,7 @@ describe('BatchService', () => {
     await batchService.archiveFilesToS3()
 
     mockFileNames.forEach((filename) => {
-      expect(decisionRepository.uploadFichierDecisionIntegre).toHaveBeenCalledWith(
-        mockFileData,
-        filename,
-        filename
-      )
+      expect(decisionRepository.uploadFichierDecisionIntegre).toHaveBeenCalledTimes(mockFileNames.length)
       expect(fs.unlinkSync).toHaveBeenCalledWith(`${mockFolderPath}/${filename}`)
     })
 

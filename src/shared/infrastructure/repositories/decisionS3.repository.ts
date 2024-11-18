@@ -42,15 +42,15 @@ export class DecisionS3Repository implements DecisionRepository {
 
   async saveDataDecisionIntegre(
     requestToS3Dto: string,
-    originalFileName: string,
-    jsonFileName?: string
+    originalPdfFileName: string,
+    jsonS3Key: string
   ): Promise<void> {
     const reqParams = {
       Body: requestToS3Dto,
       Bucket: process.env.S3_BUCKET_NAME_RAW,
-      Key: `${jsonFileName}`,
+      Key: `${jsonS3Key}`,
       Metadata: {
-        originalFileName
+        originalPdfFileName
       }
     }
 
@@ -59,17 +59,17 @@ export class DecisionS3Repository implements DecisionRepository {
 
   async uploadFichierDecisionIntegre(
     file: Express.Multer.File,
-    originalFileName: string,
-    pdfFileName: string
+    originalPdfFileName: string,
+    pdfS3Key: string
   ): Promise<void> {
     const params = {
       Bucket: process.env.S3_BUCKET_NAME_PDF,
-      Key: `${pdfFileName}`,
+      Key: `${pdfS3Key}`,
       Body: file.buffer,
       ContentType: file.mimetype,
       ACL: 'public-read',
       Metadata: {
-        originalFileName
+        originalPdfFileName
       }
     } as unknown as any
 

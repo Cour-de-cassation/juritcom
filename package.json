@@ -44,6 +44,7 @@
     "dbsder-api-types": "1.6.0",
     "express-basic-auth": "1.2.1",
     "joi": "17.13.3",
+    "minio": "^8.0.2",
     "nestjs-pino": "4.1.0",
     "pino-http": "10.3.0",
     "reflect-metadata": "0.2.2",

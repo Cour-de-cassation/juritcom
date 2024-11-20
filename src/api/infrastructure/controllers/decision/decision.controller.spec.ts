@@ -131,6 +131,28 @@ describe('Decision Controller', () => {
     })
   })
 
+  describe('DELETE /decision/decisionId', () => {
+    describe('return 204', () => {
+      it('Paramètre decisionId présent', async () => {
+        const res = await request(app.getHttpServer())
+          .delete('/decision/foobar123456')
+          .set('Authorization', `Basic ${basicAuth}`)
+
+        expect(res.statusCode).toEqual(HttpStatus.NO_CONTENT)
+        expect(res.body).toEqual({})
+      })
+    })
+    describe('return 404', () => {
+      it('Pas de paramètre decisionId', async () => {
+        const res = await request(app.getHttpServer())
+          .delete('/decision')
+          .set('Authorization', `Basic ${basicAuth}`)
+
+        expect(res.statusCode).toEqual(HttpStatus.NOT_FOUND)
+      })
+    })
+  })
+
   afterAll(async () => {
     await app.close()
   })

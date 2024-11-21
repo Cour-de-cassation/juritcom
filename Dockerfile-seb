@@ -1,5 +1,6 @@
+# Source : https://github.com/nestjs/awesome-nestjs#resources boilerplates
 # --- Builder --- #
-FROM node:20-alpine as builder
+FROM node:18-alpine as builder
 
 ENV NODE_ENV build
 
@@ -14,20 +15,21 @@ RUN npm ci
 
 COPY --chown=node:node . .
 
-# Build the application
+
+# --- Dev dependencies for testing --- #
+FROM builder as test
+
 RUN npm run build
+
 
 # --- Only prod dependencies --- #
 FROM builder as prod
 
-# Remove dev dependencies
-RUN npm prune --production
+RUN npm run build && npm prune --production
 
-# Check the contents of the dist directory in the prod stage
-RUN ls -al /home/node/dist
 
 # --- Base final image with only shared dist content --- #
-FROM node:20-alpine as shared
+FROM node:18-alpine as shared
 
 ENV NODE_ENV production
 
@@ -36,25 +38,13 @@ WORKDIR /home/node
 
 COPY --from=prod --chown=node:node /home/node/package*.json ./
 COPY --from=prod --chown=node:node /home/node/node_modules/ ./node_modules/
+COPY --from=prod --chown=node:node /home/node/dist/shared ./dist/shared
 
 # --- Base final image with api dist content --- #
 FROM shared as api
 
 USER node
-WORKDIR /home/node
-
-COPY --from=prod --chown=node:node /home/node/dist ./dist
+COPY --from=prod --chown=node:node /home/node/dist/api ./dist/api
+COPY --from=prod --chown=node:node /home/node/secrets/dev ./secrets/dev
 
 CMD ["node", "dist/api/main"]
-
-# --- Base image with api content --- #
-FROM node:18-alpine as api-local
-
-USER node
-WORKDIR /home/node
-
-COPY --chown=node:node . .
-RUN npm i
-
-CMD ["npm", "run", "start:dev"]
-

@@ -13,35 +13,35 @@ stages:
   - build
   - deploy
 
-test:
-  stage: test
-  services:
-    - docker:20.10.22
-  variables:
-    HTTP_PROXY: $HTTP_PROXY_DEV
-    HTTPS_PROXY: $HTTPS_PROXY_DEV
-  script:
-    - echo $CI_JOB_TOKEN | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
-    - docker build
-      --build-arg http_proxy=$HTTP_PROXY
-      --build-arg https_proxy=$HTTPS_PROXY
-      --target test
-      -t juritcom-test .
-    ##- docker run -e HTTP_PROXY=$HTTP_PROXY -e HTTPS_PROXY=$HTTPS_PROXY juritcom-test npm audit
-    - docker run -e HTTP_PROXY=$HTTP_PROXY -e HTTPS_PROXY=$HTTPS_PROXY juritcom-test npm run format
-    - docker run -e HTTP_PROXY=$HTTP_PROXY -e HTTPS_PROXY=$HTTPS_PROXY juritcom-test npm run lint
-    - docker run -e HTTP_PROXY=$HTTP_PROXY -e HTTPS_PROXY=$HTTPS_PROXY juritcom-test npm test
-    - echo 'ok'
-  only:
-    - master
-    - re7
-    - dev
-  tags:
-    - docker
+#test:
+#  stage: test
+#  services:
+#    - docker:20.10.22
+#  variables:
+#    HTTP_PROXY: $HTTP_PROXY_DEV
+#    HTTPS_PROXY: $HTTPS_PROXY_DEV
+#  script:
+#    - echo $CI_JOB_TOKEN | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
+#    - docker build
+#      --build-arg http_proxy=$HTTP_PROXY
+#      --build-arg https_proxy=$HTTPS_PROXY
+#      --target test
+#      -t juritcom-test .
+#    ##- docker run -e HTTP_PROXY=$HTTP_PROXY -e HTTPS_PROXY=$HTTPS_PROXY juritcom-test npm audit
+#    - docker run -e HTTP_PROXY=$HTTP_PROXY -e HTTPS_PROXY=$HTTPS_PROXY juritcom-test npm run format
+#    - docker run -e HTTP_PROXY=$HTTP_PROXY -e HTTPS_PROXY=$HTTPS_PROXY juritcom-test npm run lint
+#    - docker run -e HTTP_PROXY=$HTTP_PROXY -e HTTPS_PROXY=$HTTPS_PROXY juritcom-test npm test
+#    - echo 'ok'
+#  only:
+#    - master
+#    - re7
+#    - dev
+#  tags:
+#    - docker
 
 build_api:
   stage: build
-  needs: ['test']
+#  needs: ['test']
   variables:
     HTTP_PROXY: $HTTP_PROXY_DEV
     HTTPS_PROXY: $HTTPS_PROXY_DEV

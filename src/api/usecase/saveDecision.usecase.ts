@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { MetadonneeDto } from '../../shared/infrastructure/dto/metadonnee.dto'
 import { bucketFileDto } from '../../shared/infrastructure/dto/receive.dto'
 import { FileService } from '../../shared/infrastructure/files/file.service'
-
+import { CollectDto } from 'src/shared/infrastructure/dto/collect.dto'
 
 export class SaveDecisionUsecase {
   private readonly fileService: FileService = new FileService()
@@ -21,7 +21,7 @@ export class SaveDecisionUsecase {
     const jsonFileName = `${uuid}.json`
     const pdfFileName = `${uuid}${process.env.S3_PDF_FILE_NAME_SEPARATOR}${originalFileName}`
 
-    const requestDto = {
+    const requestDto: CollectDto = {
       texteDecisionIntegre,
       metadonnees
     }

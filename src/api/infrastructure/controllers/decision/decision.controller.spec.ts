@@ -164,16 +164,24 @@ describe('Decision Controller', () => {
         expect(res.statusCode).toEqual(HttpStatus.SERVICE_UNAVAILABLE)
       })
     })
+  })
 
     describe('return 403', () => {
       it('403 when wrong no credentials are sent', async () => {
         (jest.spyOn(mockAuthGuard, 'canActivate')).mockReturnValue(false)
         const res = await request(app.getHttpServer())
-          .put('/decision')
-          .attach('fichierDecisionIntegre', testFile, pdfFilename)
-          .field('texteDecisionIntegre', 'texteDecisionIntegre')
-          .field('metadonnees', JSON.stringify(metadonnee))
+          .delete('/decision/foobar123456')
+          .set('Authorization', `Basic ${basicAuth}`)
 
+        expect(res.statusCode).toEqual(HttpStatus.NO_CONTENT)
+        expect(res.body).toEqual({})
+      })
+    })
+    describe('return 404', () => {
+      it('Pas de paramètre decisionId', async () => {
+        const res = await request(app.getHttpServer())
+          .delete('/decision')
+          .set('Authorization', `Basic ${basicAuth}`)
         expect(res.statusCode).toEqual(403)
       })
     })

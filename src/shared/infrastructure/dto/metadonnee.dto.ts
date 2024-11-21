@@ -16,15 +16,34 @@ import {
 import { Type } from 'class-transformer'
 import { QualitePartie, TypePartie } from 'dbsder-api-types'
 
+export enum JusticeFunction {
+  GRF = 'GRF',
+  JUG = 'JUG',
+  PDT = 'PDT',
+  PRO = 'PRO',
+  JUS = 'JUS'
+}
+
+export enum JusticeRole {
+  AVOCAT = 'AVOCAT',
+  AVOCAT_GENERAL = 'AVOCAT GENERAL',
+  RAPPORTEUR = 'RAPPORTEUR',
+  MANDATAIRE = 'MANDATAIRE',
+  PARTIE = 'PARTIE',
+  AUTRE = 'AUTRE'
+}
+
+// Qualité du partie de la décision
+
 export class CompositionDto {
   @ApiPropertyOptional({
     description: 'Fonction',
-    type: String,
-    example: 'GRF'
+    enum: JusticeFunction,
+    example: JusticeFunction.GRF
   })
-  @IsString()
+  @IsEnum(JusticeFunction)
   @IsOptional()
-  fonction?: string
+  fonction?: JusticeFunction
 
   @ApiProperty({
     description: 'Nom',
@@ -129,7 +148,15 @@ export class PartieDto {
   type: TypePartie
 
   @ApiProperty({
-    description: 'Nom du partie de la décision',
+    description: 'Rôle de la partie',
+    enum: JusticeRole,
+    example: JusticeRole.AVOCAT
+  })
+  @IsEnum(JusticeRole)
+  role: JusticeRole
+
+  @ApiProperty({
+    description: 'Nom de la partie (ou nom et prénom)',
     type: String,
     example: 'Dupond'
   })
@@ -137,7 +164,7 @@ export class PartieDto {
   nom: string
 
   @ApiPropertyOptional({
-    description: 'Nom usage du partie de la décision',
+    description: "Nom d'usage de la partie",
     type: String,
     example: 'Nom usage'
   })
@@ -146,7 +173,7 @@ export class PartieDto {
   nomUsage?: string
 
   @ApiPropertyOptional({
-    description: 'Prénom du partie de la décision',
+    description: 'Prénom de la partie',
     type: String,
     example: 'Julien'
   })
@@ -155,7 +182,7 @@ export class PartieDto {
   prenom?: string
 
   @ApiPropertyOptional({
-    description: 'Alias du partie de la décision',
+    description: 'Alias de la partie',
     type: String,
     example: 'Jul'
   })
@@ -164,7 +191,7 @@ export class PartieDto {
   alias?: string
 
   @ApiPropertyOptional({
-    description: 'Prénoms autres du partie de la décision',
+    description: 'Autre prénom de la partie',
     type: String,
     example: 'Alain Patrick'
   })
@@ -173,7 +200,7 @@ export class PartieDto {
   prenomAutre?: string
 
   @ApiPropertyOptional({
-    description: 'Civilité du partie de la décision',
+    description: 'Civilité de la partie',
     type: String,
     example: 'Monsieur'
   })
@@ -188,14 +215,6 @@ export class PartieDto {
   })
   @IsEnum(QualitePartie)
   qualite: QualitePartie
-
-  @ApiProperty({
-    description: 'Permet de factoriser la définition "Avocats", "Mandataires", "Autres"',
-    type: String,
-    example: 'Monsieur'
-  })
-  @IsString()
-  role: string
 
   @ApiPropertyOptional({
     description: 'Adresse',
@@ -313,7 +332,7 @@ export class OccultationComplementaireDto {
   })
   @IsString()
   @IsOptional()
-  conserverElement: string
+  conserverElement?: string
 
   @ApiPropertyOptional({
     description: 'Supprimer élément',
@@ -322,7 +341,7 @@ export class OccultationComplementaireDto {
   })
   @IsString()
   @IsOptional()
-  supprimerElement: string
+  supprimerElement?: string
 }
 
 export class MetadonneeDto {
@@ -335,7 +354,7 @@ export class MetadonneeDto {
   idDecision: string
 
   @ApiProperty({
-    description: 'Identifiant de groupement',
+    description: 'Identifiant unique du groupement émetteur',
     type: String,
     example: 'ABDC'
   })
@@ -345,18 +364,18 @@ export class MetadonneeDto {
 
   @ApiProperty({
     description:
-      'Identifiant de la juridiction émettrice propre au système d’information originel. Au format ^TJ[0-9]{4}$',
+      'Identifiant de la juridiction émettrice propre au système d’information originel. Au format ^[0-9]{4}$',
     type: String,
-    example: 'TJ7500'
+    example: '7500'
   })
   @IsString()
-  @Matches('^TJ[0-9]{4}$')
+  @Matches('^[0-9]{4}$')
   idJuridiction: string
 
   @ApiProperty({
-    description: 'Libellé de la juridiction émettrice propre au système d’information originel.',
+    description: 'Intitulé complet de la juridiction émettrice',
     type: String,
-    example: 'Tribunal judiciaire de Paris'
+    example: 'Tribunal de commerce de Paris'
   })
   @IsString()
   @Length(2, 42)
@@ -373,24 +392,21 @@ export class MetadonneeDto {
   dateDecision: string
 
   @ApiProperty({
-    description: 'Numéro du dossier au format ^[0-9]{2}/[0-9]{5}$.',
+    description: 'Numéro du dossier associée à la décision rendue',
     type: String,
-    example: '08/20240'
+    example: '2021F00123'
   })
   @IsString()
   @Length(1, 20)
-  @Matches('^[0-9]{2}/[0-9]{5}$')
   numeroDossier: string
 
   @ApiPropertyOptional({
-    description:
-      'Identifiant de la chambre de la  juridiction émettrice au format ^[0-9a-zA-Z]{2}$',
+    description: 'Identifiant unique de la chambre de la juridiction émettrice',
     type: String,
     example: 'ID'
   })
   @IsString()
   @IsOptional()
-  @Matches('^[0-9a-zA-Z]{2}$')
   idChambre?: string
 
   @ApiPropertyOptional({
@@ -403,7 +419,7 @@ export class MetadonneeDto {
   libelleChambre?: string
 
   @ApiPropertyOptional({
-    description: 'Code matière de la décision',
+    description: 'Identifiant unique ou code relatif au fond de la décision',
     type: String,
     example: 'code matière de la décision'
   })
@@ -412,7 +428,7 @@ export class MetadonneeDto {
   idMatiere?: string
 
   @ApiPropertyOptional({
-    description: 'Intitulé complet associé au code matière de la décision',
+    description: 'Intitulé complet relatif au fond de la décision',
     type: String,
     example: "Demande de nullité d'un bail"
   })
@@ -421,7 +437,7 @@ export class MetadonneeDto {
   libelleMatiere?: string
 
   @ApiPropertyOptional({
-    description: 'Code de type de procédure',
+    description: 'Identifiant unique ou code relatif au type de procédure',
     type: String,
     example: 'CODETYPEPROCEDURE'
   })
@@ -430,7 +446,7 @@ export class MetadonneeDto {
   idProcedure?: string
 
   @ApiPropertyOptional({
-    description: 'Intitulé complet associé au type de procédure',
+    description: 'Intitulé complet relatif au type de procédure',
     type: String,
     example: 'Libellé type affaire '
   })
@@ -462,7 +478,7 @@ export class MetadonneeDto {
   @IsBoolean()
   interetParticulier: boolean
 
-  @ApiPropertyOptional({
+  @ApiProperty({
     description: 'Liste des compositions de la décision',
     type: [CompositionDto],
     example: [
@@ -475,10 +491,10 @@ export class MetadonneeDto {
     ]
   })
   @IsArray()
-  @IsOptional()
   @ValidateNested({ each: true })
   @Type(() => CompositionDto)
-  composition: CompositionDto[]
+  @IsOptional()
+  composition?: CompositionDto[]
 
   @ApiProperty({
     description: 'Liste des parties de la décision',

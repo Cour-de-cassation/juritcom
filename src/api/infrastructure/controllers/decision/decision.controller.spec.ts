@@ -166,27 +166,6 @@ describe('Decision Controller', () => {
     })
   })
 
-    describe('return 403', () => {
-      it('403 when wrong no credentials are sent', async () => {
-        (jest.spyOn(mockAuthGuard, 'canActivate')).mockReturnValue(false)
-        const res = await request(app.getHttpServer())
-          .delete('/decision/foobar123456')
-          .set('Authorization', `Basic ${basicAuth}`)
-
-        expect(res.statusCode).toEqual(HttpStatus.NO_CONTENT)
-        expect(res.body).toEqual({})
-      })
-    })
-    describe('return 404', () => {
-      it('Pas de paramètre decisionId', async () => {
-        const res = await request(app.getHttpServer())
-          .delete('/decision')
-          .set('Authorization', `Basic ${basicAuth}`)
-        expect(res.statusCode).toEqual(403)
-      })
-    })
-  })
-
   afterAll(async () => {
     jest.clearAllMocks()
     await app.close()

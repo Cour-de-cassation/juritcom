@@ -1,5 +1,4 @@
 import { NestFactory } from '@nestjs/core'
-import * as basicAuth from 'express-basic-auth'
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger'
 import { Logger } from 'nestjs-pino'
 import { AppModule } from './app.module'
@@ -21,13 +20,6 @@ async function bootstrap() {
 
   app.useGlobalInterceptors(new RequestLoggerInterceptor())
 
-  // Add login/password to access to API Documentation
-  const basicAuthOptions: basicAuth.IUsersOptions = {
-    challenge: true,
-    users: {}
-  }
-  basicAuthOptions.users[process.env.DOC_LOGIN] = process.env.DOC_PASSWORD
-  app.use(['/doc', '/doc-json'], basicAuth(basicAuthOptions))
 
   // Add API Documentation with Swagger
   const config = new DocumentBuilder()

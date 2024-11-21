@@ -8,6 +8,10 @@ import { HealthController } from './infrastructure/controllers/health/health.con
 import { BucketHealthIndicator } from './infrastructure/controllers/health/bucketHealthIndicator'
 import { DecisionController } from './infrastructure/controllers/decision/decision.controller'
 import { envValidationConfig } from '../shared/infrastructure/dto/env.validation'
+import { OauthModule } from '../shared/infrastructure/security/oauth/oauth.module'
+import { AuthModule } from '../shared/infrastructure/security/auth/auth.module'
+import { FileModule } from '../shared/infrastructure/files/file.module'
+import { BatchModule } from '../batch/batch.module'
 
 @Module({
   imports: [
@@ -16,9 +20,15 @@ import { envValidationConfig } from '../shared/infrastructure/dto/env.validation
     TerminusModule.forRoot({
       logger: false
     }),
-    configureLoggerModule()
+    configureLoggerModule(),
+    OauthModule,
+    AuthModule,
+    FileModule,
+    BatchModule,
   ],
   controllers: [RedirectController, HealthController, DecisionController],
-  providers: [BucketHealthIndicator]
+  providers: [
+    BucketHealthIndicator,
+  ]
 })
 export class AppModule {}

@@ -9,10 +9,12 @@ import {
   Req,
   Param,
   UploadedFile,
+  UseGuards,
   UseInterceptors
 } from '@nestjs/common'
 import {
   ApiBadRequestResponse,
+  ApiBearerAuth,
   ApiBody,
   ApiParam,
   ApiConsumes,
@@ -41,6 +43,7 @@ import { InfrastructureExpection } from '../../../../shared/infrastructure/excep
 import { UnexpectedException } from '../../../../shared/infrastructure/exceptions/unexpected.exception'
 import { SaveDecisionUsecase } from '../../../usecase/saveDecision.usecase'
 import { DecisionS3Repository } from '../../../../shared/infrastructure/repositories/decisionS3.repository'
+import { JwtAuthGuard } from '../../../../shared/infrastructure/security/auth/auth.guard'
 
 const FILE_MAX_SIZE = {
   size: 10000000,
@@ -53,8 +56,10 @@ export interface DecisionResponse {
   body: string
 }
 
+@ApiBearerAuth()
 @ApiTags('decision')
 @Controller('/decision')
+@UseGuards(JwtAuthGuard)
 export class DecisionController {
   private readonly logger = new Logger()
 
@@ -119,21 +124,21 @@ export class DecisionController {
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     description:
-      "Les ressources pour modifier des décisions intègres sont :\n* PUT : envoi d'une décision intègre",
+      'Les ressources pour modifier des décisions intègres sont :\n* PUT : envoi d\'une décision intègre',
     type: ReceiveDto
   })
   @ApiCreatedResponse({ description: 'La requête a été acceptée et va être traitée.' })
   @ApiBadRequestResponse({
-    description: "La requête n'est pas correcte"
+    description: 'La requête n\'est pas correcte'
   })
   @ApiInternalServerErrorResponse({
-    description: "Une erreur interne s'est produite"
+    description: 'Une erreur interne s\'est produite'
   })
   @ApiUnauthorizedResponse({
-    description: "La requête n'est pas autorisée"
+    description: 'La requête n\'est pas autorisée'
   })
   @ApiServiceUnavailableResponse({
-    description: "Une erreur inattendue liée à une dépendance de l'API a été rencontrée. "
+    description: 'Une erreur inattendue liée à une dépendance de l\'API a été rencontrée. '
   })
   @HttpCode(HttpStatus.CREATED)
   @UseInterceptors(FileInterceptor('fichierDecisionIntegre'))
@@ -141,7 +146,7 @@ export class DecisionController {
     @UploadedFile() fichierDecisionIntegre: Express.Multer.File,
     @Body('texteDecisionIntegre') texteDecisionIntegre: string,
     @Body('metadonnees', new StringToJsonPipe(), new ValidateDtoPipe())
-    metadonneeDto: MetadonneeDto,
+      metadonneeDto: MetadonneeDto,
     @Req() request: Request
   ): Promise<DecisionResponse> {
     if (!fichierDecisionIntegre || !isPdfFile(fichierDecisionIntegre.mimetype)) {

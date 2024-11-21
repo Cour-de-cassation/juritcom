@@ -40,6 +40,9 @@ describe('Decision Controller', () => {
   const testFile = Buffer.from('test file')
   const pdfFilename = 'filename.pdf'
   const metadonnee = new MockUtils().metadonneeDtoMock as MetadonneeDto
+  const username = process.env.DOC_LOGIN
+  const password = process.env.DOC_PASSWORD
+  const basicAuth = Buffer.from(`${username}:${password}`).toString('base64')
 
   const mockAuthGuard = {
     canActivate: jest.fn().mockReturnValue(true)
@@ -162,6 +165,28 @@ describe('Decision Controller', () => {
           .field('metadonnees', JSON.stringify(metadonnee))
 
         expect(res.statusCode).toEqual(HttpStatus.SERVICE_UNAVAILABLE)
+      })
+    })
+  })
+
+  describe('DELETE /decision/decisionId', () => {
+    describe('return 204', () => {
+      it('Paramètre decisionId présent', async () => {
+        const res = await request(app.getHttpServer())
+          .delete('/decision/foobar123456')
+          .set('Authorization', `Basic ${basicAuth}`)
+
+        expect(res.statusCode).toEqual(HttpStatus.NO_CONTENT)
+        expect(res.body).toEqual({})
+      })
+    })
+    describe('return 404', () => {
+      it('Pas de paramètre decisionId', async () => {
+        const res = await request(app.getHttpServer())
+          .delete('/decision')
+          .set('Authorization', `Basic ${basicAuth}`)
+
+        expect(res.statusCode).toEqual(HttpStatus.NOT_FOUND)
       })
     })
   })

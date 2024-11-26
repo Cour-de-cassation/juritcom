@@ -17,7 +17,6 @@ export const envValidationConfig = {
       .guid({
         version: ['uuidv4'],
         separator: true
-      }),
-    COMMISSIONING_DATE: Joi.string()
+      })
   })
 }

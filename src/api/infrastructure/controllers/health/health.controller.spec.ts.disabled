@@ -19,11 +19,15 @@ const batchService = {
 describe('HealthController', () => {
   let app: INestApplication
   const mockS3: AwsClientStub<S3Client> = mockClient(S3Client)
+  const username = process.env.DOC_LOGIN
+  const password = process.env.DOC_PASSWORD
+  const basicAuth = Buffer.from(`${username}:${password}`).toString('base64')
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule]
-    }).overrideProvider(BatchService)
+    })
+      .overrideProvider(BatchService)
       .useValue(batchService)
       .compile()
 
@@ -46,7 +50,9 @@ describe('HealthController', () => {
       const expectedBucketStatus = 'up'
 
       // WHEN
-      const result = await request(app.getHttpServer()).get('/health')
+      const result = await request(app.getHttpServer())
+        .get('/health')
+        .set('Authorization', `Basic ${basicAuth}`)
 
       // THEN
       expect(result.statusCode).toEqual(HttpStatus.OK)
@@ -61,7 +67,9 @@ describe('HealthController', () => {
       const expectedBucketStatus = 'down'
 
       // WHEN
-      const result = await request(app.getHttpServer()).get('/health')
+      const result = await request(app.getHttpServer())
+        .get('/health')
+        .set('Authorization', `Basic ${basicAuth}`)
 
       // THEN
       expect(result.statusCode).toEqual(HttpStatus.SERVICE_UNAVAILABLE)

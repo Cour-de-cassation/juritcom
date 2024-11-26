@@ -9,7 +9,7 @@ import * as request from 'supertest'
 import { MetadonneeDto } from '../../../../shared/infrastructure/dto/metadonnee.dto'
 import { MockUtils } from '../../../../shared/infrastructure/utils/mock.utils'
 import { UnexpectedException } from '../../../../shared/infrastructure/exceptions/unexpected.exception'
-import { OauthService } from '../../../../shared/infrastructure/security/oauth/oauth.service'
+import { AuthService } from '../../../../shared/infrastructure/security/auth/auth.service'
 import { JwtAuthGuard } from '../../../../shared/infrastructure/security/auth/auth.guard'
 import { FileService } from '../../../../shared/infrastructure/files/file.service'
 import * as fs from 'fs'
@@ -34,7 +34,7 @@ const batchService = {
 describe('Decision Controller', () => {
   let app: INestApplication
   const mockS3: AwsClientStub<S3Client> = mockClient(S3Client)
-  const oauthService = new OauthService()
+  const authService = new AuthService()
 
   let token = ''
   const testFile = Buffer.from('test file')
@@ -65,8 +65,8 @@ describe('Decision Controller', () => {
 
     await app.init()
 
-    jest.spyOn(oauthService, 'getToken').mockReturnValue(Promise.resolve('token'))
-    token = await oauthService.getToken()
+    jest.spyOn(authService, 'getToken').mockReturnValue(Promise.resolve('token'))
+    token = await authService.getToken()
   })
 
   beforeEach(() => {

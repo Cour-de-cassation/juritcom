@@ -1,9 +1,9 @@
 {
 	"info": {
-		"_postman_id": "a6d13193-d8e4-46b4-96c5-a62323a7e82c",
+		"_postman_id": "c07b961d-a299-4ba0-b6ba-f5e8cf56b47c",
 		"name": "Juritcom",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "37618049"
+		"_exporter_id": "16391540"
 	},
 	"item": [
 		{
@@ -33,41 +33,6 @@
 						"strictSSL": false
 					},
 					"request": {
-						"auth": {
-							"type": "oauth2",
-							"oauth2": [
-								{
-									"key": "client_authentication",
-									"value": "body",
-									"type": "string"
-								},
-								{
-									"key": "clientSecret",
-									"value": "m633usfnhB010OqsY04gwe7YHWqEEEdE",
-									"type": "string"
-								},
-								{
-									"key": "clientId",
-									"value": "juritcom",
-									"type": "string"
-								},
-								{
-									"key": "accessTokenUrl",
-									"value": "http://opn2vmla123:80/realms/juritcom/protocol/openid-connect/token",
-									"type": "string"
-								},
-								{
-									"key": "grant_type",
-									"value": "client_credentials",
-									"type": "string"
-								},
-								{
-									"key": "addTokenTo",
-									"value": "header",
-									"type": "string"
-								}
-							]
-						},
 						"method": "PUT",
 						"header": [
 							{
@@ -88,7 +53,7 @@
 								{
 									"key": "fichierDecisionIntegre",
 									"type": "file",
-									"src": "/home/juritcom/documentation/postman/fichier-exemples/decision.pdf"
+									"src": "./fichier-exemples/decision.pdf"
 								}
 							]
 						},
@@ -128,41 +93,6 @@
 						"disabledSystemHeaders": {}
 					},
 					"request": {
-						"auth": {
-							"type": "oauth2",
-							"oauth2": [
-								{
-									"key": "client_authentication",
-									"value": "body",
-									"type": "string"
-								},
-								{
-									"key": "clientSecret",
-									"value": "m633usfnhB010OqsY04gwe7YHWqEEEdE",
-									"type": "string"
-								},
-								{
-									"key": "clientId",
-									"value": "juritcom",
-									"type": "string"
-								},
-								{
-									"key": "accessTokenUrl",
-									"value": "http://opn2vmla123:80/realms/juritcom/protocol/openid-connect/token",
-									"type": "string"
-								},
-								{
-									"key": "grant_type",
-									"value": "client_credentials",
-									"type": "string"
-								},
-								{
-									"key": "addTokenTo",
-									"value": "header",
-									"type": "string"
-								}
-							]
-						},
 						"method": "PUT",
 						"header": [],
 						"body": {
@@ -211,41 +141,6 @@
 						"disabledSystemHeaders": {}
 					},
 					"request": {
-						"auth": {
-							"type": "oauth2",
-							"oauth2": [
-								{
-									"key": "client_authentication",
-									"value": "body",
-									"type": "string"
-								},
-								{
-									"key": "clientSecret",
-									"value": "m633usfnhB010OqsY04gwe7YHWqEEEdE",
-									"type": "string"
-								},
-								{
-									"key": "clientId",
-									"value": "juritcom",
-									"type": "string"
-								},
-								{
-									"key": "accessTokenUrl",
-									"value": "http://opn2vmla123:80/realms/juritcom/protocol/openid-connect/token",
-									"type": "string"
-								},
-								{
-									"key": "grant_type",
-									"value": "client_credentials",
-									"type": "string"
-								},
-								{
-									"key": "addTokenTo",
-									"value": "header",
-									"type": "string"
-								}
-							]
-						},
 						"method": "PUT",
 						"header": [],
 						"body": {
@@ -299,41 +194,6 @@
 						"disabledSystemHeaders": {}
 					},
 					"request": {
-						"auth": {
-							"type": "oauth2",
-							"oauth2": [
-								{
-									"key": "client_authentication",
-									"value": "body",
-									"type": "string"
-								},
-								{
-									"key": "clientSecret",
-									"value": "m633usfnhB010OqsY04gwe7YHWqEEEdE",
-									"type": "string"
-								},
-								{
-									"key": "clientId",
-									"value": "juritcom",
-									"type": "string"
-								},
-								{
-									"key": "accessTokenUrl",
-									"value": "http://opn2vmla123:80/realms/juritcom/protocol/openid-connect/token",
-									"type": "string"
-								},
-								{
-									"key": "grant_type",
-									"value": "client_credentials",
-									"type": "string"
-								},
-								{
-									"key": "addTokenTo",
-									"value": "header",
-									"type": "string"
-								}
-							]
-						},
 						"method": "PUT",
 						"header": [],
 						"body": {
@@ -342,7 +202,7 @@
 								{
 									"key": "fichierDecisionIntegre",
 									"type": "file",
-									"src": "/home/juritcom/documentation/postman/fichier-exemples/decision.pdf"
+									"src": "./fichier-exemples/decision.pdf"
 								}
 							]
 						},
@@ -382,41 +242,6 @@
 						"disabledSystemHeaders": {}
 					},
 					"request": {
-						"auth": {
-							"type": "oauth2",
-							"oauth2": [
-								{
-									"key": "client_authentication",
-									"value": "body",
-									"type": "string"
-								},
-								{
-									"key": "clientSecret",
-									"value": "m633usfnhB010OqsY04gwe7YHWqEEEdE",
-									"type": "string"
-								},
-								{
-									"key": "clientId",
-									"value": "juritcom",
-									"type": "string"
-								},
-								{
-									"key": "accessTokenUrl",
-									"value": "http://opn2vmla123:80/realms/juritcom/protocol/openid-connect/token",
-									"type": "string"
-								},
-								{
-									"key": "grant_type",
-									"value": "client_credentials",
-									"type": "string"
-								},
-								{
-									"key": "addTokenTo",
-									"value": "header",
-									"type": "string"
-								}
-							]
-						},
 						"method": "PUT",
 						"header": [],
 						"body": {
@@ -430,7 +255,7 @@
 								{
 									"key": "fichierDecisionIntegre",
 									"type": "file",
-									"src": "/home/juritcom/documentation/postman/fichier-exemples/decision.pdf"
+									"src": "./fichier-exemples/decision.pdf"
 								}
 							]
 						},
@@ -552,6 +377,133 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Test internal oAuth",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"statusCode\", function(){\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "http://localhost:3000/test-auth",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"test-auth"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "oauth2",
+				"oauth2": [
+					{
+						"key": "tokenName",
+						"value": "t3",
+						"type": "string"
+					},
+					{
+						"key": "scope",
+						"value": "{{OAUTH_SCOPE}}",
+						"type": "string"
+					},
+					{
+						"key": "clientSecret",
+						"value": "{{OAUTH_CLIENT_SECRET}}",
+						"type": "string"
+					},
+					{
+						"key": "clientId",
+						"value": "{{OAUTH_CLIENT_ID}}",
+						"type": "string"
+					},
+					{
+						"key": "accessTokenUrl",
+						"value": "{{OAUTH_TOKEN_URL}}",
+						"type": "string"
+					},
+					{
+						"key": "refreshRequestParams",
+						"value": [],
+						"type": "any"
+					},
+					{
+						"key": "tokenRequestParams",
+						"value": [],
+						"type": "any"
+					},
+					{
+						"key": "authRequestParams",
+						"value": [],
+						"type": "any"
+					},
+					{
+						"key": "challengeAlgorithm",
+						"value": "S256",
+						"type": "string"
+					},
+					{
+						"key": "grant_type",
+						"value": "client_credentials",
+						"type": "string"
+					},
+					{
+						"key": "addTokenTo",
+						"value": "header",
+						"type": "string"
+					},
+					{
+						"key": "client_authentication",
+						"value": "body",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
 				}
 			]
 		}

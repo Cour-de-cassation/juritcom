@@ -16,7 +16,7 @@ export class SaveDecisionUsecase {
     texteDecisionIntegre: string,
     metadonnees: MetadonneeDto
   ): Promise<bucketFileDto> {
-    const uuid = uuidv4()
+    const uuid = metadonnees.idDecision // uuidv4()
     const originalFileName = fichierDecisionIntegre.originalname
     const jsonFileName = `${uuid}.json`
     const pdfFileName = `${uuid}${process.env.S3_PDF_FILE_NAME_SEPARATOR}${originalFileName}`

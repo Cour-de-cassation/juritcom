@@ -31,13 +31,9 @@ export class BatchService implements OnModuleInit {
         const stats = fs.statSync(filePath)
 
         if (stats.isFile()) {
-          const uuidPattern = /^[0-9a-fA-F-]{36}/
-          const uuidMatch = filename.match(uuidPattern)
-          const pdfS3Key = uuidMatch ? `${uuidMatch[0]}.pdf` : filename
-
-          const originalNamePattern = new RegExp(`^[^${this.separator}]+${this.separator}(.*)$`)
-          const originalNameMatch = filename.match(originalNamePattern)
-          const originalPdfFileName = originalNameMatch ? `${originalNameMatch[1]}` : filename
+          const idMatch = filename.split(this.separator)
+          const pdfS3Key = `${idMatch[0]}.pdf`
+          const originalPdfFileName = idMatch.length === 2 ? `${idMatch[1]}` : filename
 
           this.decisionsRepository.uploadFichierDecisionIntegre(
             fs.readFileSync(filePath),

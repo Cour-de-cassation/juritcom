@@ -32,7 +32,7 @@ describe('BatchService', () => {
 
   beforeEach(() => {
     process.env.AV_PDF_PATH = mockFolderPath
-    process.env.S3_PDF_FILE_NAME_SEPARATOR = '_'
+    process.env.S3_PDF_FILE_NAME_SEPARATOR = '_-_-_-_'
     process.env.S3_ARCHIVE_SCHEDULE = '0 */5 * * * *'
 
     decisionRepository = {

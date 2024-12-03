@@ -3,6 +3,7 @@ import {
   ListObjectsV2Command,
   ListObjectsV2CommandInput,
   PutObjectCommand,
+  DeleteObjectCommand,
   S3Client
 } from '@aws-sdk/client-s3'
 import { Logger } from '@nestjs/common'
@@ -55,6 +56,26 @@ export class DecisionS3Repository implements DecisionRepository {
     }
 
     await this.saveDecision(reqParams)
+  }
+
+  async deleteDecision(reqParams): Promise<void> {
+    try {
+      await this.s3Client.send(new DeleteObjectCommand(reqParams))
+    } catch (error) {
+      this.logger.error({ operationName: 'deleteDecision', msg: error.message, data: error })
+      throw new BucketError(error)
+    }
+  }
+
+  async deleteDataDecisionIntegre(
+    jsonS3Key: string
+  ): Promise<void> {
+    const reqParams = {
+      Bucket: process.env.S3_BUCKET_NAME_RAW,
+      Key: `${jsonS3Key}`
+    }
+
+    await this.deleteDecision(reqParams)
   }
 
   async uploadFichierDecisionIntegre(

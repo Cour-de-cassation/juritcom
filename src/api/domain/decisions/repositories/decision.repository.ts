@@ -5,6 +5,10 @@ export interface DecisionRepository {
     jsonS3Key: string
   ): Promise<void>
 
+  deleteDataDecisionIntegre(
+    jsonS3Key: string
+  ): Promise<void>
+
   uploadFichierDecisionIntegre(
     fichierDecisionIntegre: Express.Multer.File | Buffer,
     originalPdfFileName: string,

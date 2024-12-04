@@ -52,7 +52,6 @@ describe('BatchService', () => {
     batchService = new BatchService(schedulerRegistry)
     ;(batchService as any).decisionsRepository = decisionRepository
     ;(batchService as any).logger = logger
-
     ;(fs.readdirSync as jest.Mock).mockReturnValue(mockFileNames)
   })
 
@@ -121,7 +120,6 @@ describe('BatchService', () => {
     ;(path.join as jest.Mock).mockImplementation((folder, file) => `${folder}/${file}`)
     ;(fs.statSync as jest.Mock).mockReturnValue({ isFile: () => true })
     ;(fs.readFileSync as jest.Mock).mockReturnValue(mockFileData)
-
     ;(decisionRepository.uploadFichierDecisionIntegre as jest.Mock).mockImplementation(() => {
       throw new Error('Upload error')
     })

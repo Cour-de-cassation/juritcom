@@ -76,6 +76,7 @@ export class MockUtils {
       personnePhysicoMoraleGeoMorale: false,
       supprimerElement: '#magistratGreffe|120.000€'
     },
-    composition: [this.compositionDtoMock]
+    composition: [this.compositionDtoMock],
+    date: null
   }
 }

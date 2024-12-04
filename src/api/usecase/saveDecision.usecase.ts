@@ -21,7 +21,8 @@ export class SaveDecisionUsecase {
 
     const requestDto: CollectDto = {
       texteDecisionIntegre,
-      metadonnees
+      metadonnees,
+      date: new Date()
     }
 
     await this.decisionsRepository.saveDataDecisionIntegre(

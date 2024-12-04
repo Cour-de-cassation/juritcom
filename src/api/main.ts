@@ -171,8 +171,8 @@ class DB {
 
 const enabledScopes = ['collect']
 const getUserDoc = () => ({ id: 'system' })
-const bodyParser = require('body-parser')
-const OAuthServer = require('@node-oauth/express-oauth-server')
+import bodyParser from 'body-parser'
+import OAuthServer from '@node-oauth/express-oauth-server'
 const db = new DB()
 const model = createModel(db)
 const oauth = new OAuthServer({
@@ -228,8 +228,8 @@ async function bootstrap() {
   app.use('/token', oauth.token())
 
   const httpAdapter = app.getHttpAdapter()
-  // @ts-ignore
-  httpAdapter.get('/test-auth', oauth.authenticate(), function (req, res, next) {
+  // @ts-expect-error necessary for testing purpose, will be removed later
+  httpAdapter.get('/test-auth', oauth.authenticate(), function (req, res, _next) {
     res.send({ test: true })
   })
 

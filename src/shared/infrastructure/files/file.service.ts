@@ -25,7 +25,7 @@ export class FileService {
         filename: uniqueFilename,
         path: fullPath
       }
-    } catch (error) {
+    } catch (_error) {
       throw new InternalServerErrorException('Error saving file')
     }
   }

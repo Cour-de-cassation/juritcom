@@ -1,7 +1,6 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common'
 import { getOAuth, getModel } from '../../../../api/main'
-const Request = require('@node-oauth/oauth2-server').Request
-const Response = require('@node-oauth/oauth2-server').Response
+import { Request, Response } from '@node-oauth/oauth2-server'
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
@@ -15,7 +14,7 @@ export class JwtAuthGuard implements CanActivate {
     return new Promise<boolean>((resolve) => resolve(value))
   }
 
-  async validateRequest(req: any, res: any, context: ExecutionContext) {
+  async validateRequest(req: any, res: any, _context: ExecutionContext) {
     let token
     const oAuth = getOAuth()
     const model = getModel()
@@ -24,7 +23,7 @@ export class JwtAuthGuard implements CanActivate {
 
     try {
       token = await oAuth.server.authenticate(request, response)
-    } catch (e) {
+    } catch (_e) {
       return false
     }
 

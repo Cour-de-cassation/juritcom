@@ -6,7 +6,7 @@ export class AuthService {
   constructor(/*private readonly oauthService: OauthService*/) {}
 
   async getToken() {
-    let config = {
+    const config = {
       method: 'post',
       maxBodyLength: Infinity,
       url: process.env.OAUTH_TOKEN_URL,
@@ -21,10 +21,5 @@ export class AuthService {
     }
     const tokenResponse = await axios.request(config)
     return tokenResponse.data.access_token
-  }
-
-  async validateToken(token: string) {
-    // return this.oauthService.validateToken(token)
-    return false
   }
 }

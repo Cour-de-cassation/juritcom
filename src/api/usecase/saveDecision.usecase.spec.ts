@@ -41,7 +41,7 @@ describe('SaveDecision Usecase', () => {
     expect(mockDecisionRepository.saveDataDecisionIntegre).toHaveBeenCalledWith(
       JSON.stringify(requestDto),
       'test.pdf',
-      'test.json'
+      '00001.json'
     )
   })
 })

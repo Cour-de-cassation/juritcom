@@ -3,11 +3,8 @@ import { BatchService } from './batch.service'
 import { ScheduleModule } from '@nestjs/schedule'
 
 @Module({
-  imports: [
-    ScheduleModule.forRoot()
-  ],
+  imports: [ScheduleModule.forRoot()],
   providers: [BatchService],
   exports: [BatchService]
 })
-export class BatchModule {
-}
+export class BatchModule {}

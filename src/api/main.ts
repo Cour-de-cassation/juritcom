@@ -187,7 +187,7 @@ db.saveClient({
 
 async function bootstrap() {
   const appOptions = {
-    logger: ['log', 'error', 'warn'],
+    logger: ['log', 'error', 'warn']
   } as NestApplicationOptions
 
   const app = await NestFactory.create(AppModule, appOptions)

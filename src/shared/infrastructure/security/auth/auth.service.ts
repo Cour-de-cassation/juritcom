@@ -3,8 +3,7 @@ import axios from 'axios'
 
 @Injectable()
 export class AuthService {
-  constructor(/*private readonly oauthService: OauthService*/ ) {
-  }
+  constructor(/*private readonly oauthService: OauthService*/) {}
 
   async getToken() {
     let config = {

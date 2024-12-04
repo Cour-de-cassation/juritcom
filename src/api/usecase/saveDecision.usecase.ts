@@ -7,8 +7,7 @@ import { CollectDto } from 'src/shared/infrastructure/dto/collect.dto'
 export class SaveDecisionUsecase {
   private readonly fileService: FileService = new FileService()
 
-  constructor(private decisionsRepository: DecisionRepository) {
-  }
+  constructor(private decisionsRepository: DecisionRepository) {}
 
   async putDecision(
     fichierDecisionIntegre: Express.Multer.File,

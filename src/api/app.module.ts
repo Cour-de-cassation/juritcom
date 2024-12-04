@@ -22,11 +22,9 @@ import { BatchModule } from '../batch/batch.module'
     configureLoggerModule(),
     AuthModule,
     FileModule,
-    BatchModule,
+    BatchModule
   ],
   controllers: [RedirectController, HealthController, DecisionController],
-  providers: [
-    BucketHealthIndicator,
-  ]
+  providers: [BucketHealthIndicator]
 })
 export class AppModule {}

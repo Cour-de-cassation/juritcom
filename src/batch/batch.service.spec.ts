@@ -26,8 +26,10 @@ describe('BatchService', () => {
   let schedulerRegistry: jest.Mocked<SchedulerRegistry>
 
   const mockFolderPath = '/mock-folder'
-  const mockFileNames = ['05526bff-58be-4f35-b0a9-b3bfbdd9e1ea_file_1.pdf',
-    'c5e1783b-9fa4-4147-9b16-90b902060866_file2.pdf']
+  const mockFileNames = [
+    '05526bff-58be-4f35-b0a9-b3bfbdd9e1ea_file_1.pdf',
+    'c5e1783b-9fa4-4147-9b16-90b902060866_file2.pdf'
+  ]
   const mockFileData = Buffer.from('mock file data')
 
   beforeEach(() => {
@@ -47,12 +49,11 @@ describe('BatchService', () => {
       addCronJob: jest.fn()
     } as unknown as jest.Mocked<SchedulerRegistry>
 
+    batchService = new BatchService(schedulerRegistry)
+    ;(batchService as any).decisionsRepository = decisionRepository
+    ;(batchService as any).logger = logger
 
-    batchService = new BatchService(schedulerRegistry);
-    (batchService as any).decisionsRepository = decisionRepository;
-    (batchService as any).logger = logger;
-
-    (fs.readdirSync as jest.Mock).mockReturnValue(mockFileNames)
+    ;(fs.readdirSync as jest.Mock).mockReturnValue(mockFileNames)
   })
 
   afterEach(() => {
@@ -60,7 +61,7 @@ describe('BatchService', () => {
   })
 
   it('should log an error if reading files fails', async () => {
-    (fs.readdirSync as jest.Mock).mockImplementation(() => {
+    ;(fs.readdirSync as jest.Mock).mockImplementation(() => {
       throw new Error('File read error')
     })
 
@@ -74,36 +75,42 @@ describe('BatchService', () => {
   })
 
   it('should process files in the folder and upload them', async () => {
-    (path.join as jest.Mock).mockImplementation((folder, file) => `${folder}/${file}`);
-    (fs.statSync as jest.Mock).mockReturnValue({ isFile: () => true });
-    (fs.readFileSync as jest.Mock).mockReturnValue(mockFileData);
-    (fs.unlinkSync as jest.Mock).mockImplementation(() => {
-    })
+    ;(path.join as jest.Mock).mockImplementation((folder, file) => `${folder}/${file}`)
+    ;(fs.statSync as jest.Mock).mockReturnValue({ isFile: () => true })
+    ;(fs.readFileSync as jest.Mock).mockReturnValue(mockFileData)
+    ;(fs.unlinkSync as jest.Mock).mockImplementation(() => {})
 
     await batchService.archiveFilesToS3()
 
     mockFileNames.forEach((filename) => {
-      expect(decisionRepository.uploadFichierDecisionIntegre).toHaveBeenCalledTimes(mockFileNames.length)
+      expect(decisionRepository.uploadFichierDecisionIntegre).toHaveBeenCalledTimes(
+        mockFileNames.length
+      )
       expect(fs.unlinkSync).toHaveBeenCalledWith(`${mockFolderPath}/${filename}`)
     })
 
-    expect(logger.log).toHaveBeenCalledWith({ msg: 'Starting scan', operationName: 'archiveFilesToS3' })
-    expect(logger.log).toHaveBeenCalledWith({ msg: 'End of scan', operationName: 'archiveFilesToS3' })
+    expect(logger.log).toHaveBeenCalledWith({
+      msg: 'Starting scan',
+      operationName: 'archiveFilesToS3'
+    })
+    expect(logger.log).toHaveBeenCalledWith({
+      msg: 'End of scan',
+      operationName: 'archiveFilesToS3'
+    })
   })
 
   it('should skip non-file entries in the folder', async () => {
-    const mockEntries = ['file1.pdf', 'file2.pdf'];
+    const mockEntries = ['file1.pdf', 'file2.pdf']
 
-    (fs.readdirSync as jest.Mock).mockReturnValue(mockEntries);
-    (path.join as jest.Mock).mockImplementation((folder, file) => `${folder}/${file}`);
-    (fs.statSync as jest.Mock).mockImplementation(() => {
+    ;(fs.readdirSync as jest.Mock).mockReturnValue(mockEntries)
+    ;(path.join as jest.Mock).mockImplementation((folder, file) => `${folder}/${file}`)
+    ;(fs.statSync as jest.Mock).mockImplementation(() => {
       return {
         isFile: () => true
       }
-    });
-    (fs.readFileSync as jest.Mock).mockReturnValue(mockFileData);
-    (fs.unlinkSync as jest.Mock).mockImplementation(() => {
     })
+    ;(fs.readFileSync as jest.Mock).mockReturnValue(mockFileData)
+    ;(fs.unlinkSync as jest.Mock).mockImplementation(() => {})
 
     await batchService.archiveFilesToS3()
 
@@ -111,11 +118,11 @@ describe('BatchService', () => {
   })
 
   it('should throw and log an error if upload fails', async () => {
-    (path.join as jest.Mock).mockImplementation((folder, file) => `${folder}/${file}`);
-    (fs.statSync as jest.Mock).mockReturnValue({ isFile: () => true });
-    (fs.readFileSync as jest.Mock).mockReturnValue(mockFileData);
+    ;(path.join as jest.Mock).mockImplementation((folder, file) => `${folder}/${file}`)
+    ;(fs.statSync as jest.Mock).mockReturnValue({ isFile: () => true })
+    ;(fs.readFileSync as jest.Mock).mockReturnValue(mockFileData)
 
-    (decisionRepository.uploadFichierDecisionIntegre as jest.Mock).mockImplementation(() => {
+    ;(decisionRepository.uploadFichierDecisionIntegre as jest.Mock).mockImplementation(() => {
       throw new Error('Upload error')
     })
 
@@ -126,6 +133,5 @@ describe('BatchService', () => {
       msg: 'Upload error',
       operationName: 'archiveFilesToS3'
     })
-
   })
 })

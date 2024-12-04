@@ -26,11 +26,7 @@ export class FileService {
         path: fullPath
       }
     } catch (error) {
-      throw new InternalServerErrorException(
-        'Error saving file'
-      )
+      throw new InternalServerErrorException('Error saving file')
     }
   }
-
-
 }

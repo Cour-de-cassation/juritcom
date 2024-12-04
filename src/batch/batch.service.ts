@@ -6,7 +6,6 @@ import { DecisionRepository } from '../api/domain/decisions/repositories/decisio
 import { DecisionS3Repository } from '../shared/infrastructure/repositories/decisionS3.repository'
 import { CronJob } from 'cron'
 
-
 @Injectable()
 export class BatchService implements OnModuleInit {
   private readonly folderPath = process.env.AV_PDF_PATH
@@ -14,11 +13,14 @@ export class BatchService implements OnModuleInit {
   private readonly logger: Logger = new Logger(BatchService.name)
   private readonly decisionsRepository: DecisionRepository = new DecisionS3Repository(this.logger)
 
-  constructor(private schedulerRegistry: SchedulerRegistry) {
-  }
+  constructor(private schedulerRegistry: SchedulerRegistry) {}
 
   onModuleInit() {
-    this.addCronJob(`archive_files_to_s3`, process.env.S3_ARCHIVE_SCHEDULE, this.archiveFilesToS3.bind(this))
+    this.addCronJob(
+      `archive_files_to_s3`,
+      process.env.S3_ARCHIVE_SCHEDULE,
+      this.archiveFilesToS3.bind(this)
+    )
   }
 
   async archiveFilesToS3() {
@@ -26,7 +28,7 @@ export class BatchService implements OnModuleInit {
 
     try {
       const fileNames = fs.readdirSync(this.folderPath)
-      fileNames.forEach(filename => {
+      fileNames.forEach((filename) => {
         const filePath = path.join(this.folderPath, filename)
         const stats = fs.statSync(filePath)
 
@@ -47,7 +49,6 @@ export class BatchService implements OnModuleInit {
         const filePath = path.join(this.folderPath, filename)
         fs.unlinkSync(filePath) // file deletion
       })
-
     } catch (error) {
       this.logger.error({ operationName: 'archiveFilesToS3', msg: error.message, data: error })
     }
@@ -70,7 +71,8 @@ export class BatchService implements OnModuleInit {
     this.schedulerRegistry.addCronJob(name, job)
     job.start()
 
-    this.logger.log(`The cron job ${name} has been added with the following cron expression : ${cronExpression}`)
+    this.logger.log(
+      `The cron job ${name} has been added with the following cron expression : ${cronExpression}`
+    )
   }
-
 }

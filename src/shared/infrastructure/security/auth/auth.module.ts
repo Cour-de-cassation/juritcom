@@ -6,5 +6,4 @@ import { AuthService } from './auth.service'
   providers: [AuthService, JwtAuthGuard],
   exports: [AuthService]
 })
-export class AuthModule {
-}
+export class AuthModule {}

@@ -1,18 +1,12 @@
 import { DecisionRepository } from '../domain/decisions/repositories/decision.repository'
 
 export class DeleteDecisionUsecase {
+  constructor(private decisionsRepository: DecisionRepository) {}
 
-  constructor(private decisionsRepository: DecisionRepository) {
-  }
-
-  async deleteDecision(
-    decisionId: string
-  ): Promise<string> {
+  async deleteDecision(decisionId: string): Promise<string> {
     const jsonFileName = `${decisionId}.json`
 
-    await this.decisionsRepository.deleteDataDecisionIntegre(
-      jsonFileName
-    )
+    await this.decisionsRepository.deleteDataDecisionIntegre(jsonFileName)
 
     return jsonFileName
   }

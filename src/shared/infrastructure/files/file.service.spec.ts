@@ -22,9 +22,8 @@ describe('FileService', () => {
   })
 
   it('should create the upload directory if it does not exist', () => {
-    (fs.existsSync as jest.Mock).mockReturnValue(false);
-    (fs.mkdirSync as jest.Mock).mockImplementation(() => {
-    })
+    ;(fs.existsSync as jest.Mock).mockReturnValue(false)
+    ;(fs.mkdirSync as jest.Mock).mockImplementation(() => {})
 
     new FileService()
 
@@ -32,7 +31,7 @@ describe('FileService', () => {
   })
 
   it('should not create the upload directory if it already exists', () => {
-    (fs.existsSync as jest.Mock).mockReturnValue(true)
+    ;(fs.existsSync as jest.Mock).mockReturnValue(true)
 
     new FileService()
 
@@ -41,9 +40,8 @@ describe('FileService', () => {
 
   it('should save the file successfully and return the file path and name', () => {
     const mockFilename = 'uniqueFile.pdf'
-    const mockFullPath = `${mockUploadPath}/${mockFilename}`;
-    (fs.writeFileSync as jest.Mock).mockImplementation(() => {
-    })
+    const mockFullPath = `${mockUploadPath}/${mockFilename}`
+    ;(fs.writeFileSync as jest.Mock).mockImplementation(() => {})
 
     const result = fileService.saveFile(mockFile, mockFilename)
 
@@ -55,13 +53,11 @@ describe('FileService', () => {
   })
 
   it('should throw an InternalServerErrorException if saving the file fails', () => {
-    const mockFilename = 'uniqueFile.pdf';
-    (fs.writeFileSync as jest.Mock).mockImplementation(() => {
+    const mockFilename = 'uniqueFile.pdf'
+    ;(fs.writeFileSync as jest.Mock).mockImplementation(() => {
       throw new Error('Write failed')
     })
 
-    expect(() => fileService.saveFile(mockFile, mockFilename)).toThrow(
-      InternalServerErrorException
-    )
+    expect(() => fileService.saveFile(mockFile, mockFilename)).toThrow(InternalServerErrorException)
   })
 })

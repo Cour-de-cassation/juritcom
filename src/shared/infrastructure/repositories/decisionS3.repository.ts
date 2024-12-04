@@ -67,9 +67,7 @@ export class DecisionS3Repository implements DecisionRepository {
     }
   }
 
-  async deleteDataDecisionIntegre(
-    jsonS3Key: string
-  ): Promise<void> {
+  async deleteDataDecisionIntegre(jsonS3Key: string): Promise<void> {
     const reqParamsMarkForDeletion = {
       Body: JSON.stringify({
         date: new Date()

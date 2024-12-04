@@ -5,7 +5,6 @@ import { DecisionRepository } from '../domain/decisions/repositories/decision.re
 import { MetadonneeDto } from '../../shared/infrastructure/dto/metadonnee.dto'
 import * as fs from 'fs'
 
-
 const fakeFilename = 'test'
 jest.mock('uuid', () => ({ v4: () => fakeFilename }))
 jest.mock('fs', () => ({
@@ -32,8 +31,7 @@ describe('SaveDecision Usecase', () => {
       path: ''
     } as unknown as Express.Multer.File
     const metadonnees = new MockUtils().metadonneeDtoMock as unknown as MetadonneeDto
-    (fs.writeFileSync as jest.Mock).mockImplementation(() => {
-    })
+    ;(fs.writeFileSync as jest.Mock).mockImplementation(() => {})
     await usecase.putDecision(fichierDecisionIntegre, 'test', metadonnees)
 
     const requestDto = {

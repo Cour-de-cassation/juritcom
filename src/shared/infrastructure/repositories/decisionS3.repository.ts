@@ -70,12 +70,22 @@ export class DecisionS3Repository implements DecisionRepository {
   async deleteDataDecisionIntegre(
     jsonS3Key: string
   ): Promise<void> {
-    const reqParams = {
+    const reqParamsMarkForDeletion = {
+      Body: JSON.stringify({
+        date: new Date()
+      }),
+      Bucket: process.env.S3_BUCKET_NAME_DELETION,
+      Key: `${jsonS3Key}.deletion`
+    }
+
+    await this.saveDecision(reqParamsMarkForDeletion)
+
+    const reqParamsDelete = {
       Bucket: process.env.S3_BUCKET_NAME_RAW,
       Key: `${jsonS3Key}`
     }
 
-    await this.deleteDecision(reqParams)
+    await this.deleteDecision(reqParamsDelete)
   }
 
   async uploadFichierDecisionIntegre(

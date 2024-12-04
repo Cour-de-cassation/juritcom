@@ -14,8 +14,6 @@ export class DeleteDecisionUsecase {
       jsonFileName
     )
 
-    // @TODO propagate deletion to DBSDER 
-
     return jsonFileName
   }
 }

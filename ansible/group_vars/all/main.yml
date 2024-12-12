@@ -6,6 +6,8 @@ api_service: "api-service"
 bucket_service: "bucket-service"
 juritcom_private_name: "tcm.judilibre-prive.local"
 
+use_auth: "basic"
+
 api_port: "3000"
 doc_login: "root"
 s3_region: "eu-west-paris-1"

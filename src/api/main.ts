@@ -171,8 +171,8 @@ class DB {
 
 const enabledScopes = ['collect']
 const getUserDoc = () => ({ id: 'system' })
-import bodyParser from 'body-parser'
-import OAuthServer from '@node-oauth/express-oauth-server'
+import * as bodyParser from 'body-parser'
+import * as OAuthServer from '@node-oauth/express-oauth-server'
 const db = new DB()
 const model = createModel(db)
 const oauth = new OAuthServer({

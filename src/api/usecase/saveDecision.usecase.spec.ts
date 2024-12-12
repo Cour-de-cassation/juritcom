@@ -34,13 +34,13 @@ describe('SaveDecision Usecase', () => {
     const metadonnees = new MockUtils().metadonneeDtoMock as unknown as MetadonneeDto
     ;(fs.writeFileSync as jest.Mock).mockImplementation(() => {})
     metadonnees.date = now
-    await usecase.putDecision(fichierDecisionIntegre, 'test', metadonnees)
-
     const requestDto = {
       texteDecisionIntegre: 'test',
       metadonnees,
       date: now
     }
+    await usecase.putDecision(fichierDecisionIntegre, 'test', metadonnees)
+
     expect(mockDecisionRepository.saveDataDecisionIntegre).toHaveBeenCalledWith(
       JSON.stringify(requestDto),
       'test.pdf',

@@ -21,4 +21,5 @@
         S3_BUCKET_NAME_NORMALIZED: "{{ s3_bucket_name_normalized }}"
         S3_ARCHIVE_SCHEDULE: "{{ s3_archive_schedule }}"
         S3_PDF_FILE_NAME_SEPARATOR: "{{ s3_pdf_file_name_separator }}"
+        USE_AUTH: "{{ use_auth }}"
 ...

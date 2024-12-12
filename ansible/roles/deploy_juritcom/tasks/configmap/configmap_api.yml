@@ -17,6 +17,7 @@
         DBSDER_API_URL: "{{ dbsder_api_url }}"
         NO_COLOR: "{{ no_color }}"
         PORT: "{{ api_port }}"
+        USE_AUTH: "{{ use_auth }}"
         OAUTH_PROVIDER_URL: "{{ oauth_provider_url }}"
         OAUTH_CLIENT_ID: "{{ oauth_client_id }}"
         OAUTH_TOKEN_URL: "{{ oauth_token_url }}"

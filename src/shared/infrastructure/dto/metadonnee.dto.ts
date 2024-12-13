@@ -1,4 +1,4 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import { ApiProperty, ApiPropertyOptional, ApiHideProperty } from '@nestjs/swagger'
 import {
   IsArray,
   IsBoolean,
@@ -549,4 +549,8 @@ export class MetadonneeDto {
   @Type(() => OccultationComplementaireDto)
   @IsOptional()
   occultationsComplementaires?: OccultationComplementaireDto
+
+  @ApiHideProperty()
+  @IsOptional()
+  date?: any
 }

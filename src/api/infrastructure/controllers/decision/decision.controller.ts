@@ -9,10 +9,12 @@ import {
   Req,
   Param,
   UploadedFile,
+  UseGuards,
   UseInterceptors
 } from '@nestjs/common'
 import {
   ApiBadRequestResponse,
+  ApiBearerAuth,
   ApiBody,
   ApiParam,
   ApiConsumes,
@@ -40,7 +42,9 @@ import { BucketError } from '../../../../shared/domain/errors/bucket.error'
 import { InfrastructureExpection } from '../../../../shared/infrastructure/exceptions/infrastructure.exception'
 import { UnexpectedException } from '../../../../shared/infrastructure/exceptions/unexpected.exception'
 import { SaveDecisionUsecase } from '../../../usecase/saveDecision.usecase'
+import { DeleteDecisionUsecase } from '../../../usecase/deleteDecision.usecase'
 import { DecisionS3Repository } from '../../../../shared/infrastructure/repositories/decisionS3.repository'
+import { JwtAuthGuard } from '../../../../shared/infrastructure/security/auth/auth.guard'
 
 const FILE_MAX_SIZE = {
   size: 10000000,
@@ -53,8 +57,15 @@ export interface DecisionResponse {
   body: string
 }
 
+export interface DeleteDecisionResponse {
+  decisionId: string | void
+  decisionStoredKey: string | void
+}
+
+@ApiBearerAuth()
 @ApiTags('decision')
 @Controller('/decision')
+@UseGuards(JwtAuthGuard)
 export class DecisionController {
   private readonly logger = new Logger()
 
@@ -87,8 +98,12 @@ export class DecisionController {
     description: "Une erreur inattendue liée à une dépendance de l'API a été rencontrée. "
   })
   @HttpCode(HttpStatus.NO_CONTENT)
-  deleteDecision(@Param('decisionId') decisionId: string, @Req() request: Request) {
+  async deleteDecision(
+    @Param('decisionId') decisionId: string,
+    @Req() request: Request
+  ): Promise<DeleteDecisionResponse> {
     const routePath = request.method + ' ' + request.path
+    const decisionUseCase = new DeleteDecisionUsecase(new DecisionS3Repository(this.logger))
     const formatLogs: LogsFormat = {
       operationName: 'deleteDecision',
       httpMethod: request.method,
@@ -97,16 +112,37 @@ export class DecisionController {
       correlationId: request.headers['x-correlation-id']
     }
 
+    const decisionStoredKey = await decisionUseCase.deleteDecision(decisionId).catch((error) => {
+      if (error instanceof BucketError) {
+        this.logger.error({
+          ...formatLogs,
+          msg: error.message,
+          statusCode: HttpStatus.SERVICE_UNAVAILABLE
+        })
+        throw new InfrastructureExpection(error.message)
+      }
+      this.logger.error({
+        ...formatLogs,
+        msg: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+      })
+      throw new UnexpectedException(error)
+    })
+
     this.logger.log({
       ...formatLogs,
       msg: routePath + ' returns ' + HttpStatus.NO_CONTENT,
       data: {
-        decisionId: decisionId
+        decisionId: decisionId,
+        decisionStoredKey: decisionStoredKey
       },
       statusCode: HttpStatus.NO_CONTENT
     })
 
-    return `L'ordre de suppression de la décision ${decisionId} a bien été reçu, mais la suppression n'est pas encore implémentée pour l'instant.`
+    return {
+      decisionId: decisionId,
+      decisionStoredKey: decisionStoredKey
+    }
   }
 
   @Put()

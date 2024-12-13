@@ -6,6 +6,7 @@ import { fetchDecisionListFromS3 } from './services/fetchDecisionListFromS3'
 import { DecisionS3Repository } from '../../shared/infrastructure/repositories/decisionS3.repository'
 import { mapDecisionNormaliseeToDecisionDto } from './infrastructure/decision.dto'
 import { computeLabelStatus } from './services/computeLabelStatus'
+import { computeOccultation } from './services/computeOccultation'
 import { DbSderApiGateway } from './repositories/gateways/dbsderApi.gateway'
 import { normalizationFormatLogs } from './index'
 
@@ -39,8 +40,8 @@ export async function normalizationJob(): Promise<ConvertedDecisionWithMetadonne
 
         // Step 3: Generating unique id for decision
         const _id = decision.metadonnees.idDecision
-        // generateUniqueId(decision.metadonnees) (à réévaluer avec les premiers lots de test), cf. [generateUniqueId.ts](https://github.com/Cour-de-cassation/juritj/blob/dev/src/batch/normalization/services/generateUniqueId.ts)
         normalizationFormatLogs.data = { decisionId: _id }
+
         logger.info({ ...normalizationFormatLogs, msg: 'Generated unique id for decision' })
 
         // Step 4: Transforming decision from WPD to text
@@ -67,11 +68,9 @@ export async function normalizationJob(): Promise<ConvertedDecisionWithMetadonne
           categoriesToOmit: [],
           motivationOccultation: false
         }
-        // decisionToSave.occultation = computeOccultation(
-        //   decision.metadonnees.recommandationOccultation,
-        //   decision.metadonnees.occultationComplementaires,
-        //   decision.metadonnees.debatPublic
-        // ) // @TODO not ready
+        decisionToSave.occultation = computeOccultation(
+           decision.metadonnees.occultationsComplementaires
+        ) // @TODO
 
         // Step 7: Save decision in database
         await dbSderApiGateway.saveDecision(decisionToSave)

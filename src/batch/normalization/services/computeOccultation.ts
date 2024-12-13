@@ -1,11 +1,10 @@
 import { DecisionOccultation, Occultation } from 'dbsder-api-types'
 import { logger, normalizationFormatLogs } from '../index'
 import { LogsFormat } from '../../../shared/infrastructure/utils/logsFormat.utils'
+import { OccultationComplementaireDto } from '../../../shared/infrastructure/dto/metadonnee.dto'
 
 export function computeOccultation(
-  recommandationOccultation: string,
-  occultationSupplementaire: string,
-  debatPublic: boolean
+  occultationsComplementaires: OccultationComplementaireDto
 ): DecisionOccultation {
   const formatLogs: LogsFormat = {
     ...normalizationFormatLogs,
@@ -13,6 +12,9 @@ export function computeOccultation(
     msg: 'Starting computeOccultation...'
   }
 
+  const additionalTerms = ''
+  const motivationOccultation = false
+  /*
   const additionalTerms =
     recommandationOccultation === Occultation.SUBSTITUANT ||
     recommandationOccultation === Occultation.COMPLEMENT
@@ -34,6 +36,7 @@ export function computeOccultation(
     ...formatLogs,
     msg: `motivationOccultation computed ${motivationOccultation}`
   })
+    */
 
   return {
     additionalTerms,

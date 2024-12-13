@@ -31,21 +31,6 @@ describe('updateLabelStatus', () => {
       // THEN
       expect(mockDecisionLabel.labelStatus).toEqual(expectedLabelStatus)
     })
-
-    it(`when decision endCaseCode (codeDecision) is not in bloqued codeDecision list`, () => {
-      // GIVEN
-      const mockDecisionLabel = {
-        ...mockUtils.decisionMock,
-        endCaseCode: '33A'
-      }
-      const expectedLabelStatus = LabelStatus.TOBETREATED
-
-      // WHEN
-      mockDecisionLabel.labelStatus = computeLabelStatus(mockDecisionLabel)
-
-      // THEN
-      expect(mockDecisionLabel.labelStatus).toEqual(expectedLabelStatus)
-    })
   })
 
   describe('changes labelStatus if it has exceptions', () => {
@@ -68,21 +53,6 @@ describe('updateLabelStatus', () => {
         // THEN
         expect(mockDecisionLabel.labelStatus).toEqual(expectedLabelStatus)
       })
-    })
-
-    it('returns ignored_codeDecisionBloqueCC when endCaseCode (codeDecision) is in the list of bloqued codeDecision', () => {
-      // GIVEN
-      const mockDecisionLabel = {
-        ...new MockUtils().decisionMock,
-        endCaseCode: '11D'
-      }
-      const expectedLabelStatus = LabelStatus.IGNORED_CODE_DECISION_BLOQUE_CC
-
-      // WHEN
-      mockDecisionLabel.labelStatus = computeLabelStatus(mockDecisionLabel)
-
-      // THEN
-      expect(mockDecisionLabel.labelStatus).toEqual(expectedLabelStatus)
     })
 
     describe('returns ignored_dateAvantMiseEnService', () => {

@@ -34,14 +34,6 @@ export function computeLabelStatus(decisionDto: DecisionDTO): LabelStatus {
     return LabelStatus.IGNORED_DATE_AVANT_MISE_EN_SERVICE
   }
 
-  if (!isDecisionFromTJTransmissibleToCC(decisionDto.endCaseCode)) {
-    logger.error({
-      ...formatLogs,
-      msg: `Decision can not be treated by Judilibre because codeDecision is in blocked codeDecision list, changing LabelStatus to ${LabelStatus.IGNORED_CODE_DECISION_BLOQUE_CC}.`
-    })
-    return LabelStatus.IGNORED_CODE_DECISION_BLOQUE_CC
-  }
-
   if (!decisionContainsOnlyAuthorizedCharacters(decisionDto.originalText)) {
     logger.error({
       ...formatLogs,
@@ -55,10 +47,6 @@ export function computeLabelStatus(decisionDto: DecisionDTO): LabelStatus {
 
 function isDecisionInTheFuture(dateCreation: Date, dateDecision: Date): boolean {
   return dateDecision > dateCreation
-}
-
-function isDecisionFromTJTransmissibleToCC(endCaseCode: string): boolean {
-  return !codeDecisionListNotTransmissibleToCC.includes(endCaseCode)
 }
 
 function isDecisionOlderThanMiseEnService(dateDecision: Date): boolean {
@@ -79,6 +67,6 @@ function getMiseEnServiceDate(): Date {
   if (!isNaN(new Date(process.env.COMMISSIONING_DATE).getTime())) {
     return new Date(process.env.COMMISSIONING_DATE)
   } else {
-    return new Date('2023-12-15')
+    return new Date('2024-12-20')
   }
 }

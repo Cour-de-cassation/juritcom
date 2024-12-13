@@ -36,7 +36,7 @@
                       "idDecision": "66177ce6e5d",
                       "idGroupement": "ABCD",
                       "idJuridiction": "7501",
-                      "libelleJuridiction": "Tribunal judiciaire de Paris",
+                      "libelleJuridiction": "Tribunal de commerce de Paris",
                       "dateDecision": "20240322",
                       "numeroDossier": "2021F00123",
                       "libelleMatiere": "Demande de nullité d'un bail",
@@ -180,7 +180,7 @@
         },
         "operationId": "deleteDecision",
         "summary": "Supprimer une décision intègre",
-        "description": "Une décision intègre sera supprimée et, le cas échéant, dépubliée Judilibre"
+        "description": "Une décision intègre sera supprimée et, le cas échéant, dépubliée de Judilibre"
       }
     }
   },
@@ -198,7 +198,6 @@
           "decisionPublique",
           "debatChambreDuConseil",
           "interetParticulier",
-          "composition",
           "parties",
           "occultationsComplementaires"
         ],
@@ -295,7 +294,7 @@
           "idDecision": "66177ce6e5d",
           "idGroupement": "ABCD",
           "idJuridiction": "7501",
-          "libelleJuridiction": "Tribunal judiciaire de Paris",
+          "libelleJuridiction": "Tribunal de commerce de Paris",
           "dateDecision": "20240322",
           "numeroDossier": "2021F00123",
           "libelleMatiere": "Demande de nullité d'un bail",

@@ -1,15 +1,22 @@
 import { QualitePartie, TypePartie } from 'dbsder-api-types'
-import { AdresseDto, CompositionDto, MetadonneeDto, PartieDto } from '../dto/metadonnee.dto'
+import {
+  AdresseDto,
+  CompositionDto,
+  JusticeFunction,
+  JusticeRole,
+  MetadonneeDto,
+  PartieDto
+} from '../dto/metadonnee.dto'
 
 export class MockUtils {
   // Shared context
-  uniqueDecisionId = `TJ75011A01-1234520240120`
+  uniqueDecisionId = `TCOM75011A01-1234520240120`
 
   mandatoryPartieDtoMock = {
     nom: 'some valid name',
     type: TypePartie.AA,
     qualite: QualitePartie.G,
-    role: 'Avocat'
+    role: JusticeRole.AVOCAT
   }
 
   adresseDtoMock: AdresseDto = {
@@ -33,10 +40,10 @@ export class MockUtils {
 
   mandatoryMetadonneesDtoMock: MetadonneeDto = {
     composition: [],
-    idDecision: 'TJ00001',
+    idDecision: '00001',
     idGroupement: 'ABDC',
-    libelleJuridiction: 'Tribunal judiciaire de Paris',
-    idJuridiction: 'TJ7501',
+    libelleJuridiction: 'Tribunal de commerce de Paris',
+    idJuridiction: '7501',
     numeroDossier: '08/20240',
     dateDecision: '20240120',
     decisionPublique: true,
@@ -45,7 +52,7 @@ export class MockUtils {
   }
 
   compositionDtoMock: CompositionDto = {
-    fonction: 'GRF',
+    fonction: JusticeFunction.GRF,
     nom: 'Dupond',
     prenom: 'Henry',
     civilite: 'Monsieur'
@@ -69,6 +76,7 @@ export class MockUtils {
       personnePhysicoMoraleGeoMorale: false,
       supprimerElement: '#magistratGreffe|120.000€'
     },
-    composition: [this.compositionDtoMock]
+    composition: [this.compositionDtoMock],
+    date: null
   }
 }

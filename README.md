@@ -154,4 +154,4 @@ Pour effectuer des tests Postman sur l'environnement de développement :
 
 Un Swagger est disponible à l'url `/doc` ou via `/doc-json`
 
-Il vous suffit d'utiliser les variables DOC_LOGIN et DOC_PASSWORD à votre disposition pour vous authentifier.
+L'API utilise le protocole OAuth 2 avec un flow client credentials, et l'utilisation d'un jeton JWT valide est requise pour accéder aux différents endpoints.

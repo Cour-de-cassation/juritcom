@@ -51,7 +51,7 @@ export class DecisionS3Repository implements DecisionRepository {
       Bucket: process.env.S3_BUCKET_NAME_RAW,
       Key: `${jsonS3Key}`,
       Metadata: {
-        date: new Date(),
+        date: new Date().toISOString(),
         originalPdfFileName: originalPdfFileName
       }
     }
@@ -76,7 +76,7 @@ export class DecisionS3Repository implements DecisionRepository {
       Bucket: process.env.S3_BUCKET_NAME_DELETION,
       Key: `${jsonS3Key}.deletion`,
       Metadata: {
-        date: new Date()
+        date: new Date().toISOString()
       }
     }
 
@@ -102,7 +102,7 @@ export class DecisionS3Repository implements DecisionRepository {
       ContentType: file.mimetype,
       ACL: 'public-read',
       Metadata: {
-        date: new Date(),
+        date: new Date().toISOString(),
         originalPdfFileName: originalPdfFileName
       }
     } as unknown as any

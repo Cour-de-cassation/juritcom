@@ -22,7 +22,7 @@ describe('SaveDecision Usecase', () => {
   })
 
   it('should call putDecision integre', async () => {
-    const now = new Date()
+    const now = new Date().toISOString()
     const fichierDecisionIntegre = {
       originalname: 'test.pdf',
       mimetype: 'application/pdf',

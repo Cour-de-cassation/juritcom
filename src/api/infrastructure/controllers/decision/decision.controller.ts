@@ -5,14 +5,21 @@ import {
   HttpStatus,
   Logger,
   Put,
+  Delete,
   Req,
+  Param,
   UploadedFile,
+  UseGuards,
   UseInterceptors
 } from '@nestjs/common'
 import {
   ApiBadRequestResponse,
+  ApiBearerAuth,
   ApiBody,
+  ApiParam,
   ApiConsumes,
+  ApiNoContentResponse,
+  ApiNotFoundResponse,
   ApiCreatedResponse,
   ApiInternalServerErrorResponse,
   ApiOperation,
@@ -35,7 +42,9 @@ import { BucketError } from '../../../../shared/domain/errors/bucket.error'
 import { InfrastructureExpection } from '../../../../shared/infrastructure/exceptions/infrastructure.exception'
 import { UnexpectedException } from '../../../../shared/infrastructure/exceptions/unexpected.exception'
 import { SaveDecisionUsecase } from '../../../usecase/saveDecision.usecase'
+import { DeleteDecisionUsecase } from '../../../usecase/deleteDecision.usecase'
 import { DecisionS3Repository } from '../../../../shared/infrastructure/repositories/decisionS3.repository'
+import { JwtAuthGuard } from '../../../../shared/infrastructure/security/auth/auth.guard'
 
 const FILE_MAX_SIZE = {
   size: 10000000,
@@ -48,10 +57,93 @@ export interface DecisionResponse {
   body: string
 }
 
+export interface DeleteDecisionResponse {
+  decisionId: string | void
+  decisionStoredKey: string | void
+}
+
+@ApiBearerAuth()
 @ApiTags('decision')
 @Controller('/decision')
+@UseGuards(JwtAuthGuard)
 export class DecisionController {
   private readonly logger = new Logger()
+
+  @Delete(':decisionId')
+  @ApiOperation({
+    summary: 'Supprimer une décision intègre',
+    description:
+      "Une décision intègre sera supprimée et, le cas échéant, dépubliée de Judilibre (fonctionnalité non implémentée pour l'instant)",
+    operationId: 'deleteDecision'
+  })
+  @ApiParam({
+    name: 'decisionId',
+    type: 'string'
+  })
+  @ApiNoContentResponse({
+    description:
+      "L'ordre de suppression de la décision a bien été reçu, mais la suppression n'est pas encore implémentée pour l'instant."
+  })
+  @ApiNotFoundResponse({ description: 'La décision est introuvable' })
+  @ApiBadRequestResponse({
+    description: "La requête n'est pas correcte"
+  })
+  @ApiInternalServerErrorResponse({
+    description: "Une erreur interne s'est produite"
+  })
+  @ApiUnauthorizedResponse({
+    description: "La requête n'est pas autorisée"
+  })
+  @ApiServiceUnavailableResponse({
+    description: "Une erreur inattendue liée à une dépendance de l'API a été rencontrée. "
+  })
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteDecision(
+    @Param('decisionId') decisionId: string,
+    @Req() request: Request
+  ): Promise<DeleteDecisionResponse> {
+    const routePath = request.method + ' ' + request.path
+    const decisionUseCase = new DeleteDecisionUsecase(new DecisionS3Repository(this.logger))
+    const formatLogs: LogsFormat = {
+      operationName: 'deleteDecision',
+      httpMethod: request.method,
+      path: request.path,
+      msg: `Starting ${routePath}...`,
+      correlationId: request.headers['x-correlation-id']
+    }
+
+    const decisionStoredKey = await decisionUseCase.deleteDecision(decisionId).catch((error) => {
+      if (error instanceof BucketError) {
+        this.logger.error({
+          ...formatLogs,
+          msg: error.message,
+          statusCode: HttpStatus.SERVICE_UNAVAILABLE
+        })
+        throw new InfrastructureExpection(error.message)
+      }
+      this.logger.error({
+        ...formatLogs,
+        msg: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+      })
+      throw new UnexpectedException(error)
+    })
+
+    this.logger.log({
+      ...formatLogs,
+      msg: routePath + ' returns ' + HttpStatus.NO_CONTENT,
+      data: {
+        decisionId: decisionId,
+        decisionStoredKey: decisionStoredKey
+      },
+      statusCode: HttpStatus.NO_CONTENT
+    })
+
+    return {
+      decisionId: decisionId,
+      decisionStoredKey: decisionStoredKey
+    }
+  }
 
   @Put()
   @ApiOperation({

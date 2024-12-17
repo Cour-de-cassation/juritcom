@@ -1,10 +1,12 @@
 import { DecisionRepository } from '../domain/decisions/repositories/decision.repository'
-import { v4 as uuidv4 } from 'uuid'
 import { MetadonneeDto } from '../../shared/infrastructure/dto/metadonnee.dto'
 import { bucketFileDto } from '../../shared/infrastructure/dto/receive.dto'
+import { FileService } from '../../shared/infrastructure/files/file.service'
 import { CollectDto } from 'src/shared/infrastructure/dto/collect.dto'
 
 export class SaveDecisionUsecase {
+  private readonly fileService: FileService = new FileService()
+
   constructor(private decisionsRepository: DecisionRepository) {}
 
   async putDecision(
@@ -12,14 +14,15 @@ export class SaveDecisionUsecase {
     texteDecisionIntegre: string,
     metadonnees: MetadonneeDto
   ): Promise<bucketFileDto> {
-    const uuid = uuidv4()
+    const uuid = metadonnees.idDecision
     const originalFileName = fichierDecisionIntegre.originalname
     const jsonFileName = `${uuid}.json`
-    const pdfFileName = `${uuid}-${originalFileName}`
+    const pdfFileName = `${uuid}${process.env.S3_PDF_FILE_NAME_SEPARATOR}${originalFileName}`
 
     const requestDto: CollectDto = {
       texteDecisionIntegre,
-      metadonnees
+      metadonnees,
+      date: new Date()
     }
 
     await this.decisionsRepository.saveDataDecisionIntegre(
@@ -27,11 +30,8 @@ export class SaveDecisionUsecase {
       originalFileName,
       jsonFileName
     )
-    await this.decisionsRepository.uploadFichierDecisionIntegre(
-      fichierDecisionIntegre,
-      originalFileName,
-      pdfFileName
-    )
+
+    this.fileService.saveFile(fichierDecisionIntegre, pdfFileName)
 
     return {
       jsonFileName,

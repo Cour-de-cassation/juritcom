@@ -9,7 +9,6 @@ import {
 export function computeOccultation(metadonnees: MetadonneeDto): DecisionOccultation {
   const occultationsComplementaires: OccultationComplementaireDto =
     metadonnees.occultationsComplementaires
-  const additionalTerms = ''
   const categoriesToOmit = []
   const formatLogs: LogsFormat = {
     ...normalizationFormatLogs,
@@ -78,15 +77,27 @@ export function computeOccultation(metadonnees: MetadonneeDto): DecisionOccultat
     msg: `categoriesToOmit computed ${categoriesToOmit}`
   })
 
-  /* @TODO using
-  occultationsComplementaires.conserverElement and occultationsComplementaires.supprimerElement :
+  const additionalTermsArray = []
 
-  const additionalTerms =
-    recommandationOccultation === Occultation.SUBSTITUANT ||
-    recommandationOccultation === Occultation.COMPLEMENT
-      ? occultationSupplementaire
-      : ''
-    */
+  if (occultationsComplementaires.conserverElement !== '') {
+    for (let item of occultationsComplementaires.conserverElement.split('|')) {
+      item = item.trim()
+      if (item !== '') {
+        additionalTermsArray.push(`+${item}`)
+      }
+    }
+  }
+
+  if (occultationsComplementaires.supprimerElement !== '') {
+    for (let item of occultationsComplementaires.supprimerElement.split('|')) {
+      item = item.trim()
+      if (item !== '') {
+        additionalTermsArray.push(item)
+      }
+    }
+  }
+
+  const additionalTerms = additionalTermsArray.join('|')
 
   logger.info({
     ...formatLogs,

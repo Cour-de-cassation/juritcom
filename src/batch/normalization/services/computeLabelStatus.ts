@@ -2,7 +2,6 @@ import { DecisionTCOMDTO, LabelStatus } from 'dbsder-api-types'
 import { logger } from '../index'
 import { LogsFormat } from '../../../shared/infrastructure/utils/logsFormat.utils'
 import { normalizationFormatLogs } from '../index'
-import { codeDecisionListNotTransmissibleToCC } from '../infrastructure/codeDecisionList'
 import { authorizedCharacters } from '../infrastructure/authorizedCharactersList'
 
 const dateMiseEnService = getMiseEnServiceDate()

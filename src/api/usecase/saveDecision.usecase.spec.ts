@@ -22,7 +22,6 @@ describe('SaveDecision Usecase', () => {
   })
 
   it('should call putDecision integre', async () => {
-    const now = new Date().toISOString()
     const fichierDecisionIntegre = {
       originalname: 'test.pdf',
       mimetype: 'application/pdf',
@@ -33,14 +32,13 @@ describe('SaveDecision Usecase', () => {
     } as unknown as Express.Multer.File
     const metadonnees = new MockUtils().metadonneeDtoMock as unknown as MetadonneeDto
     ;(fs.writeFileSync as jest.Mock).mockImplementation(() => {})
-    metadonnees.date = now
+    metadonnees.date = new Date().toISOString()
+    await usecase.putDecision(fichierDecisionIntegre, 'test', metadonnees)
     const requestDto = {
       texteDecisionIntegre: 'test',
       metadonnees,
-      date: now
+      date: new Date().toISOString()
     }
-    await usecase.putDecision(fichierDecisionIntegre, 'test', metadonnees)
-
     expect(mockDecisionRepository.saveDataDecisionIntegre).toHaveBeenCalledWith(
       JSON.stringify(requestDto),
       'test.pdf',

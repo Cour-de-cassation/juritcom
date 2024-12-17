@@ -1,4 +1,4 @@
-import { LabelStatus, Sources, DecisionDTO } from 'dbsder-api-types'
+import { LabelStatus, PublishStatus, Sources, DecisionTCOMDTO } from 'dbsder-api-types'
 import { hashDecisionId } from '../../../shared/infrastructure/utils/hash.utils'
 import { MetadonneeDto } from '../../../shared/infrastructure/dto/metadonnee.dto'
 
@@ -7,29 +7,41 @@ export function mapDecisionNormaliseeToDecisionDto(
   decisionContent: string,
   metadonnees: MetadonneeDto,
   filename: string
-): DecisionDTO {
+): DecisionTCOMDTO {
   return {
-    appeals: [], // Non trouvé,
-    chamberId: metadonnees.idChambre ?? '', // @TODO Optionnel dans le swagger, mandatory dans dbsder-api ?
-    chamberName: metadonnees.libelleChambre ?? '', // @TODO Optionnel dans le swagger, mandatory dans dbsder-api ?
+    appeals: [],
+    chamberId: metadonnees.idChambre ?? '', // @FIXME Optionnel dans le swagger, mandatory dans dbsder-api
+    chamberName: metadonnees.libelleChambre ?? '', // @FIXME Optionnel dans le swagger, mandatory dans dbsder-api
     dateCreation: new Date().toISOString(),
     dateDecision: parseDate(metadonnees.dateDecision).toISOString(),
-    jurisdictionCode: '', // Non trouvé,
+    jurisdictionCode: `${metadonnees.idGroupement}_${metadonnees.idJuridiction}`,
     jurisdictionId: metadonnees.idJuridiction,
     jurisdictionName: metadonnees.libelleJuridiction,
     labelStatus: LabelStatus.TOBETREATED,
+    publishStatus:
+      metadonnees.decisionPublique === true ? PublishStatus.TOBEPUBLISHED : PublishStatus.BLOCKED,
     occultation: {
-      // @TODO
       additionalTerms: '',
       categoriesToOmit: [],
       motivationOccultation: false
     },
     originalText: decisionContent,
-    registerNumber: '', // Non trouvé
+    registerNumber: metadonnees.numeroDossier,
     sourceId: hashDecisionId(generatedId),
     sourceName: Sources.TCOM,
     blocOccultation: 0,
-    filenameSource: filename
+    filenameSource: filename,
+    public: metadonnees.decisionPublique === true,
+    solution: metadonnees.libelleProcedure ?? '',
+    codeMatiereCivil: metadonnees.idMatiere ?? '',
+    parties: metadonnees.parties ?? [{}],
+    idGroupement: metadonnees.idGroupement,
+    debatPublic: metadonnees.debatChambreDuConseil === false,
+    idDecisionTCOM: generatedId,
+    codeProcedure: metadonnees.idProcedure ?? '',
+    libelleMatiere: metadonnees.libelleMatiere ?? '',
+    selection: metadonnees.interetParticulier === true,
+    composition: metadonnees.composition ?? [{}]
   }
 }
 

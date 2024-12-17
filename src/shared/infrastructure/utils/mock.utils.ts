@@ -1,4 +1,4 @@
-import { DecisionDTO, LabelStatus, QualitePartie, Sources, TypePartie } from 'dbsder-api-types'
+import { DecisionTCOMDTO, LabelStatus, QualitePartie, Sources, TypePartie } from 'dbsder-api-types'
 import {
   AdresseDto,
   CompositionDto,
@@ -68,26 +68,30 @@ export class MockUtils {
   }
 
   // End of normalization context
-  decisionMock: DecisionDTO = {
+  decisionMock: DecisionTCOMDTO = {
     appeals: [],
     chamberId: '',
     chamberName: '',
     dateCreation: this.dateNow.toISOString(),
     dateDecision: new Date(parseInt('2024'), parseInt('03') - 1, parseInt('22')).toISOString(),
-    jurisdictionCode: '', // Non trouvé,
+    jurisdictionCode: '01_0605',
     jurisdictionId: this.mandatoryMetadonneesDtoMock.idJuridiction,
     jurisdictionName: this.mandatoryMetadonneesDtoMock.libelleJuridiction,
     labelStatus: LabelStatus.TOBETREATED,
     occultation: {
-      // @TODO
       additionalTerms: '',
       categoriesToOmit: [],
       motivationOccultation: false
     },
     originalText: this.decisionContentNormalized,
-    registerNumber: '', // Non trouvé
+    registerNumber: '2001F00930',
     sourceId: 1845940738,
     sourceName: Sources.TCOM,
-    blocOccultation: 0
+    blocOccultation: 0,
+    public: true,
+    idGroupement: '01',
+    debatPublic: true,
+    idDecisionTCOM: '0605_2001F00930_2012-12-05_19',
+    selection: false
   }
 }

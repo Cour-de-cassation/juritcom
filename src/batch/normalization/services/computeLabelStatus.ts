@@ -1,4 +1,4 @@
-import { DecisionDTO, LabelStatus } from 'dbsder-api-types'
+import { DecisionTCOMDTO, LabelStatus } from 'dbsder-api-types'
 import { logger } from '../index'
 import { LogsFormat } from '../../../shared/infrastructure/utils/logsFormat.utils'
 import { normalizationFormatLogs } from '../index'
@@ -8,7 +8,7 @@ import { authorizedCharacters } from '../infrastructure/authorizedCharactersList
 const dateMiseEnService = getMiseEnServiceDate()
 const authorizedCharactersdSet = new Set(authorizedCharacters)
 
-export function computeLabelStatus(decisionDto: DecisionDTO): LabelStatus {
+export function computeLabelStatus(decisionDto: DecisionTCOMDTO): LabelStatus {
   const dateCreation = new Date(decisionDto.dateCreation)
   const dateDecision = new Date(decisionDto.dateDecision)
 

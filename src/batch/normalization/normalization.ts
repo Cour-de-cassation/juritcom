@@ -68,9 +68,7 @@ export async function normalizationJob(): Promise<ConvertedDecisionWithMetadonne
           categoriesToOmit: [],
           motivationOccultation: false
         }
-        decisionToSave.occultation = computeOccultation(
-           decision.metadonnees.occultationsComplementaires
-        ) // @TODO
+        decisionToSave.occultation = computeOccultation(decision.metadonnees)
 
         // Step 7: Save decision in database
         await dbSderApiGateway.saveDecision(decisionToSave)

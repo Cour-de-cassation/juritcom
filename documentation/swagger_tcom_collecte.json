@@ -180,7 +180,7 @@
         },
         "operationId": "deleteDecision",
         "summary": "Supprimer une décision intègre",
-        "description": "Une décision intègre sera supprimée et, le cas échéant, dépubliée Judilibre"
+        "description": "Une décision intègre sera supprimée et, le cas échéant, dépubliée de Judilibre"
       }
     }
   },

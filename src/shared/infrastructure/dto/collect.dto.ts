@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger'
+import { ApiProperty, ApiHideProperty } from '@nestjs/swagger'
 import { MetadonneeDto } from './metadonnee.dto'
 
 export class CollectDto {
@@ -11,4 +11,7 @@ export class CollectDto {
     description: 'Metadonnées associées à la décision intègre.'
   })
   metadonnees: MetadonneeDto
+
+  @ApiHideProperty()
+  date: Date
 }

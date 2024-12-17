@@ -45,19 +45,51 @@ export class DecisionS3Repository implements DecisionRepository {
 
   async saveDataDecisionIntegre(
     requestToS3Dto: string,
-    originalFileName: string,
-    jsonFileName?: string
+    originalPdfFileName: string,
+    jsonS3Key: string
   ): Promise<void> {
     const reqParams = {
       Body: requestToS3Dto,
       Bucket: process.env.S3_BUCKET_NAME_RAW,
-      Key: `${process.env.S3_BUCKET_METADATA_PATH}${jsonFileName}`,
+      Key: `${jsonS3Key}`,
       Metadata: {
-        originalFileName
+        date: new Date().toISOString(),
+        originalPdfFileName: originalPdfFileName
       }
     }
 
     await this.saveDecision(reqParams)
+  }
+
+  async deleteDecision(reqParams): Promise<void> {
+    try {
+      await this.s3Client.send(new DeleteObjectCommand(reqParams))
+    } catch (error) {
+      this.logger.error({ operationName: 'deleteDecision', msg: error.message, data: error })
+      throw new BucketError(error)
+    }
+  }
+
+  async deleteDataDecisionIntegre(jsonS3Key: string): Promise<void> {
+    const reqParamsMarkForDeletion = {
+      Body: JSON.stringify({
+        date: new Date()
+      }),
+      Bucket: process.env.S3_BUCKET_NAME_DELETION,
+      Key: `${jsonS3Key}.deletion`,
+      Metadata: {
+        date: new Date().toISOString()
+      }
+    }
+
+    await this.saveDecision(reqParamsMarkForDeletion)
+
+    const reqParamsDelete = {
+      Bucket: process.env.S3_BUCKET_NAME_RAW,
+      Key: `${jsonS3Key}`
+    }
+
+    await this.deleteDecision(reqParamsDelete)
   }
 
   async saveDecisionNormalisee(requestToS3Dto: string, filename: string) {
@@ -72,17 +104,18 @@ export class DecisionS3Repository implements DecisionRepository {
 
   async uploadFichierDecisionIntegre(
     file: Express.Multer.File,
-    originalFileName: string,
-    pdfFileName: string
+    originalPdfFileName: string,
+    pdfS3Key: string
   ): Promise<void> {
     const params = {
-      Bucket: process.env.S3_BUCKET_NAME_RAW,
-      Key: `${process.env.S3_BUCKET_PDF_PATH}${pdfFileName}`,
+      Bucket: process.env.S3_BUCKET_NAME_PDF,
+      Key: `${pdfS3Key}`,
       Body: file.buffer,
       ContentType: file.mimetype,
       ACL: 'public-read',
       Metadata: {
-        originalFileName
+        date: new Date().toISOString(),
+        originalPdfFileName: originalPdfFileName
       }
     } as unknown as any
 
@@ -127,20 +160,6 @@ export class DecisionS3Repository implements DecisionRepository {
       return decisionListFromS3.Contents ? decisionListFromS3.Contents : []
     } catch (error) {
       this.logger.error({ operationName: 'getDecisionList', msg: error.message, data: error })
-      throw new BucketError(error)
-    }
-  }
-
-  async deleteDecision(filename: string, bucketName: string): Promise<void> {
-    const reqParams = {
-      Bucket: bucketName,
-      Key: filename
-    }
-
-    try {
-      await this.s3Client.send(new DeleteObjectCommand(reqParams))
-    } catch (error) {
-      this.logger.error({ operationName: 'deleteDecision', msg: error.message, data: error })
       throw new BucketError(error)
     }
   }

@@ -3,8 +3,7 @@ import { MetadonneeDto } from './metadonnee.dto'
 
 export class CollectDto {
   @ApiProperty({
-    type: 'string',
-    description: 'Contenu de la décision intègre.'
+    description: 'Texte intègre de la décision.'
   })
   texteDecisionIntegre: string
 

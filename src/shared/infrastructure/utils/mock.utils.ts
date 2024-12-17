@@ -64,7 +64,25 @@ export class MockUtils {
   }
 
   metadonneeDtoMock = {
-    ...this.mandatoryMetadonneesDtoMock
+    ...this.mandatoryMetadonneesDtoMock,
+    parties: [this.partieDtoMock],
+    occultationsComplementaires: {
+      dateCivile: false,
+      motifsSecretAffaires: false,
+      cadastre: false,
+      adresse: true,
+      professionnelMagistratGreffier: false,
+      plaqueImmatriculation: true,
+      coordonneeElectronique: true,
+      motifsDebatsChambreConseil: true,
+      personneMorale: true,
+      conserverElement: '#dateCivile|automobile',
+      chaineNumeroIdentifiante: false,
+      personnePhysicoMoraleGeoMorale: false,
+      supprimerElement: '#magistratGreffe|120.000€'
+    },
+    composition: [this.compositionDtoMock],
+    date: null
   }
 
   // End of normalization context

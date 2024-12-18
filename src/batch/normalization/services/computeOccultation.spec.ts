@@ -1,5 +1,7 @@
-import { DecisionOccultation, Occultation } from 'dbsder-api-types'
+import { DecisionOccultation } from 'dbsder-api-types'
 import { computeOccultation } from './computeOccultation'
+import { MockUtils } from '../../../shared/infrastructure/utils/mock.utils'
+import { MetadonneeDto } from '../../../shared/infrastructure/dto/metadonnee.dto'
 
 jest.mock('../index', () => ({
   logger: {
@@ -10,126 +12,100 @@ jest.mock('../index', () => ({
 }))
 
 describe('compute occultation', () => {
-  const providedOccultationComplementaire = 'occultation complementaire'
-  const debatPublic = true
-
-  it('returns an empty additionalTerms when recommandationOccultation has value "aucune"', () => {
+  it('returns an empty additionalTerms when recommandations are respected', () => {
     // GIVEN
-    const providedRecommandationOccultation = Occultation.AUCUNE
+    const metadonnees = new MockUtils().metadonneeDtoMock as unknown as MetadonneeDto
     const expectedResponse: DecisionOccultation = {
       additionalTerms: '',
       categoriesToOmit: [],
       motivationOccultation: false
     }
 
+    metadonnees.decisionPublique = true
+    metadonnees.occultationsComplementaires = {
+      dateCivile: true,
+      motifsSecretAffaires: false,
+      cadastre: true,
+      adresse: true,
+      professionnelMagistratGreffier: false,
+      plaqueImmatriculation: true,
+      coordonneeElectronique: true,
+      motifsDebatsChambreConseil: false,
+      personneMorale: true,
+      conserverElement: '',
+      chaineNumeroIdentifiante: true,
+      personnePhysicoMoraleGeoMorale: true,
+      supprimerElement: ''
+    }
+
     // WHEN
-    const response = computeOccultation(
-      providedRecommandationOccultation,
-      providedOccultationComplementaire,
-      debatPublic
-    )
+    const response = computeOccultation(metadonnees)
 
     // THEN
     expect(response).toEqual(expectedResponse)
   })
 
-  it('returns an empty additionalTerms when recommandationOccultation has value "conforme"', () => {
+  it('returns an additionalTerms equal to the provided "occultations complementaires"', () => {
     // GIVEN
-    const providedRecommandationOccultation = Occultation.CONFORME
+    const metadonnees = new MockUtils().metadonneeDtoMock as unknown as MetadonneeDto
+    const expectedResponse: DecisionOccultation = {
+      additionalTerms: '#magistratGreffe|+fiat rouge|volvo verte',
+      categoriesToOmit: [],
+      motivationOccultation: false
+    }
+
+    metadonnees.decisionPublique = true
+    metadonnees.occultationsComplementaires = {
+      dateCivile: true,
+      motifsSecretAffaires: false,
+      cadastre: true,
+      adresse: true,
+      professionnelMagistratGreffier: true,
+      plaqueImmatriculation: true,
+      coordonneeElectronique: true,
+      motifsDebatsChambreConseil: false,
+      personneMorale: true,
+      conserverElement: 'fiat rouge',
+      chaineNumeroIdentifiante: true,
+      personnePhysicoMoraleGeoMorale: true,
+      supprimerElement: 'volvo verte'
+    }
+
+    // WHEN
+    const response = computeOccultation(metadonnees)
+
+    // THEN
+    expect(response).toEqual(expectedResponse)
+  })
+
+  it('returns motivationOccultation true when debat are not public', () => {
+    // GIVEN
+    const metadonnees = new MockUtils().metadonneeDtoMock as unknown as MetadonneeDto
     const expectedResponse: DecisionOccultation = {
       additionalTerms: '',
-      categoriesToOmit: [],
-      motivationOccultation: false
-    }
-
-    // WHEN
-    const response = computeOccultation(
-      providedRecommandationOccultation,
-      providedOccultationComplementaire,
-      debatPublic
-    )
-
-    // THEN
-    expect(response).toEqual(expectedResponse)
-  })
-
-  it('returns an additionalTerms equal to OccultationComplementaire when recommandationOccultation has value "substituant"', () => {
-    // GIVEN
-    const providedRecommandationOccultation = Occultation.SUBSTITUANT
-    const expectedResponse: DecisionOccultation = {
-      additionalTerms: providedOccultationComplementaire,
-      categoriesToOmit: [],
-      motivationOccultation: false
-    }
-
-    // WHEN
-    const response = computeOccultation(
-      providedRecommandationOccultation,
-      providedOccultationComplementaire,
-      debatPublic
-    )
-
-    // THEN
-    expect(response).toEqual(expectedResponse)
-  })
-
-  it('returns an additionalTerms equal to OccultationComplementaire when recommandationOccultation has value "complément"', () => {
-    // GIVEN
-    const providedRecommandationOccultation = Occultation.COMPLEMENT
-    const expectedResponse: DecisionOccultation = {
-      additionalTerms: providedOccultationComplementaire,
-      categoriesToOmit: [],
-      motivationOccultation: false
-    }
-
-    // WHEN
-    const response = computeOccultation(
-      providedRecommandationOccultation,
-      providedOccultationComplementaire,
-      debatPublic
-    )
-
-    // THEN
-    expect(response).toEqual(expectedResponse)
-  })
-
-  it('returns motivationOccultation true when debat are not public and recommandationOccultation are followed (conforme or complémentaire)', () => {
-    // GIVEN
-    const debatPublic = false
-    const providedRecommandationOccultation = Occultation.COMPLEMENT
-    const expectedResponse: DecisionOccultation = {
-      additionalTerms: providedOccultationComplementaire,
       categoriesToOmit: [],
       motivationOccultation: true
     }
 
-    // WHEN
-    const response = computeOccultation(
-      providedRecommandationOccultation,
-      providedOccultationComplementaire,
-      debatPublic
-    )
-
-    // THEN
-    expect(response).toEqual(expectedResponse)
-  })
-
-  it('returns motivationOccultation false when recommandationOccultation are not followed (aucune or substituant)', () => {
-    // GIVEN
-    const debatPublic = false
-    const providedRecommandationOccultation = Occultation.AUCUNE
-    const expectedResponse: DecisionOccultation = {
-      additionalTerms: '',
-      categoriesToOmit: [],
-      motivationOccultation: false
+    metadonnees.decisionPublique = true
+    metadonnees.occultationsComplementaires = {
+      dateCivile: true,
+      motifsSecretAffaires: false,
+      cadastre: true,
+      adresse: true,
+      professionnelMagistratGreffier: false,
+      plaqueImmatriculation: true,
+      coordonneeElectronique: true,
+      motifsDebatsChambreConseil: true,
+      personneMorale: true,
+      conserverElement: '',
+      chaineNumeroIdentifiante: true,
+      personnePhysicoMoraleGeoMorale: true,
+      supprimerElement: ''
     }
 
     // WHEN
-    const response = computeOccultation(
-      providedRecommandationOccultation,
-      providedOccultationComplementaire,
-      debatPublic
-    )
+    const response = computeOccultation(metadonnees)
 
     // THEN
     expect(response).toEqual(expectedResponse)

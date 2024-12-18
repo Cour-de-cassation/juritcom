@@ -1,14 +1,7 @@
-import { ArgumentMetadata, Injectable, PipeTransform, Logger, HttpStatus } from '@nestjs/common'
+import { ArgumentMetadata, Injectable, PipeTransform } from '@nestjs/common'
 import { plainToInstance } from 'class-transformer'
 import { validate, ValidationError } from 'class-validator'
 import { BadPropertiesException } from '../exceptions/missingProperties.exception'
-import { LogsFormat } from '../../../shared/infrastructure/utils/logsFormat.utils'
-
-const logger = new Logger()
-const formatLogs: LogsFormat = {
-  operationName: 'ValidateDtoPipe.transform',
-  msg: 'Error while calling ValidateDtoPipe.transform()'
-}
 
 @Injectable()
 export class ValidateDtoPipe implements PipeTransform {
@@ -21,11 +14,6 @@ export class ValidateDtoPipe implements PipeTransform {
     if (errors.length > 0) {
       const messages = errors.map((err) => err.property)
       const error = new BadPropertiesException(messages, value)
-      logger.error({
-        ...formatLogs,
-        msg: error.message,
-        statusCode: HttpStatus.BAD_REQUEST
-      })
       throw error
     }
     return value

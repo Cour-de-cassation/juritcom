@@ -10,7 +10,7 @@ import {
 
 export class MockUtils {
   // Shared context
-  uniqueDecisionId = `TCOM75011`
+  uniqueDecisionId = `0605_2001F00930_2012-12-05_19`
   dateNow = new Date()
 
   decisionContentToNormalize =
@@ -46,11 +46,11 @@ export class MockUtils {
 
   mandatoryMetadonneesDtoMock: MetadonneeDto = {
     idDecision: this.uniqueDecisionId,
-    idGroupement: 'ABDC',
-    idJuridiction: '7500',
+    idGroupement: '01',
+    idJuridiction: '0605',
     libelleJuridiction: 'Tribunal de commerce de Paris',
-    dateDecision: '20240322',
-    numeroDossier: '2021F00123',
+    dateDecision: '20241224',
+    numeroDossier: '2001F00930',
     decisionPublique: false,
     debatChambreDuConseil: false,
     interetParticulier: false
@@ -90,8 +90,8 @@ export class MockUtils {
     appeals: [],
     chamberId: '',
     chamberName: '',
-    dateCreation: this.dateNow.toISOString(),
-    dateDecision: new Date(parseInt('2024'), parseInt('03') - 1, parseInt('22')).toISOString(),
+    dateCreation: new Date(parseInt('2024'), parseInt('12') - 1, parseInt('25')).toISOString(),
+    dateDecision: new Date(parseInt('2024'), parseInt('12') - 1, parseInt('24')).toISOString(),
     jurisdictionCode: '01_0605',
     jurisdictionId: this.mandatoryMetadonneesDtoMock.idJuridiction,
     jurisdictionName: this.mandatoryMetadonneesDtoMock.libelleJuridiction,
@@ -103,10 +103,10 @@ export class MockUtils {
     },
     originalText: this.decisionContentNormalized,
     registerNumber: '2001F00930',
-    sourceId: 1845940738,
+    sourceId: 2187651241,
     sourceName: Sources.TCOM,
     blocOccultation: 0,
-    public: true,
+    public: false,
     idGroupement: '01',
     debatPublic: true,
     idDecisionTCOM: '0605_2001F00930_2012-12-05_19',

@@ -15,8 +15,8 @@ describe('updateLabelStatus', () => {
   describe('Returns provided labelStatus', () => {
     it('when decision is not ignored', () => {
       // GIVEN
-      const dateDecember2023 = new Date(2023, 11, 31)
-      const dateMarch2024 = new Date(2024, 2, 29)
+      const dateDecember2023 = new Date(2024, 12, 25)
+      const dateMarch2024 = new Date(2024, 12, 29)
       const mockDecisionLabel = {
         ...mockUtils.decisionMock,
         dateDecision: dateDecember2023.toISOString(),

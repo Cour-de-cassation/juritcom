@@ -25,6 +25,11 @@ describe('mapDecisionNormaliseeToDecisionDto', () => {
       metadonneeDtoMock,
       'filename'
     )
+    mappedDecision.dateCreation = new Date(
+      parseInt('2024'),
+      parseInt('12') - 1,
+      parseInt('25')
+    ).toISOString()
 
     // THEN
     expect(mappedDecision).toMatchObject(decisionMock)

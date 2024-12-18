@@ -48,12 +48,14 @@ export class DecisionS3Repository implements DecisionRepository {
     originalPdfFileName: string,
     jsonS3Key: string
   ): Promise<void> {
+    const now = new Date()
+    now.setMilliseconds(0)
     const reqParams = {
       Body: requestToS3Dto,
       Bucket: process.env.S3_BUCKET_NAME_RAW,
       Key: `${jsonS3Key}`,
       Metadata: {
-        date: new Date().toISOString(),
+        date: now.toISOString(),
         originalPdfFileName: originalPdfFileName
       }
     }

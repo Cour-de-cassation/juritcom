@@ -32,17 +32,19 @@ describe('SaveDecision Usecase', () => {
     } as unknown as Express.Multer.File
     const metadonnees = new MockUtils().metadonneeDtoMock as unknown as MetadonneeDto
     ;(fs.writeFileSync as jest.Mock).mockImplementation(() => {})
-    metadonnees.date = new Date().toISOString()
+    const now = new Date()
+    now.setMilliseconds(0)
+    metadonnees.date = now.toISOString()
     await usecase.putDecision(fichierDecisionIntegre, 'test', metadonnees)
     const requestDto = {
       texteDecisionIntegre: 'test',
       metadonnees,
-      date: new Date().toISOString()
+      date: now.toISOString()
     }
     expect(mockDecisionRepository.saveDataDecisionIntegre).toHaveBeenCalledWith(
       JSON.stringify(requestDto),
       'test.pdf',
-      '00001.json'
+      '0605_2001F00930_2012-12-05_19.json'
     )
   })
 })

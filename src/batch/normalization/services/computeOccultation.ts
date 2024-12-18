@@ -9,7 +9,8 @@ import {
 export function computeOccultation(metadonnees: MetadonneeDto): DecisionOccultation {
   const occultationsComplementaires: OccultationComplementaireDto =
     metadonnees.occultationsComplementaires
-  const categoriesToOmit = []
+  const categoriesToOmitRaw = []
+  const additionalTermsRaw = []
   const formatLogs: LogsFormat = {
     ...normalizationFormatLogs,
     operationName: 'computeOccultation',
@@ -27,63 +28,66 @@ export function computeOccultation(metadonnees: MetadonneeDto): DecisionOccultat
   })
 
   if (occultationsComplementaires.personneMorale !== true) {
-    categoriesToOmit.push(Categories.PERSONNEMORALE)
+    categoriesToOmitRaw.push(Categories.PERSONNEMORALE)
+    categoriesToOmitRaw.push(Categories.NUMEROSIRETSIREN)
   }
 
   if (occultationsComplementaires.personnePhysicoMoraleGeoMorale !== true) {
-    categoriesToOmit.push(Categories.PERSONNEPHYSIQUE)
-    categoriesToOmit.push(Categories.ETABLISSEMENT)
+    categoriesToOmitRaw.push(Categories.PERSONNEMORALE)
+    categoriesToOmitRaw.push(Categories.LOCALITE)
+    categoriesToOmitRaw.push(Categories.NUMEROSIRETSIREN)
   }
 
   if (occultationsComplementaires.adresse !== true) {
-    categoriesToOmit.push(Categories.ADRESSE)
+    categoriesToOmitRaw.push(Categories.ADRESSE)
+    categoriesToOmitRaw.push(Categories.LOCALITE)
+    categoriesToOmitRaw.push(Categories.ETABLISSEMENT)
   }
 
   if (occultationsComplementaires.dateCivile !== true) {
-    categoriesToOmit.push(Categories.DATENAISSANCE)
-    categoriesToOmit.push(Categories.DATEDECES)
-    categoriesToOmit.push(Categories.DATEMARIAGE)
+    categoriesToOmitRaw.push(Categories.DATENAISSANCE)
+    categoriesToOmitRaw.push(Categories.DATEDECES)
+    categoriesToOmitRaw.push(Categories.DATEMARIAGE)
   }
 
   if (occultationsComplementaires.plaqueImmatriculation !== true) {
-    categoriesToOmit.push(Categories.PLAQUEIMMATRICULATION)
+    categoriesToOmitRaw.push(Categories.PLAQUEIMMATRICULATION)
   }
 
   if (occultationsComplementaires.cadastre !== true) {
-    categoriesToOmit.push(Categories.ADRESSE)
-    categoriesToOmit.push(Categories.CADASTRE)
-    categoriesToOmit.push(Categories.LOCALITE)
+    categoriesToOmitRaw.push(Categories.CADASTRE)
   }
 
   if (occultationsComplementaires.chaineNumeroIdentifiante !== true) {
-    categoriesToOmit.push(Categories.INSEE)
-    categoriesToOmit.push(Categories.NUMEROIDENTIFIANT)
-    categoriesToOmit.push(Categories.COMPTEBANCAIRE)
-    categoriesToOmit.push(Categories.NUMEROSIRETSIREN)
-    categoriesToOmit.push(Categories.TELEPHONEFAX)
+    categoriesToOmitRaw.push(Categories.INSEE)
+    categoriesToOmitRaw.push(Categories.NUMEROIDENTIFIANT)
+    categoriesToOmitRaw.push(Categories.COMPTEBANCAIRE)
+    categoriesToOmitRaw.push(Categories.PLAQUEIMMATRICULATION)
   }
 
   if (occultationsComplementaires.coordonneeElectronique !== true) {
-    categoriesToOmit.push(Categories.SITEWEBSENSIBLE)
+    categoriesToOmitRaw.push(Categories.SITEWEBSENSIBLE)
+    categoriesToOmitRaw.push(Categories.TELEPHONEFAX)
   }
 
-  if (occultationsComplementaires.professionnelMagistratGreffier !== true) {
-    categoriesToOmit.push(Categories.PROFESSIONNELAVOCAT)
-    categoriesToOmit.push(Categories.PROFESSIONNELMAGISTRATGREFFIER)
+  if (occultationsComplementaires.professionnelMagistratGreffier === true) {
+    additionalTermsRaw.push('#magistratGreffe')
   }
+
+  const categoriesToOmit = categoriesToOmitRaw.filter(
+    (value, index, array) => array.indexOf(value) === index
+  )
 
   logger.info({
     ...formatLogs,
     msg: `categoriesToOmit computed ${categoriesToOmit}`
   })
 
-  const additionalTermsArray = []
-
   if (occultationsComplementaires.conserverElement !== '') {
     for (let item of occultationsComplementaires.conserverElement.split('|')) {
       item = item.trim()
       if (item !== '') {
-        additionalTermsArray.push(`+${item}`)
+        additionalTermsRaw.push(`+${item}`)
       }
     }
   }
@@ -92,12 +96,14 @@ export function computeOccultation(metadonnees: MetadonneeDto): DecisionOccultat
     for (let item of occultationsComplementaires.supprimerElement.split('|')) {
       item = item.trim()
       if (item !== '') {
-        additionalTermsArray.push(item)
+        additionalTermsRaw.push(item)
       }
     }
   }
 
-  const additionalTerms = additionalTermsArray.join('|')
+  const additionalTerms = additionalTermsRaw
+    .filter((value, index, array) => array.indexOf(value) === index)
+    .join('|')
 
   logger.info({
     ...formatLogs,

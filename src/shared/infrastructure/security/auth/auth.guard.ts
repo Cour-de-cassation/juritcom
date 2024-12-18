@@ -1,8 +1,21 @@
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common'
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  UnauthorizedException,
+  Logger,
+  HttpStatus
+} from '@nestjs/common'
 import { getOAuth, getModel } from '../../../../api/main'
 import { Request, Response } from '@node-oauth/oauth2-server'
 import { timingSafeEqual } from 'crypto'
+import { LogsFormat } from '../../../../shared/infrastructure/utils/logsFormat.utils'
 
+const logger = new Logger()
+const formatLogs: LogsFormat = {
+  operationName: 'JwtAuthGuard',
+  msg: 'Error while calling JwtAuthGuard'
+}
 const CREDENTIALS_REGEXP = /^ *(?:[Bb][Aa][Ss][Ii][Cc]) +([A-Za-z0-9._~+/-]+=*) *$/
 const USER_PASS_REGEXP = /^([^:]*):(.*)$/
 
@@ -66,7 +79,13 @@ export class JwtAuthGuard implements CanActivate {
       value = await this.validateRequest(request, response, context)
     }
     if (!value) {
-      throw new UnauthorizedException('You are not authorized to access this resource.')
+      const error = new UnauthorizedException('You are not authorized to access this resource.')
+      logger.error({
+        ...formatLogs,
+        msg: error.message,
+        statusCode: HttpStatus.UNAUTHORIZED
+      })
+      throw error
     }
     return new Promise<boolean>((resolve) => resolve(value))
   }

@@ -21,7 +21,7 @@ export class SaveDecisionUsecase {
 
     const now = new Date()
     now.setMilliseconds(0)
-    
+
     const requestDto: CollectDto = {
       texteDecisionIntegre,
       metadonnees,

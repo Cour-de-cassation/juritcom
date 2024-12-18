@@ -18,8 +18,10 @@ export class SaveDecisionUsecase {
     const originalFileName = fichierDecisionIntegre.originalname
     const jsonFileName = `${uuid}.json`
     const pdfFileName = `${uuid}${process.env.S3_PDF_FILE_NAME_SEPARATOR}${originalFileName}`
+
     const now = new Date()
     now.setMilliseconds(0)
+
     const requestDto: CollectDto = {
       texteDecisionIntegre,
       metadonnees,

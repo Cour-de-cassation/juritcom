@@ -36,6 +36,8 @@ describe('SaveDecision Usecase', () => {
     now.setMilliseconds(0)
     metadonnees.date = now.toISOString()
     await usecase.putDecision(fichierDecisionIntegre, 'test', metadonnees)
+    const now = new Date()
+    now.setMilliseconds(0)
     const requestDto = {
       texteDecisionIntegre: 'test',
       metadonnees,

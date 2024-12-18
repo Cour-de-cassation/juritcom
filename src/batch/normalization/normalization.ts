@@ -91,7 +91,11 @@ export async function normalizationJob(): Promise<ConvertedDecisionWithMetadonne
         })
 
         // Step 9: Delete decision in raw bucket
-        await s3Repository.deleteDecision(decisionFilename, bucketNameIntegre)
+        const reqParamsDelete = {
+          Bucket: bucketNameIntegre,
+          Key: decisionFilename
+        }
+        await s3Repository.deleteDecision(reqParamsDelete)
 
         logger.info({
           ...normalizationFormatLogs,

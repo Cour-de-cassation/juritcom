@@ -16,13 +16,12 @@ describe('hashDecisionId', () => {
 
   it('returns the hashed valued of a decisionId-like string', () => {
     // GIVEN
-    const decisionId = new MockUtils().uniqueDecisionId
-    const expectedHashedValue = 1038711481
+    const { uniqueDecisionId, decisionMock } = new MockUtils()
 
     // WHEN
-    const hashedValue = hashDecisionId(decisionId)
+    const hashedValue = hashDecisionId(uniqueDecisionId)
 
     // THEN
-    expect(hashedValue).toEqual(expectedHashedValue)
+    expect(hashedValue).toEqual(decisionMock.sourceId)
   })
 })

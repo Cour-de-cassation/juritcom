@@ -180,15 +180,7 @@ export class DecisionController {
     metadonneeDto: MetadonneeDto,
     @Req() request: Request
   ): Promise<DecisionResponse> {
-    if (!fichierDecisionIntegre || !isPdfFile(fichierDecisionIntegre.mimetype)) {
-      throw new BadFileFormatException('fichierDecisionIntegre', 'PDF')
-    }
-    if (fichierDecisionIntegre.size >= FILE_MAX_SIZE.size) {
-      throw new BadFileSizeException(FILE_MAX_SIZE.readSize)
-    }
-
     const routePath = request.method + ' ' + request.path
-    const decisionUseCase = new SaveDecisionUsecase(new DecisionS3Repository(this.logger))
     const formatLogs: LogsFormat = {
       operationName: 'putDecision',
       httpMethod: request.method,
@@ -196,6 +188,28 @@ export class DecisionController {
       msg: `Starting ${routePath}...`,
       correlationId: request.headers['x-correlation-id']
     }
+
+    if (!fichierDecisionIntegre || !isPdfFile(fichierDecisionIntegre.mimetype)) {
+      const error = new BadFileFormatException('fichierDecisionIntegre', 'PDF')
+      this.logger.error({
+        ...formatLogs,
+        msg: error.message,
+        statusCode: HttpStatus.BAD_REQUEST
+      })
+      throw error
+    }
+
+    if (fichierDecisionIntegre.size >= FILE_MAX_SIZE.size) {
+      const error = new BadFileSizeException(FILE_MAX_SIZE.readSize)
+      this.logger.error({
+        ...formatLogs,
+        msg: error.message,
+        statusCode: HttpStatus.BAD_REQUEST
+      })
+      throw error
+    }
+
+    const decisionUseCase = new SaveDecisionUsecase(new DecisionS3Repository(this.logger))
 
     const bucketFileDto = await decisionUseCase
       .putDecision(fichierDecisionIntegre, texteDecisionIntegre, metadonneeDto)

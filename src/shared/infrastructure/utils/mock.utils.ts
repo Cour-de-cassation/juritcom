@@ -1,4 +1,4 @@
-import { QualitePartie, TypePartie } from 'dbsder-api-types'
+import { DecisionTCOMDTO, LabelStatus, QualitePartie, Sources, TypePartie } from 'dbsder-api-types'
 import {
   AdresseDto,
   CompositionDto,
@@ -10,7 +10,13 @@ import {
 
 export class MockUtils {
   // Shared context
-  uniqueDecisionId = `TCOM75011A01-1234520240120`
+  uniqueDecisionId = `0605_2001F00930_2012-12-05_19`
+  dateNow = new Date()
+
+  decisionContentToNormalize =
+    '\tLe contenu de ma décision avec    des espaces     et des backslash multiples \r\n \t'
+  decisionContentNormalized =
+    ' Le contenu de ma décision avec des espaces et des backslash multiples \n '
 
   mandatoryPartieDtoMock = {
     nom: 'some valid name',
@@ -39,16 +45,15 @@ export class MockUtils {
   }
 
   mandatoryMetadonneesDtoMock: MetadonneeDto = {
-    composition: [],
-    idDecision: '00001',
-    idGroupement: 'ABDC',
+    idDecision: this.uniqueDecisionId,
+    idGroupement: '01',
+    idJuridiction: '0605',
     libelleJuridiction: 'Tribunal de commerce de Paris',
-    idJuridiction: '7501',
-    numeroDossier: '08/20240',
-    dateDecision: '20240120',
+    dateDecision: '20241224',
+    numeroDossier: '2001F00930',
     decisionPublique: true,
-    interetParticulier: false,
-    debatChambreDuConseil: false
+    debatChambreDuConseil: false,
+    interetParticulier: false
   }
 
   compositionDtoMock: CompositionDto = {
@@ -78,5 +83,33 @@ export class MockUtils {
     },
     composition: [this.compositionDtoMock],
     date: null
+  }
+
+  // End of normalization context
+  decisionMock: DecisionTCOMDTO = {
+    appeals: [],
+    chamberId: '',
+    chamberName: '',
+    dateCreation: new Date(parseInt('2024'), parseInt('12') - 1, parseInt('25')).toISOString(),
+    dateDecision: new Date(parseInt('2024'), parseInt('12') - 1, parseInt('24')).toISOString(),
+    jurisdictionCode: '01_0605',
+    jurisdictionId: this.mandatoryMetadonneesDtoMock.idJuridiction,
+    jurisdictionName: this.mandatoryMetadonneesDtoMock.libelleJuridiction,
+    labelStatus: LabelStatus.TOBETREATED,
+    occultation: {
+      additionalTerms: '',
+      categoriesToOmit: [],
+      motivationOccultation: false
+    },
+    originalText: this.decisionContentNormalized,
+    registerNumber: '2001F00930',
+    sourceId: 2187651241,
+    sourceName: Sources.TCOM,
+    blocOccultation: 0,
+    public: true,
+    idGroupement: '01',
+    debatPublic: true,
+    idDecisionTCOM: '0605_2001F00930_2012-12-05_19',
+    selection: false
   }
 }

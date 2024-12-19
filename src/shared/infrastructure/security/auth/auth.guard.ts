@@ -13,8 +13,8 @@ import { LogsFormat } from '../../../../shared/infrastructure/utils/logsFormat.u
 
 const logger = new Logger()
 const formatLogs: LogsFormat = {
-  operationName: 'JwtAuthGuard',
-  msg: 'Error while calling JwtAuthGuard'
+  operationName: 'auth.guard',
+  msg: 'Error while calling auth.guard'
 }
 const CREDENTIALS_REGEXP = /^ *(?:[Bb][Aa][Ss][Ii][Cc]) +([A-Za-z0-9._~+/-]+=*) *$/
 const USER_PASS_REGEXP = /^([^:]*):(.*)$/
@@ -71,12 +71,20 @@ export class JwtAuthGuard implements CanActivate {
             password: authentication.pass
           }
           value = staticUsersAuthorizer(users, authentication.name, authentication.pass)
+          logger.log({
+            ...formatLogs,
+            msg: `Validate request using Basic: ${value}`
+          })
         }
       } catch (_ignore) {
         value = false
       }
     } else if (`${process.env.USE_AUTH}` === 'oauth') {
       value = await this.validateRequest(request, response, context)
+      logger.log({
+        ...formatLogs,
+        msg: `Validate request using OAuth: ${value}`
+      })
     }
     if (!value) {
       const error = new UnauthorizedException('You are not authorized to access this resource.')
@@ -99,7 +107,11 @@ export class JwtAuthGuard implements CanActivate {
 
     try {
       token = await oAuth.server.authenticate(request, response)
-    } catch (_e) {
+    } catch (error) {
+      logger.error({
+        ...formatLogs,
+        msg: error.message
+      })
       return false
     }
 
@@ -109,6 +121,10 @@ export class JwtAuthGuard implements CanActivate {
 
     if (token.user && token.client && token.scope) {
       const validateScope = await model.validateScope(token.user, token.client, token.scope)
+      logger.log({
+        ...formatLogs,
+        msg: `Validate OAuth scope [${token.user}, ${token.client?.id}, ${token.scope}]: ${validateScope}`
+      })
       return validateScope !== false
     } else {
       return false

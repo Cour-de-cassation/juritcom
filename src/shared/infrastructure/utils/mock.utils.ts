@@ -51,7 +51,7 @@ export class MockUtils {
     libelleJuridiction: 'Tribunal de commerce de Paris',
     dateDecision: '20241224',
     numeroDossier: '2001F00930',
-    decisionPublique: false,
+    decisionPublique: true,
     debatChambreDuConseil: false,
     interetParticulier: false
   }
@@ -106,7 +106,7 @@ export class MockUtils {
     sourceId: 2187651241,
     sourceName: Sources.TCOM,
     blocOccultation: 0,
-    public: false,
+    public: true,
     idGroupement: '01',
     debatPublic: true,
     idDecisionTCOM: '0605_2001F00930_2012-12-05_19',

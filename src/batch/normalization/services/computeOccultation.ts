@@ -19,8 +19,7 @@ export function computeOccultation(metadonnees: MetadonneeDto): DecisionOccultat
 
   const motivationOccultation =
     occultationsComplementaires.motifsDebatsChambreConseil === true ||
-    occultationsComplementaires.motifsSecretAffaires === true ||
-    metadonnees.debatChambreDuConseil === true
+    occultationsComplementaires.motifsSecretAffaires === true
 
   logger.info({
     ...formatLogs,

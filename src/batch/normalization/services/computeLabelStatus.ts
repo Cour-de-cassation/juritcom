@@ -17,10 +17,26 @@ export function computeLabelStatus(decisionDto: DecisionTCOMDTO): LabelStatus {
     msg: 'Starting computeLabelStatus...'
   }
 
+  if (decisionDto.public === false) {
+    logger.error({
+      ...formatLogs,
+      msg: `Decision is not public. Changing LabelStatus to ${LabelStatus.IGNORED_DECISION_NON_PUBLIQUE}.`
+    })
+    return LabelStatus.IGNORED_DECISION_NON_PUBLIQUE
+  }
+
+  if (decisionDto.debatPublic === false) {
+    logger.error({
+      ...formatLogs,
+      msg: `Decision debates are not public. Changing LabelStatus to ${LabelStatus.IGNORED_DEBAT_NON_PUBLIC}.`
+    })
+    return LabelStatus.IGNORED_DEBAT_NON_PUBLIC
+  }
+
   if (isDecisionInTheFuture(dateCreation, dateDecision)) {
     logger.error({
       ...formatLogs,
-      msg: `Incorrect date, dateDecision must be before dateCreation.. Changing LabelStatus to ${LabelStatus.IGNORED_DATE_DECISION_INCOHERENTE}.`
+      msg: `Incorrect date, dateDecision must be before dateCreation. Changing LabelStatus to ${LabelStatus.IGNORED_DATE_DECISION_INCOHERENTE}.`
     })
     return LabelStatus.IGNORED_DATE_DECISION_INCOHERENTE
   }
@@ -36,7 +52,7 @@ export function computeLabelStatus(decisionDto: DecisionTCOMDTO): LabelStatus {
   if (!decisionContainsOnlyAuthorizedCharacters(decisionDto.originalText)) {
     logger.error({
       ...formatLogs,
-      msg: `Decision can not be treated by Judilibre because its text contains unknown characters, changing LabelStatus to ${LabelStatus.IGNORED_CARACTERE_INCONNU}.`
+      msg: `Decision can not be treated by Judilibre because its text contains unknown characters. Changing LabelStatus to ${LabelStatus.IGNORED_CARACTERE_INCONNU}.`
     })
     return LabelStatus.IGNORED_CARACTERE_INCONNU
   }

@@ -82,8 +82,8 @@ export function computeOccultation(metadonnees: MetadonneeDto): DecisionOccultat
     msg: `categoriesToOmit computed ${categoriesToOmit}`
   })
 
-  if (occultationsComplementaires.conserverElement !== '') {
-    for (let item of occultationsComplementaires.conserverElement.split('|')) {
+  if (occultationsComplementaires.conserverElement) {
+    for (let item of `${occultationsComplementaires.conserverElement}`.split('|')) {
       item = item.trim()
       if (item !== '') {
         additionalTermsRaw.push(`+${item}`)
@@ -91,8 +91,8 @@ export function computeOccultation(metadonnees: MetadonneeDto): DecisionOccultat
     }
   }
 
-  if (occultationsComplementaires.supprimerElement !== '') {
-    for (let item of occultationsComplementaires.supprimerElement.split('|')) {
+  if (occultationsComplementaires.supprimerElement) {
+    for (let item of `${occultationsComplementaires.supprimerElement}`.split('|')) {
       item = item.trim()
       if (item !== '') {
         additionalTermsRaw.push(item)

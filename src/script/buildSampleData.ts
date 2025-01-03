@@ -9,9 +9,9 @@ import * as fs from 'fs'
 const basePath = path.join(__dirname, '..', '..', 'documentation', 'test', 'decisions')
 
 async function job() {
-  let decisionList = []
+  const decisionList = []
 
-  for (let file of fs.readdirSync(basePath)) {
+  for (const file of fs.readdirSync(basePath)) {
     if (/\d\.json$/.test(file) === true) {
       try {
         decisionList.push(JSON.parse(fs.readFileSync(path.join(basePath, file)).toString()))
@@ -67,7 +67,7 @@ async function job() {
       }
       let dateForIndexing = null
       try {
-        let date = new Date(Date.parse(decisionNormalized.dateDecision))
+        const date = new Date(Date.parse(decisionNormalized.dateDecision))
         if (isNaN(date.getTime())) {
           dateForIndexing = null
         } else {
@@ -87,7 +87,7 @@ async function job() {
         if (isNaN(dateTimeForIndexing.getTime())) {
           dateTimeForIndexing = null
         }
-      } catch (e) {
+      } catch (_e) {
         dateTimeForIndexing = null
       }
       decisionPublished.decision_datetime = dateTimeForIndexing

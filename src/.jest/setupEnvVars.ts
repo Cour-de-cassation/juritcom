@@ -10,6 +10,6 @@ process.env = {
   S3_BUCKET_NAME_DELETION: 'fake-deletion-bucket-nam',
   S3_BUCKET_NAME_NORMALIZED: 'fake-normalized-bucket-name',
   DBSDER_API_URL: 'http://localhost:3000',
-  DBSDER_API_KEY: 'xxx',
+  DBSDER_API_KEY: '24277eca-290c-40c3-9bf6-a370880d800b',
   USE_AUTH: 'basic'
 }

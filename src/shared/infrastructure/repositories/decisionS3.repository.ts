@@ -1,15 +1,17 @@
 import {
+  S3Client,
+  GetObjectCommand,
+  PutObjectCommand,
+  ListObjectsV2CommandInput,
   _Object,
   ListObjectsV2Command,
-  ListObjectsV2CommandInput,
-  PutObjectCommand,
-  DeleteObjectCommand,
-  S3Client
+  DeleteObjectCommand
 } from '@aws-sdk/client-s3'
 import { Logger } from '@nestjs/common'
 import { PinoLogger } from 'nestjs-pino'
 import { BucketError } from '../../domain/errors/bucket.error'
 import { DecisionRepository } from '../../../api/domain/decisions/repositories/decision.repository'
+import { CollectDto } from '../dto/collect.dto'
 
 export class DecisionS3Repository implements DecisionRepository {
   private s3Client: S3Client
@@ -92,6 +94,16 @@ export class DecisionS3Repository implements DecisionRepository {
     await this.deleteDecision(reqParamsDelete)
   }
 
+  async saveDecisionNormalisee(requestToS3Dto: string, filename: string) {
+    const reqParams = {
+      Body: requestToS3Dto,
+      Bucket: process.env.S3_BUCKET_NAME_NORMALIZED,
+      Key: filename
+    }
+
+    await this.saveDecision(reqParams)
+  }
+
   async uploadFichierDecisionIntegre(
     file: Express.Multer.File,
     originalPdfFileName: string,
@@ -113,6 +125,22 @@ export class DecisionS3Repository implements DecisionRepository {
       await this.s3Client.send(new PutObjectCommand(params))
     } catch (error) {
       this.logger.error({ operationName: 'putDecision', msg: error.message, data: error })
+      throw new BucketError(error)
+    }
+  }
+
+  async getDecisionByFilename(filename: string): Promise<CollectDto & { _id: string }> {
+    const reqParams = {
+      Bucket: process.env.S3_BUCKET_NAME_RAW,
+      Key: filename
+    }
+
+    try {
+      const decisionFromS3 = await this.s3Client.send(new GetObjectCommand(reqParams))
+      const stringifiedDecision = await decisionFromS3.Body?.transformToString()
+      return JSON.parse(stringifiedDecision)
+    } catch (error) {
+      this.logger.error({ operationName: 'getDecisionByFilename', msg: error.message, data: error })
       throw new BucketError(error)
     }
   }

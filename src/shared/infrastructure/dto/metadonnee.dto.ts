@@ -107,8 +107,16 @@ export class AdresseDto {
   })
   @IsString()
   @IsOptional()
-  @Matches('^[0-9]{5}$')
   codePostal?: string
+
+  @ApiPropertyOptional({
+    description: 'Pays',
+    type: String,
+    example: 'France'
+  })
+  @IsString()
+  @IsOptional()
+  pays?: string
 
   @ApiPropertyOptional({
     description: 'Localité',

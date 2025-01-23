@@ -65,6 +65,7 @@
                             "type": "rue",
                             "voie": "du Bourg",
                             "codePostal": "39100",
+                            "pays": "France",
                             "localite": "Dole"
                           }
                         }
@@ -323,6 +324,7 @@
                 "type": "rue",
                 "voie": "du Bourg",
                 "codePostal": "39100",
+                "pays": "France",
                 "localite": "Dole"
               }
             }
@@ -534,6 +536,7 @@
             "type": "rue",
             "voie": "du Bourg",
             "codePostal": "39100",
+            "pays": "France",
             "localite": "Dole"
           }
         }
@@ -562,6 +565,10 @@
             "description": "Code postal",
             "type": "string"
           },
+          "pays": {
+            "description": "Pays",
+            "type": "string"
+          },
           "localite": {
             "description": "Localité",
             "type": "string"
@@ -576,6 +583,7 @@
           "type": "rue",
           "voie": "du Bourg",
           "codePostal": "39100",
+          "pays": "France",
           "localite": "Dole"
         }
       },

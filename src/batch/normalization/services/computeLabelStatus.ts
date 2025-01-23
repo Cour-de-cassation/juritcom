@@ -82,6 +82,6 @@ function getMiseEnServiceDate(): Date {
   if (!isNaN(new Date(process.env.COMMISSIONING_DATE).getTime())) {
     return new Date(process.env.COMMISSIONING_DATE)
   } else {
-    return new Date('2024-12-20')
+    return new Date('2024-12-31')
   }
 }

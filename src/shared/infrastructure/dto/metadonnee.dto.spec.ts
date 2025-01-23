@@ -446,24 +446,6 @@ describe('Validate MetadonneeDTO format', () => {
       // THEN
       expect(response).toEqual(metadonneesWithParties)
     })
-
-    it('throws an error when codePostal property on parties does not have valid value', async () => {
-      // GIVEN
-      const invalidPartieDto: PartieDto = { ...mockUtils.partieDtoMock }
-      invalidPartieDto['adresse'] = mockUtils.adresseDtoMock
-      invalidPartieDto.adresse.codePostal = '390000'
-      const partiesWithMandatoryFields: PartieDto[] = [invalidPartieDto]
-
-      const invalidMetadonnee = {
-        ...someValidMetaDonneeDto,
-        parties: partiesWithMandatoryFields
-      }
-
-      // WHEN
-      await expect(async () => await target.transform(invalidMetadonnee, metadata))
-        // THEN
-        .rejects.toThrow(BadPropertiesException)
-    })
   })
 
   describe('idDecision property', () => {

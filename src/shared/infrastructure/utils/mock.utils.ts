@@ -30,6 +30,7 @@ export class MockUtils {
     type: 'rue',
     voie: 'du Bourg',
     codePostal: '39100',
+    pays: 'France',
     complement: "Complement d'adresse",
     bureau: 'Bureau distributeur'
   }

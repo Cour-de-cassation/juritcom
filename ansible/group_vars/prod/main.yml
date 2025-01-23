@@ -6,5 +6,5 @@ doc_password: "{{ vault_doc_password }}"
 av_pdf_path: "{{ vault_av_pdf_path }}"
 oauth_client_secret: "{{ vault_oauth_client_secret}}"
 
-commissioning_date: "2023-12-15"
+commissioning_date: "2024-12-31"
 master_node_name: "jud7vcorc001"

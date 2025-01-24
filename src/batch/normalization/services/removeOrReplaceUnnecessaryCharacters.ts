@@ -18,7 +18,7 @@ export const removeOrReplaceUnnecessaryCharacters = (rawString: string): string 
   const carriageReturnRegex = /\r\n|\r/gi
   const multipleSpaceRegex = /[ ]{2,}/gi
   const spaceAndReturnAndNonSpaceRegex = / \n(\S)/gim
-  const wordBreakRegex = /(\S)-\n(\S)/gim
+  // const wordBreakRegex = /(\S)-\n(\S)/gim
   const nonSpaceAndReturnAndNonSpaceRegex = /(\S)\n(\S)/gim
 
   // Replace tab or pageBreak characters with an empty string
@@ -32,11 +32,13 @@ export const removeOrReplaceUnnecessaryCharacters = (rawString: string): string 
     spaceAndReturnAndNonSpaceRegex,
     ' $1'
   )
+  /*
   const stringWithoutWordBreak = stringWithoutSpaceAndReturnAndNonSpace.replace(
     wordBreakRegex,
     '$1$2'
   )
-  const stringWithoutNonSpaceAndReturnAndNonSpace = stringWithoutWordBreak.replace(
+  */
+  const stringWithoutNonSpaceAndReturnAndNonSpace = stringWithoutSpaceAndReturnAndNonSpace.replace(
     nonSpaceAndReturnAndNonSpaceRegex,
     '$1 $2'
   )

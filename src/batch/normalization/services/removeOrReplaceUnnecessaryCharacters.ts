@@ -32,12 +32,12 @@ export const removeOrReplaceUnnecessaryCharacters = (rawString: string): string 
     spaceAndReturnAndNonSpaceRegex,
     ' $1'
   )
-  
+
   const stringWithoutWordBreak = stringWithoutSpaceAndReturnAndNonSpace.replace(
     wordBreakRegex,
     '$1-$2'
   )
-  
+
   /*
   const stringWithoutNonSpaceAndReturnAndNonSpace = stringWithoutWordBreak.replace(
     nonSpaceAndReturnAndNonSpaceRegex,
@@ -46,10 +46,7 @@ export const removeOrReplaceUnnecessaryCharacters = (rawString: string): string 
   */
 
   // Replace multiple consecutive spaces with a white space
-  const stringWithoutConsecutiveSpaces = stringWithoutWordBreak.replace(
-    multipleSpaceRegex,
-    ' '
-  )
+  const stringWithoutConsecutiveSpaces = stringWithoutWordBreak.replace(multipleSpaceRegex, ' ')
 
   //replace tibetain characters
   const normalizedText = replaceUnknownCharacters(stringWithoutConsecutiveSpaces)

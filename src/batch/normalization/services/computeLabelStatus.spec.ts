@@ -112,11 +112,14 @@ describe('updateLabelStatus', () => {
     describe('when decision contains unknown characters', () => {
       it('when originalText contains tibetan characters', () => {
         // GIVEN
-
+        const dateDecision = new Date(2025, 7, 20)
+        const dateCreation = new Date(2025, 7, 20)
         const mockDecisionLabel = {
           ...mockUtils.decisionMock,
           originalText:
-            'la somme de 66. 224, 25 €, après imputation de la créance des tiers payeurs et déduction faite des provisions à hauteur de 9. 000 སྒྱ, en réparation de son préjudice corporel, consécutif à l’accident survenu le'
+            'la somme de 66. 224, 25 €, après imputation de la créance des tiers payeurs et déduction faite des provisions à hauteur de 9. 000 སྒྱ, en réparation de son préjudice corporel, consécutif à l’accident survenu le',
+          dateDecision: dateDecision.toISOString(),
+          dateCreation: dateCreation.toISOString()
         }
         const expectedLabelStatus = LabelStatus.IGNORED_CARACTERE_INCONNU
 

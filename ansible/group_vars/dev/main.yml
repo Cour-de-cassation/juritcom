@@ -7,5 +7,6 @@ minio_root_password: "{{ vault_minio_root_password }}"
 av_pdf_path: "{{ vault_av_pdf_path }}"
 oauth_client_secret: "{{ vault_oauth_client_secret}}"
 
-commissioning_date: "2023-01-01"
-master_node_name: "judilibre-dev"
+commissioning_date: "2024-12-31"
+av_node_name: "judilibre-dev"
+av_host_path: "/data/av"

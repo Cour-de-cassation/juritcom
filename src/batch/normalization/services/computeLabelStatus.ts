@@ -17,20 +17,20 @@ export function computeLabelStatus(decisionDto: DecisionTCOMDTO): LabelStatus {
     msg: 'Starting computeLabelStatus...'
   }
 
+  if (decisionDto.debatPublic === false && decisionDto.public === false) {
+    logger.error({
+      ...formatLogs,
+      msg: `Decision debates are not public. Changing LabelStatus to ${LabelStatus.IGNORED_DEBAT_NON_PUBLIC}.`
+    })
+    return LabelStatus.IGNORED_DEBAT_NON_PUBLIC
+  }
+
   if (decisionDto.public === false) {
     logger.error({
       ...formatLogs,
       msg: `Decision is not public. Changing LabelStatus to ${LabelStatus.IGNORED_DECISION_NON_PUBLIQUE}.`
     })
     return LabelStatus.IGNORED_DECISION_NON_PUBLIQUE
-  }
-
-  if (decisionDto.debatPublic === false) {
-    logger.error({
-      ...formatLogs,
-      msg: `Decision debates are not public. Changing LabelStatus to ${LabelStatus.IGNORED_DEBAT_NON_PUBLIC}.`
-    })
-    return LabelStatus.IGNORED_DEBAT_NON_PUBLIC
   }
 
   if (isDecisionInTheFuture(dateCreation, dateDecision)) {
@@ -82,6 +82,6 @@ function getMiseEnServiceDate(): Date {
   if (!isNaN(new Date(process.env.COMMISSIONING_DATE).getTime())) {
     return new Date(process.env.COMMISSIONING_DATE)
   } else {
-    return new Date('2024-12-20')
+    return new Date('2024-12-31')
   }
 }

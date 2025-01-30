@@ -29,7 +29,9 @@ const characterReplacementMapUnicode = {
   '3940': '-',
   '3934': '«',
   '3931': ' »',
-  '3924': '-'
+  '3924': '-',
+  '61623': '●',
+  '61485': '●'
 }
 
 export const characterReplacementMap = Object.keys(characterReplacementMapUnicode).reduce(

@@ -22,6 +22,8 @@
             labels:
               app: "{{ batch_app_id }}"
           spec:
+            nodeSelector:
+              kubernetes.io/hostname: "{{ av_node_name }}"
             containers:
               - name: "{{ batch_app_id }}"
                 image: "{{ juritcom_batch_image }}"
@@ -39,4 +41,12 @@
                       name: "s3-config"
                   - secretRef:
                       name: "s3-secret"
+                volumeMounts:
+                  - name: av-volume
+                    mountPath: "{{ av_pdf_path }}"
+            volumes:
+              - name: av-volume
+                hostPath:
+                  path: "{{ av_host_path }}"
+                  type: Directory
 ...

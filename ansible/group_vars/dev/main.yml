@@ -8,4 +8,5 @@ av_pdf_path: "{{ vault_av_pdf_path }}"
 oauth_client_secret: "{{ vault_oauth_client_secret}}"
 
 commissioning_date: "2024-12-31"
-master_node_name: "judilibre-dev"
+av_node_name: "judilibre-dev"
+av_host_path: "/data/av"

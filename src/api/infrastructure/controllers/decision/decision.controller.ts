@@ -54,7 +54,7 @@ const FILE_MAX_SIZE = {
 
 const MULTER_OPTIONS = {
   limits: {
-    fieldSize: 4 * 1024 * 1024
+    fieldSize: 4 * 1024 * 1024 // 4 Mo
   }
 } as MulterOptions
 

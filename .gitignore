@@ -162,3 +162,5 @@ dist
 # Secrets
 /secrets/
 !secrets/dev/generate-keys.sh
+/test
+.vscode/

@@ -27,6 +27,7 @@ import {
   ApiTags,
   ApiUnauthorizedResponse
 } from '@nestjs/swagger'
+import { MulterOptions } from '@nestjs/platform-express/multer/interfaces/multer-options.interface'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { ReceiveDto } from '../../../../shared/infrastructure/dto/receive.dto'
 import { MetadonneeDto } from '../../../../shared/infrastructure/dto/metadonnee.dto'
@@ -50,6 +51,12 @@ const FILE_MAX_SIZE = {
   size: 10000000,
   readSize: '10Mo'
 } as const
+
+const MULTER_OPTIONS = {
+  limits: {
+    fieldSize: 4 * 1024 * 1024
+  }
+} as MulterOptions
 
 export interface DecisionResponse {
   jsonFileName: string | void
@@ -172,7 +179,7 @@ export class DecisionController {
     description: "Une erreur inattendue liée à une dépendance de l'API a été rencontrée. "
   })
   @HttpCode(HttpStatus.CREATED)
-  @UseInterceptors(FileInterceptor('fichierDecisionIntegre'))
+  @UseInterceptors(FileInterceptor('fichierDecisionIntegre', MULTER_OPTIONS))
   async receiveDecision(
     @UploadedFile() fichierDecisionIntegre: Express.Multer.File,
     @Body('texteDecisionIntegre') texteDecisionIntegre: string,

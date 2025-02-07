@@ -197,7 +197,7 @@ export class DecisionController {
       correlationId: request.headers['x-correlation-id']
     }
 
-    if (!texteDecisionIntegre.trim()) {
+    if (!texteDecisionIntegre || isEmptyText(texteDecisionIntegre)) {
       const error = new MissingFieldException('texteDecisionIntegre')
       this.logger.error({
         ...formatLogs,
@@ -272,4 +272,9 @@ export class DecisionController {
 
 export function isPdfFile(mimeType: string): boolean {
   return mimeType === 'application/pdf'
+}
+
+export function isEmptyText(text: string): boolean {
+  text = `${text}`.replace(/[\t\s\r\n]/gm, '').trim()
+  return text.length === 0
 }

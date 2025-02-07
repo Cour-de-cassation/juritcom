@@ -31,6 +31,7 @@ import { MulterOptions } from '@nestjs/platform-express/multer/interfaces/multer
 import { FileInterceptor } from '@nestjs/platform-express'
 import { ReceiveDto } from '../../../../shared/infrastructure/dto/receive.dto'
 import { MetadonneeDto } from '../../../../shared/infrastructure/dto/metadonnee.dto'
+import { MissingFieldException } from '../../exceptions/missingField.exception'
 import {
   BadFileFormatException,
   BadFileSizeException
@@ -194,6 +195,16 @@ export class DecisionController {
       path: request.path,
       msg: `Starting ${routePath}...`,
       correlationId: request.headers['x-correlation-id']
+    }
+
+    if (!texteDecisionIntegre.trim()) {
+      const error = new MissingFieldException('texteDecisionIntegre')
+      this.logger.error({
+        ...formatLogs,
+        msg: error.message,
+        statusCode: HttpStatus.BAD_REQUEST
+      })
+      throw error
     }
 
     if (!fichierDecisionIntegre || !isPdfFile(fichierDecisionIntegre.mimetype)) {

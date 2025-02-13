@@ -16,7 +16,7 @@ const requestOptions = {
   redirect: "follow"
 };
 */
-  const response = axios.post(
+  const response = await axios.post(
     'http://nlp-pseudonymisation-api-service.nlp.svc.cluster.local:8081/pdf-to-text',
     formdata,
     {
@@ -69,7 +69,7 @@ async function getPDFByFilename(filename) {
 
   try {
     const fileFromS3 = await s3Client.send(new GetObjectCommand(reqParams))
-    return Buffer.from(await fileFromS3.Body.transformToByteArray())
+    return fileFromS3.Body
   } catch (error) {
     console.log({ operationName: 'getPDFByFilename', msg: error.message, data: error })
   }

@@ -69,7 +69,7 @@ async function getPDFByFilename(filename) {
 
   try {
     const fileFromS3 = await s3Client.send(new GetObjectCommand(reqParams))
-    return fileFromS3.Body
+    return await fileFromS3.Body?.transformToByteArray()
   } catch (error) {
     console.log({ operationName: 'getPDFByFilename', msg: error.message, data: error })
   }

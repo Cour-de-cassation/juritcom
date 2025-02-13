@@ -1,23 +1,33 @@
 import * as FormData from 'form-data'
-import axios from 'axios'
+import axios, { AxiosError, AxiosResponse } from 'axios'
 import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3'
 
 async function main() {
   const pdf = Buffer.from(await getPDFByFilename('0605_2001F00930_2012-12-05_19.pdf'))
   const formdata = new FormData()
   formdata.append('pdf_file', pdf, '0605_2001F00930_2012-12-05_19.pdf')
-  const response = await axios.post(
-    'http://nlp-pseudonymisation-api-service.nlp.svc.cluster.local:8081/pdf-to-text',
-    formdata,
-    {
-      headers: {
-        ...formdata.getHeaders()
+  try {
+    const response: AxiosResponse = await axios.post(
+      'http://nlp-pseudonymisation-api-service.nlp.svc.cluster.local:8081/pdf-to-text',
+      formdata,
+      {
+        headers: {
+          ...formdata.getHeaders()
+        }
       }
+    )
+    console.log(response.status)
+    console.log(response.statusText)
+    console.log(response.data)
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      console.error(error.code)
+      console.error(error.status)
+      console.error(error.cause)
+    } else {
+      console.error(error)
     }
-  )
-  console.log(response.status)
-  console.log(response.statusText)
-  console.log(response.data)
+  }
 }
 
 async function getPDFByFilename(filename) {

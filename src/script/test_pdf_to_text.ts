@@ -3,8 +3,8 @@ import axios, { AxiosError, AxiosResponse } from 'axios'
 import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3'
 
 async function main() {
-  const pdf = Buffer.from(await getPDFByFilename('0605_2001F00930_2012-12-05_19.pdf'))
-  const formdata = new FormData()
+  const pdf: Buffer = await getPDFByFilename('0605_2001F00930_2012-12-05_19.pdf')
+  const formdata: FormData = new FormData()
   formdata.append('pdf_file', pdf, '0605_2001F00930_2012-12-05_19.pdf')
   try {
     const response: AxiosResponse = await axios.post(
@@ -19,7 +19,7 @@ async function main() {
     console.log(response.status)
     console.log(response.statusText)
     console.log(response.data)
-  } catch (error) {
+  } catch (error: any) {
     if (error instanceof AxiosError) {
       console.error(error.code)
       console.error(error.status)
@@ -30,7 +30,7 @@ async function main() {
   }
 }
 
-async function getPDFByFilename(filename) {
+async function getPDFByFilename(filename: string): Promise<Buffer> {
   const s3Client = new S3Client({
     endpoint: process.env.S3_URL,
     forcePathStyle: true,
@@ -48,7 +48,7 @@ async function getPDFByFilename(filename) {
 
   try {
     const fileFromS3 = await s3Client.send(new GetObjectCommand(reqParams))
-    return await fileFromS3.Body?.transformToByteArray()
+    return Buffer.from(await fileFromS3.Body?.transformToByteArray())
   } catch (error) {
     console.log({ operationName: 'getPDFByFilename', msg: error.message, data: error })
   }

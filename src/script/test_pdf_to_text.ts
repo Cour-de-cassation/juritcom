@@ -1,14 +1,17 @@
-const FormData  = require('form-data')
-const {S3Client, GetObjectCommand} = require('@aws-sdk/client-s3')
+import FormData from 'form-data'
+import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3'
 
 async function main() {
   const pdf = await getPDFByFilename('0605_2001F00930_2012-12-05_19.pdf')
   const form = new FormData()
   form.append('pdf_file', pdf)
-  const response = await fetch('http://nlp-pseudonymisation-api-service.nlp.svc.cluster.local:8081/pdf-to-text', {
-    method: 'POST',
-    body: form.getBuffer()
-  });
+  const response = await fetch(
+    'http://nlp-pseudonymisation-api-service.nlp.svc.cluster.local:8081/pdf-to-text',
+    {
+      method: 'POST',
+      body: form.getBuffer()
+    }
+  )
   console.log(response)
 }
 

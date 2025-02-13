@@ -4,7 +4,6 @@ import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3'
 
 async function main() {
   const pdf = Buffer.from(await getPDFByFilename('0605_2001F00930_2012-12-05_19.pdf'))
-  console.log(pdf.toString())
   const formdata = new FormData()
   formdata.append('pdf_file', pdf, '0605_2001F00930_2012-12-05_19.pdf')
   const response = await axios.post(
@@ -16,7 +15,9 @@ async function main() {
       }
     }
   )
-  console.log(response)
+  console.log(response.status)
+  console.log(response.statusText)
+  console.log(response.data)
 }
 
 async function getPDFByFilename(filename) {

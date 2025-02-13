@@ -31,7 +31,7 @@ import { MulterOptions } from '@nestjs/platform-express/multer/interfaces/multer
 import { FileInterceptor } from '@nestjs/platform-express'
 import { ReceiveDto } from '../../../../shared/infrastructure/dto/receive.dto'
 import { MetadonneeDto } from '../../../../shared/infrastructure/dto/metadonnee.dto'
-import { MissingFieldException } from '../../exceptions/missingField.exception'
+// import { MissingFieldException } from '../../exceptions/missingField.exception'
 import {
   BadFileFormatException,
   BadFileSizeException
@@ -197,6 +197,7 @@ export class DecisionController {
       correlationId: request.headers['x-correlation-id']
     }
 
+    /* texteDecisionIntegre is no longer mandatory:
     if (!texteDecisionIntegre || isEmptyText(texteDecisionIntegre)) {
       const error = new MissingFieldException('texteDecisionIntegre')
       this.logger.error({
@@ -206,6 +207,7 @@ export class DecisionController {
       })
       throw error
     }
+    */
 
     if (!fichierDecisionIntegre || !isPdfFile(fichierDecisionIntegre.mimetype)) {
       const error = new BadFileFormatException('fichierDecisionIntegre', 'PDF')
@@ -274,7 +276,9 @@ export function isPdfFile(mimeType: string): boolean {
   return mimeType === 'application/pdf'
 }
 
+/*
 export function isEmptyText(text: string): boolean {
   text = `${text}`.replace(/[\t\s\r\n]/gm, '').trim()
   return text.length === 0
 }
+*/

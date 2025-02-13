@@ -3,51 +3,19 @@ import axios from 'axios'
 import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3'
 
 async function main() {
-  const pdf = await getPDFByFilename('0605_2001F00930_2012-12-05_19.pdf')
-  console.log(pdf)
-  // const form = new FormData()
-  // form.append('pdf_file', pdf)
+  const pdf = Buffer.from(await getPDFByFilename('0605_2001F00930_2012-12-05_19.pdf'))
+  console.log(pdf.toString())
   const formdata = new FormData()
   formdata.append('pdf_file', pdf, '0605_2001F00930_2012-12-05_19.pdf')
-  /*
-const requestOptions = {
-  method: "POST",
-  body: formdata,
-  redirect: "follow"
-};
-*/
   const response = await axios.post(
     'http://nlp-pseudonymisation-api-service.nlp.svc.cluster.local:8081/pdf-to-text',
     formdata,
     {
       headers: {
-        'Content-Type': 'multipart/form-data'
+        ...formdata.getHeaders()
       }
     }
   )
-  /*
-fetch("http://nlp-pseudonymisation-api-service.nlp.svc.cluster.local:8081/pdf-to-text", requestOptions)
-  .then((response) => response.text())
-  .then((result) => console.log(result))
-  .catch((error) => console.error(error));
-*/
-  /*
-  const formdata = new FormData();
-formdata.append("pdf_file", fileInput.files[0], "/C:/Users/amaury.fouret/Documents/portalis_test/decision/auto/decision_origin.pdf");
-
-const requestOptions = {
-  method: "POST",
-  body: formdata,
-  redirect: "follow"
-};
-  const response = await fetch(
-    'http://nlp-pseudonymisation-api-service.nlp.svc.cluster.local:8081/pdf-to-text',
-    {
-      method: 'POST',
-      body: form.getBuffer()
-    }
-  )
-  */
   console.log(response)
 }
 

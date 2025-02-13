@@ -3,6 +3,7 @@ import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3'
 
 async function main() {
   const pdf = await getPDFByFilename('0605_2001F00930_2012-12-05_19.pdf')
+  console.log(pdf)
   const form = new FormData()
   form.append('pdf_file', pdf)
   const response = await fetch(

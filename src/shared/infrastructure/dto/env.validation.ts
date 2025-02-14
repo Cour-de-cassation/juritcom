@@ -16,6 +16,7 @@ export const envValidationConfig = {
     S3_BUCKET_NAME_PDF2TEXT_FAILED: Joi.string().required(),
     S3_BUCKET_NAME_DELETION: Joi.string().required(),
     S3_BUCKET_NAME_NORMALIZED: Joi.string().required(),
+    NLP_PSEUDONYMISATION_API_URL: Joi.string().required(),
     DBSDER_API_URL: Joi.string().required(),
     DBSDER_API_KEY: Joi.string()
       .required()

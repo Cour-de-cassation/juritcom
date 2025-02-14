@@ -145,6 +145,21 @@ export class DecisionS3Repository implements DecisionRepository {
     }
   }
 
+  async getPDFByFilename(filename: string): Promise<Buffer> {
+    const reqParams = {
+      Bucket: process.env.S3_BUCKET_NAME_PDF,
+      Key: filename
+    }
+
+    try {
+      const fileFromS3 = await this.s3Client.send(new GetObjectCommand(reqParams))
+      return Buffer.from(await fileFromS3.Body?.transformToByteArray())
+    } catch (error) {
+      this.logger.error({ operationName: 'getPDFByFilename', msg: error.message, data: error })
+      throw new BucketError(error)
+    }
+  }
+
   async getDecisionList(
     maxNumberOfDecisionsToRetrieve?: number,
     startAfterFileName?: string

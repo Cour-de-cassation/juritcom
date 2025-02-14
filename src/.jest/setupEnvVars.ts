@@ -7,7 +7,7 @@ process.env = {
   S3_REGION: 's3-region',
   S3_BUCKET_NAME_RAW: 'fake-raw-bucket-name',
   S3_BUCKET_NAME_PDF: 'fake-pdf-bucket-name',
-  S3_BUCKET_NAME_PDF2TEXT: 'fake-pdf2text-bucket-name',
+  S3_BUCKET_NAME_PDF2TEXT_SUCCESS: 'fake-pdf2text-success-bucket-name',
   S3_BUCKET_NAME_PDF2TEXT_FAILED: 'fake-pdf2text-failed-bucket-name',
   S3_BUCKET_NAME_DELETION: 'fake-deletion-bucket-nam',
   S3_BUCKET_NAME_NORMALIZED: 'fake-normalized-bucket-name',

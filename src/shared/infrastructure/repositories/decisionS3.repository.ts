@@ -160,6 +160,47 @@ export class DecisionS3Repository implements DecisionRepository {
     }
   }
 
+  async archiveFailedPDF(file: Buffer, key: string): Promise<void> {
+    const params = {
+      Bucket: process.env.S3_BUCKET_NAME_PDF2TEXT_FAILED,
+      Key: `${key}`,
+      Body: file,
+      ContentType: 'application/pdf',
+      ACL: 'public-read',
+      Metadata: {
+        date: new Date().toISOString(),
+        originalPdfFileName: `${key}`
+      }
+    } as unknown as any
+
+    try {
+      await this.s3Client.send(new PutObjectCommand(params))
+    } catch (error) {
+      this.logger.error({ operationName: 'archiveFailedPDF', msg: error.message, data: error })
+      throw new BucketError(error)
+    }
+  }
+
+  async archiveSuccessPDF(data: object, key: string): Promise<void> {
+    const params = {
+      Bucket: process.env.S3_BUCKET_NAME_PDF2TEXT_SUCCESS,
+      Key: `${key}`,
+      Body: data,
+      ACL: 'public-read',
+      Metadata: {
+        date: new Date().toISOString(),
+        originalPdfFileName: `${key}`
+      }
+    } as unknown as any
+
+    try {
+      await this.s3Client.send(new PutObjectCommand(params))
+    } catch (error) {
+      this.logger.error({ operationName: 'archiveSuccessPDF', msg: error.message, data: error })
+      throw new BucketError(error)
+    }
+  }
+
   async getDecisionList(
     maxNumberOfDecisionsToRetrieve?: number,
     startAfterFileName?: string

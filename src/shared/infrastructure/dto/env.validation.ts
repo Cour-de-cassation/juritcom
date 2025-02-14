@@ -12,7 +12,7 @@ export const envValidationConfig = {
     S3_REGION: Joi.string().required(),
     S3_BUCKET_NAME_RAW: Joi.string().required(),
     S3_BUCKET_NAME_PDF: Joi.string().required(),
-    S3_BUCKET_NAME_PDF2TEXT: Joi.string().required(),
+    S3_BUCKET_NAME_PDF2TEXT_SUCCESS: Joi.string().required(),
     S3_BUCKET_NAME_PDF2TEXT_FAILED: Joi.string().required(),
     S3_BUCKET_NAME_DELETION: Joi.string().required(),
     S3_BUCKET_NAME_NORMALIZED: Joi.string().required(),

@@ -22,7 +22,7 @@ async function main() {
     console.log(response.status)
     console.log(response.statusText)
     console.log(response.data)
-    console.log(typeof JSON.parse(response.data).markdownText)
+    console.log(typeof response.data.markdownText)
   } catch (error: any) {
     if (error instanceof AxiosError) {
       console.error(error.code)

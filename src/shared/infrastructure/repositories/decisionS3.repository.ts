@@ -185,7 +185,7 @@ export class DecisionS3Repository implements DecisionRepository {
     const params = {
       Bucket: process.env.S3_BUCKET_NAME_PDF2TEXT_SUCCESS,
       Key: `${key}`,
-      Body: data,
+      Body: JSON.stringify(data),
       ACL: 'public-read',
       Metadata: {
         date: new Date().toISOString(),

@@ -71,9 +71,7 @@ export async function fetchNLPDataFromPDF(pdfFile: Buffer, pdfFilename: string):
 }
 
 export function markdownToPlainText(input: string): string {
-  const marked = new Marked({ gfm: true })
-  marked.use(markedPlaintify())
-  const plainText = marked.parse(input, { async: false })
+  const plainText = new Marked({ gfm: true }).use(markedPlaintify()).parse(input, { async: false })
   if (!plainText || isEmptyText(plainText)) {
     const error = new InfrastructureExpection('Le texte retourné est vide')
     const formatLogs: LogsFormat = {

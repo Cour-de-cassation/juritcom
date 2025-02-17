@@ -1,6 +1,8 @@
 import * as FormData from 'form-data'
 import axios, { AxiosError, AxiosResponse } from 'axios'
 import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3'
+import { Marked } from 'marked'
+import markedPlaintify from 'marked-plaintify'
 
 // @TODO http://nlp-pseudonymisation-api-service.nlp.svc.cluster.local:8081/pdf-to-text
 // cf. https://stackoverflow.com/a/64169877
@@ -23,6 +25,10 @@ async function main() {
     console.log(response.statusText)
     console.log(response.data)
     console.log(typeof response.data.markdownText)
+    const plainText = new Marked({ gfm: true })
+      .use(markedPlaintify())
+      .parse(response.data.markdownText, { async: false })
+    console.log(plainText)
   } catch (error: any) {
     if (error instanceof AxiosError) {
       console.error(error.code)

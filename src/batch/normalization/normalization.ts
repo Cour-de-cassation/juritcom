@@ -9,6 +9,14 @@ import { computeLabelStatus } from './services/computeLabelStatus'
 import { computeOccultation } from './services/computeOccultation'
 import { DbSderApiGateway } from './repositories/gateways/dbsderApi.gateway'
 import { normalizationFormatLogs } from './index'
+import {
+  fetchPDFFromS3,
+  fetchNLPDataFromPDF,
+  markdownToPlainText,
+  NLPPDFToTextDTO,
+  isEmptyText
+} from './services/PDFToText'
+import { PostponeException } from './infrastructure/nlp.exception'
 
 const dbSderApiGateway = new DbSderApiGateway()
 const bucketNameIntegre = process.env.S3_BUCKET_NAME_RAW
@@ -30,7 +38,54 @@ export async function normalizationJob(): Promise<ConvertedDecisionWithMetadonne
         // Step 1: Fetch decision from S3
         const decision = await s3Repository.getDecisionByFilename(decisionFilename)
 
-        // // Step 2: Cloning decision to save it in normalized bucket
+        if (process.env.PLAINTEXT_SOURCE === 'nlp') {
+          // Step 2a, use pdf-to-text NLP API:
+
+          // Fetch PDF from -pdf bucket
+          const pdfFilename: string = decisionFilename.replace(/\.json$/, '.pdf')
+          const pdfFile = await fetchPDFFromS3(s3Repository, pdfFilename)
+
+          try {
+            // Transforming decision from PDF to text
+
+            // 1. Get data from NLP API:
+            const NLPData: NLPPDFToTextDTO = await fetchNLPDataFromPDF(pdfFile, pdfFilename)
+
+            // 2. Get plain text from markdown:
+            decision.texteDecisionIntegre = markdownToPlainText(NLPData.markdownText)
+
+            // 3. Store NLP data in -pdf-success bucket:
+            await s3Repository.archiveSuccessPDF(NLPData, pdfFilename)
+          } catch (error) {
+            if (error instanceof PostponeException === false) {
+              // *Move* failed PDF to pdf-failed bucket:
+              await s3Repository.archiveFailedPDF(pdfFile, pdfFilename)
+              await s3Repository.deleteDecision({
+                Bucket: process.env.S3_BUCKET_NAME_PDF,
+                Key: pdfFilename
+              })
+            }
+            throw error
+          }
+
+          logger.info({
+            ...normalizationFormatLogs,
+            msg: 'Plain text extracted by NLP API from collected PDF file'
+          })
+        } else {
+          // Step 2b, use texteDecisionIntegre property:
+
+          if (isEmptyText(decision.texteDecisionIntegre)) {
+            throw new Error('Collected texteDecisionIntegre property is empty')
+          }
+
+          logger.info({
+            ...normalizationFormatLogs,
+            msg: 'Plain text from collected texteDecisionIntegre property'
+          })
+        }
+
+        // Step 3: Cloning decision to save it in normalized bucket
         const decisionFromS3Clone = JSON.parse(JSON.stringify(decision))
 
         logger.info({
@@ -38,22 +93,19 @@ export async function normalizationJob(): Promise<ConvertedDecisionWithMetadonne
           msg: 'Starting normalization of ' + decisionFilename
         })
 
-        // Step 3: Generating unique id for decision
+        // Step 4: Generating unique id for decision
         const _id = decision.metadonnees.idDecision
         normalizationFormatLogs.data = { decisionId: _id }
 
         logger.info({ ...normalizationFormatLogs, msg: 'Generated unique id for decision' })
 
-        // Step 4: Transforming decision from WPD to text
-        const decisionContent = decision.texteDecisionIntegre
+        // Step 5: Removing or replace (by other thing) unnecessary characters from decision
+        const cleanedDecision = removeOrReplaceUnnecessaryCharacters(decision.texteDecisionIntegre)
 
         logger.info({
           ...normalizationFormatLogs,
-          msg: 'Decision conversion finished. Removing unnecessary characters'
+          msg: 'Removed unnecessary characters'
         })
-
-        // Step 5: Removing or replace (by other thing) unnecessary characters from decision
-        const cleanedDecision = removeOrReplaceUnnecessaryCharacters(decisionContent) // (là aussi, à réévaluer avec les premiers lots de test)
 
         // Step 6: Map decision to DBSDER API Type to save it in database
         const decisionToSave = mapDecisionNormaliseeToDecisionDto(
@@ -115,6 +167,10 @@ export async function normalizationJob(): Promise<ConvertedDecisionWithMetadonne
           ...normalizationFormatLogs,
           msg: 'Failed to normalize the decision ' + decisionFilename + '.'
         })
+        // To avoid a 429 too many request error after a timeout (as in Label):
+        if (error instanceof PostponeException) {
+          await new Promise((_) => setTimeout(_, 10000))
+        }
         continue
       }
     }

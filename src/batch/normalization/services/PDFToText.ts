@@ -46,7 +46,7 @@ export async function fetchNLPDataFromPDF(pdfFile: Buffer, pdfFilename: string):
         }
       }
     )
-    return JSON.parse(response.data)
+    return response.data
   } catch (error) {
     const formatLogs: LogsFormat = {
       ...normalizationFormatLogs,

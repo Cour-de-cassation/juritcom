@@ -38,7 +38,7 @@ export async function fetchNLPDataFromPDF(pdfFile: Buffer, pdfFilename: string):
   formData.append('pdf_file', pdfFile, pdfFilename)
   try {
     const response: AxiosResponse = await axios.post(
-      process.env.NLP_PSEUDONYMISATION_API_URL,
+      `${process.env.NLP_PSEUDONYMISATION_API_URL}/pdf-to-text`,
       formData,
       {
         headers: {

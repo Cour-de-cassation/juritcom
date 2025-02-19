@@ -167,9 +167,11 @@ export async function normalizationJob(): Promise<ConvertedDecisionWithMetadonne
           ...normalizationFormatLogs,
           msg: 'Failed to normalize the decision ' + decisionFilename + '.'
         })
-        // To avoid a 429 too many request error after a timeout (as in Label):
+        // To avoid too many request errors (as in Label):
         if (error instanceof PostponeException) {
           await new Promise((_) => setTimeout(_, 10000))
+        } else {
+          await new Promise((_) => setTimeout(_, 500))
         }
         continue
       }

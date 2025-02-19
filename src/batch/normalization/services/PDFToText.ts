@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { DecisionS3Repository } from '../../../shared/infrastructure/repositories/decisionS3.repository'
-import { InfrastructureExpection } from '../../../shared/infrastructure/exceptions/infrastructure.exception'
+import { InfrastructureException } from '../../../shared/infrastructure/exceptions/infrastructure.exception'
 import { logger, normalizationFormatLogs } from '..'
 import { LogsFormat } from '../../../shared/infrastructure/utils/logsFormat.utils'
 import * as FormData from 'form-data'
@@ -29,7 +29,7 @@ export async function fetchPDFFromS3(
     logger.error({
       ...formatLogs
     })
-    throw new InfrastructureExpection(error.message)
+    throw new InfrastructureException(error.message)
   }
 }
 
@@ -59,13 +59,16 @@ export async function fetchNLPDataFromPDF(pdfFile: Buffer, pdfFilename: string):
     if (error instanceof AxiosError) {
       formatLogs.msg = error.code
       formatLogs.statusCode = error.status
-      if (error.status === 429) {
+      if (error.status === 429 || error.status === 500) {
+        // @TODO add postpone counter per decision
+        // if counter <= 2 then postpone
+        // else exception
         throw new PostponeException(error.message)
       } else {
-        throw new InfrastructureExpection(error.message)
+        throw new InfrastructureException(error.message)
       }
     } else {
-      throw new InfrastructureExpection(error.message)
+      throw new InfrastructureException(error.message)
     }
   }
 }
@@ -75,7 +78,7 @@ export function markdownToPlainText(input: string): string {
   // Remove any remaining HTML tags:
   plainText = `${plainText}`.replace(/<\/?[^>]+(>|$)/gm, '').trim()
   if (!plainText || isEmptyText(plainText)) {
-    const error = new InfrastructureExpection('Le texte retourné est vide')
+    const error = new InfrastructureException('Le texte retourné est vide')
     const formatLogs: LogsFormat = {
       ...normalizationFormatLogs,
       operationName: 'markdownToPlainText',

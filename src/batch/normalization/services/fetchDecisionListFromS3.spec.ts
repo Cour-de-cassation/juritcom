@@ -1,7 +1,7 @@
 import { Logger } from '@nestjs/common'
 import { DecisionS3Repository } from '../../../shared/infrastructure/repositories/decisionS3.repository'
 import { fetchDecisionListFromS3 } from './fetchDecisionListFromS3'
-import { InfrastructureExpection } from '../../../shared/infrastructure/exceptions/infrastructure.exception'
+import { InfrastructureException } from '../../../shared/infrastructure/exceptions/infrastructure.exception'
 
 jest.mock('../index', () => ({
   logger: {
@@ -27,7 +27,7 @@ describe('fetchDecisionListFromS3', () => {
       fetchDecisionListFromS3(repository)
     )
       // THEN
-      .rejects.toThrow(InfrastructureExpection)
+      .rejects.toThrow(InfrastructureException)
   })
 
   it('returns an empty list when no decisions are found', async () => {

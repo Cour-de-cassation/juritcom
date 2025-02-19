@@ -12,7 +12,7 @@ import { MockUtils } from '../../shared/infrastructure/utils/mock.utils'
 import { Readable } from 'stream'
 import { sdkStreamMixin } from '@smithy/util-stream'
 import { DbSderApiGateway } from './repositories/gateways/dbsderApi.gateway'
-import { InfrastructureExpection } from '../../shared/infrastructure/exceptions/infrastructure.exception'
+import { InfrastructureException } from '../../shared/infrastructure/exceptions/infrastructure.exception'
 // import { LabelStatus } from 'dbsder-api-types'
 import { CollectDto } from 'src/shared/infrastructure/dto/collect.dto'
 // import { ConvertedDecisionWithMetadonneesDto } from 'src/shared/infrastructure/dto/convertedDecisionWithMetadonnees.dto'
@@ -188,7 +188,7 @@ describe('Normalization', () => {
       // WHEN
       expect(async () => await normalizationJob())
         // THEN
-        .rejects.toThrow(InfrastructureExpection)
+        .rejects.toThrow(InfrastructureException)
     })
 
     it('returns an empty list when S3 is available but dbSder API is unavailable', async () => {

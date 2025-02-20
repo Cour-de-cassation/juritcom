@@ -82,7 +82,7 @@ export function markdownToPlainText(input: string): string {
 
   // Let's plaintify do... something:
   let plainText = new Marked({ gfm: true }).use(markedPlaintify()).parse(input, { async: false })
-  
+
   // Remove any remaining HTML tags:
   // 1. markedPlaintify could have encode some HTML elements anyway:
   plainText = decode(plainText)

@@ -50,6 +50,7 @@
     "cron": "3.1.7",
     "dbsder-api-types": "^1.6.3",
     "express-basic-auth": "1.2.1",
+    "html-entities": "^2.5.2",
     "joi": "17.13.3",
     "jsonwebtoken": "^9.0.2",
     "jwks-rsa": "^3.1.0",

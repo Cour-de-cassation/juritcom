@@ -7,7 +7,7 @@ import * as FormData from 'form-data'
 import axios, { AxiosError, AxiosResponse } from 'axios'
 import { Marked, Renderer as x } from 'marked'
 import { PostponeException } from '../infrastructure/nlp.exception'
-import {decode} from 'html-entities';
+import { decode } from 'html-entities'
 
 export interface NLPPDFToTextDTO {
   markdownText?: string

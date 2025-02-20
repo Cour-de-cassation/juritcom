@@ -5,6 +5,7 @@
     "outDir": "./dist",
     "baseUrl": "./",
     "declaration": true,
+    "esModuleInterop": true,
     "removeComments": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,

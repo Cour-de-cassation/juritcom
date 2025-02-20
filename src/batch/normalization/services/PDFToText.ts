@@ -8,6 +8,7 @@ import axios, { AxiosError, AxiosResponse } from 'axios'
 import { Marked, Renderer as x } from 'marked'
 import { PostponeException } from '../infrastructure/nlp.exception'
 import { decode } from 'html-entities'
+import { convert } from 'html-to-text'
 
 export interface NLPPDFToTextDTO {
   markdownText?: string
@@ -75,13 +76,14 @@ export async function fetchNLPDataFromPDF(pdfFile: Buffer, pdfFilename: string):
 }
 
 export function markdownToPlainText(input: string): string {
-  // Remove any <html> and <body> tags (they prevent the transformation of tables and other elements):
+  // Remove any <html> and <body> tags, so plaintify does not encode their content:
   input = input.replace(/<\/?html>/gim, '')
   input = input.replace(/<\/?body>/gim, '')
   let plainText = new Marked({ gfm: true }).use(markedPlaintify()).parse(input, { async: false })
   // Remove any remaining HTML tags:
   plainText = decode(plainText)
-  // plainText = plainText.replace(/<\/?[^>]+(>|$)/gm, '').trim()
+  plainText = convert(plainText, { wordwrap: false })
+  plainText = plainText.replace(/<\/?[^>]+(>|$)/gm, '').trim()
   if (!plainText || isEmptyText(plainText)) {
     const error = new InfrastructureException('Le texte retourné est vide')
     const formatLogs: LogsFormat = {

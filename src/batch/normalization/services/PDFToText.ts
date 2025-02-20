@@ -77,11 +77,11 @@ export async function fetchNLPDataFromPDF(pdfFile: Buffer, pdfFilename: string):
 export function markdownToPlainText(input: string): string {
   // Remove any <html> and <body> tags (they prevent the transformation of tables and other elements):
   input = input.replace(/<\/?html>/gim, '')
-  input = input.replace(/<\/?body>/gim, '')
+  // input = input.replace(/<\/?body>/gim, '')
   let plainText = new Marked({ gfm: true }).use(markedPlaintify()).parse(input, { async: false })
   // Remove any remaining HTML tags:
   plainText = decode(plainText)
-  plainText = plainText.replace(/<\/?[^>]+(>|$)/gm, '').trim()
+  // plainText = plainText.replace(/<\/?[^>]+(>|$)/gm, '').trim()
   if (!plainText || isEmptyText(plainText)) {
     const error = new InfrastructureException('Le texte retourné est vide')
     const formatLogs: LogsFormat = {

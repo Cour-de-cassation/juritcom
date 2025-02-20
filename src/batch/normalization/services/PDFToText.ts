@@ -79,11 +79,20 @@ export function markdownToPlainText(input: string): string {
   // Remove any <html> and <body> tags, so plaintify does not encode their content:
   input = input.replace(/<\/?html>/gim, '')
   input = input.replace(/<\/?body>/gim, '')
+
+  // Let's plaintify do... something:
   let plainText = new Marked({ gfm: true }).use(markedPlaintify()).parse(input, { async: false })
+
   // Remove any remaining HTML tags:
+  // 1. markedPlaintify could have encode some HTML elements anyway:
   plainText = decode(plainText)
-  plainText = convert(plainText, { wordwrap: false })
+  // 2. add a space to every table cell:
+  plainText = plainText.replace(/<\/td>/gim, ' </td>')
+  // 3. convert:
+  plainText = convert(plainText, { wordwrap: false, preserveNewlines: true })
+  // 4. remove every tag that could remain:
   plainText = plainText.replace(/<\/?[^>]+(>|$)/gm, '').trim()
+
   if (!plainText || isEmptyText(plainText)) {
     const error = new InfrastructureException('Le texte retourné est vide')
     const formatLogs: LogsFormat = {

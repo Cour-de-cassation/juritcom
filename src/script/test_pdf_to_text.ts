@@ -213,4 +213,4 @@ function o(c) {
   return c.replace(/[&<>"']/g, (a) => s[a])
 }
 
-main(process.argv[2]);
+main(process.argv[2])

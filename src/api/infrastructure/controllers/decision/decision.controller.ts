@@ -31,7 +31,6 @@ import { MulterOptions } from '@nestjs/platform-express/multer/interfaces/multer
 import { FileInterceptor } from '@nestjs/platform-express'
 import { ReceiveDto } from '../../../../shared/infrastructure/dto/receive.dto'
 import { MetadonneeDto } from '../../../../shared/infrastructure/dto/metadonnee.dto'
-import { MissingFieldException } from '../../exceptions/missingField.exception'
 import {
   BadFileFormatException,
   BadFileSizeException
@@ -41,7 +40,7 @@ import { ValidateDtoPipe } from '../../pipes/validateDto.pipe'
 import { LogsFormat } from '../../../../shared/infrastructure/utils/logsFormat.utils'
 import { Request } from 'express'
 import { BucketError } from '../../../../shared/domain/errors/bucket.error'
-import { InfrastructureExpection } from '../../../../shared/infrastructure/exceptions/infrastructure.exception'
+import { InfrastructureException } from '../../../../shared/infrastructure/exceptions/infrastructure.exception'
 import { UnexpectedException } from '../../../../shared/infrastructure/exceptions/unexpected.exception'
 import { SaveDecisionUsecase } from '../../../usecase/saveDecision.usecase'
 import { DeleteDecisionUsecase } from '../../../usecase/deleteDecision.usecase'
@@ -127,7 +126,7 @@ export class DecisionController {
           msg: error.message,
           statusCode: HttpStatus.SERVICE_UNAVAILABLE
         })
-        throw new InfrastructureExpection(error.message)
+        throw new InfrastructureException(error.message)
       }
       this.logger.error({
         ...formatLogs,
@@ -197,16 +196,6 @@ export class DecisionController {
       correlationId: request.headers['x-correlation-id']
     }
 
-    if (!texteDecisionIntegre || isEmptyText(texteDecisionIntegre)) {
-      const error = new MissingFieldException('texteDecisionIntegre')
-      this.logger.error({
-        ...formatLogs,
-        msg: error.message,
-        statusCode: HttpStatus.BAD_REQUEST
-      })
-      throw error
-    }
-
     if (!fichierDecisionIntegre || !isPdfFile(fichierDecisionIntegre.mimetype)) {
       const error = new BadFileFormatException('fichierDecisionIntegre', 'PDF')
       this.logger.error({
@@ -238,7 +227,7 @@ export class DecisionController {
             msg: error.message,
             statusCode: HttpStatus.SERVICE_UNAVAILABLE
           })
-          throw new InfrastructureExpection(error.message)
+          throw new InfrastructureException(error.message)
         }
         this.logger.error({
           ...formatLogs,
@@ -272,9 +261,4 @@ export class DecisionController {
 
 export function isPdfFile(mimeType: string): boolean {
   return mimeType === 'application/pdf'
-}
-
-export function isEmptyText(text: string): boolean {
-  text = `${text}`.replace(/[\t\s\r\n]/gm, '').trim()
-  return text.length === 0
 }

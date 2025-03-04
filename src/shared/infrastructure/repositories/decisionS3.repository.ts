@@ -145,6 +145,62 @@ export class DecisionS3Repository implements DecisionRepository {
     }
   }
 
+  async getPDFByFilename(filename: string): Promise<Buffer> {
+    const reqParams = {
+      Bucket: process.env.S3_BUCKET_NAME_PDF,
+      Key: filename
+    }
+
+    try {
+      const fileFromS3 = await this.s3Client.send(new GetObjectCommand(reqParams))
+      return Buffer.from(await fileFromS3.Body?.transformToByteArray())
+    } catch (error) {
+      this.logger.error({ operationName: 'getPDFByFilename', msg: error.message, data: error })
+      throw new BucketError(error)
+    }
+  }
+
+  async archiveFailedPDF(file: Buffer, key: string): Promise<void> {
+    const params = {
+      Bucket: process.env.S3_BUCKET_NAME_PDF2TEXT_FAILED,
+      Key: `${key}`,
+      Body: file,
+      ContentType: 'application/pdf',
+      ACL: 'public-read',
+      Metadata: {
+        date: new Date().toISOString(),
+        originalPdfFileName: `${key}`
+      }
+    } as unknown as any
+
+    try {
+      await this.s3Client.send(new PutObjectCommand(params))
+    } catch (error) {
+      this.logger.error({ operationName: 'archiveFailedPDF', msg: error.message, data: error })
+      throw new BucketError(error)
+    }
+  }
+
+  async archiveSuccessPDF(data: object, key: string): Promise<void> {
+    const params = {
+      Bucket: process.env.S3_BUCKET_NAME_PDF2TEXT_SUCCESS,
+      Key: `${key}`,
+      Body: JSON.stringify(data),
+      ACL: 'public-read',
+      Metadata: {
+        date: new Date().toISOString(),
+        originalPdfFileName: `${key}`
+      }
+    } as unknown as any
+
+    try {
+      await this.s3Client.send(new PutObjectCommand(params))
+    } catch (error) {
+      this.logger.error({ operationName: 'archiveSuccessPDF', msg: error.message, data: error })
+      throw new BucketError(error)
+    }
+  }
+
   async getDecisionList(
     maxNumberOfDecisionsToRetrieve?: number,
     startAfterFileName?: string

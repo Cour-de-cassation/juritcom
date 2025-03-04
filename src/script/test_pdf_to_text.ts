@@ -7,10 +7,10 @@ import { Marked, Renderer as x } from 'marked'
 // @TODO http://nlp-pseudonymisation-api-service.nlp.svc.cluster.local:8081/pdf-to-text
 // cf. https://stackoverflow.com/a/64169877
 
-async function main() {
-  const pdf: Buffer = await getPDFByFilename('0605_2001F00930_2012-12-05_19.pdf')
+async function main(id: string) {
+  const pdf: Buffer = await getPDFByFilename(`${id}.pdf`)
   const formdata: FormData = new FormData()
-  formdata.append('pdf_file', pdf, '0605_2001F00930_2012-12-05_19.pdf')
+  formdata.append('pdf_file', pdf, `${id}.pdf`)
   try {
     const response: AxiosResponse = await axios.post(
       'http://nlp-pseudonymisation-api-service.nlp.svc.cluster.local:8081/pdf-to-text',
@@ -213,4 +213,4 @@ function o(c) {
   return c.replace(/[&<>"']/g, (a) => s[a])
 }
 
-main()
+main(process.argv[2]);

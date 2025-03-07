@@ -32,8 +32,8 @@ async function getCollectedIDs(): Promise<Array<object>> {
     )
     listObjects.Contents.forEach((item) => {
       list.push({
-        id: item.Key,
-        date: item.LastModified.toISOString(),
+        id: `${item.Key}`.replace('.json', ''),
+        date: `${item.LastModified.toISOString()}`.split('T')[0],
         size: item.Size
       })
     })

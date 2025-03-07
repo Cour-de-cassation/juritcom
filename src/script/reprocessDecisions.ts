@@ -2,6 +2,7 @@ import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3'
 
 async function main(id: string) {
   const pdf: Buffer = await getPDFByFilename(`${id}.pdf`)
+  console.log(pdf.byteLength)
 }
 
 async function getPDFByFilename(filename: string): Promise<Buffer> {

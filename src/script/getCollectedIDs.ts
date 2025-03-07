@@ -10,7 +10,7 @@ async function main() {
   }
 }
 
-async function getCollectedIDs(): Promise<Array<Object>> {
+async function getCollectedIDs(): Promise<Array<object>> {
   const list = []
   const s3Client = new S3Client({
     endpoint: process.env.S3_URL,

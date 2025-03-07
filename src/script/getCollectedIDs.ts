@@ -22,23 +22,38 @@ async function getCollectedIDs(): Promise<Array<object>> {
     }
   })
 
-  const reqParams = {
-    Bucket: process.env.S3_BUCKET_NAME_NORMALIZED
-  }
+  let done = false
+  let marker = null
 
-  try {
-    const listObjects: ListObjectsCommandOutput = await s3Client.send(
-      new ListObjectsCommand(reqParams)
-    )
-    listObjects.Contents.forEach((item) => {
-      list.push({
-        id: `${item.Key}`.replace('.json', ''),
-        date: `${item.LastModified.toISOString()}`.split('T')[0],
-        size: item.Size
+  while (done === false) {
+    const reqParams = {
+      Bucket: process.env.S3_BUCKET_NAME_NORMALIZED,
+      Marker: undefined
+    }
+
+    if (marker !== null) {
+      reqParams.Marker = marker
+    }
+
+    try {
+      const listObjects: ListObjectsCommandOutput = await s3Client.send(
+        new ListObjectsCommand(reqParams)
+      )
+      listObjects.Contents.forEach((item) => {
+        list.push({
+          id: `${item.Key}`.replace('.json', ''),
+          date: `${item.LastModified.toISOString()}`.split('T')[0],
+          size: item.Size
+        })
+        marker = item.Key
       })
-    })
-  } catch (error) {
-    console.log({ operationName: 'getCollectedIDs', msg: error.message, data: error })
+
+      if (listObjects.IsTruncated === false) {
+        done = true
+      }
+    } catch (error) {
+      console.log({ operationName: 'getCollectedIDs', msg: error.message, data: error })
+    }
   }
 
   return list

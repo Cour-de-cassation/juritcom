@@ -13,6 +13,7 @@ process.env = {
   S3_BUCKET_NAME_NORMALIZED: 'fake-normalized-bucket-name',
   DBSDER_API_URL: 'http://localhost:3000',
   DBSDER_API_KEY: '24277eca-290c-40c3-9bf6-a370880d800b',
+  DBSDER_OTHER_API_KEY: '24277eca-290c-40c3-9bf6-a370880d800b',
   NLP_PSEUDONYMISATION_API_URL: 'http://localhost:8081',
   USE_AUTH: 'basic'
 }

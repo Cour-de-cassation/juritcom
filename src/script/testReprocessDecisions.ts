@@ -1,3 +1,6 @@
+import * as dotenv from 'dotenv'
+dotenv.config()
+
 import {
   BadRequestException,
   ConflictException,
@@ -5,6 +8,7 @@ import {
   ServiceUnavailableException,
   UnauthorizedException
 } from '@nestjs/common'
+
 import axios from 'axios'
 
 let batchSize: number

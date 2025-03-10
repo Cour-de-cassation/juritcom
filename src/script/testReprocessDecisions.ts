@@ -29,7 +29,7 @@ async function main(count: string) {
     '2025-03-04'
   )
 
-  console.log(decisions)
+  console.log(decisions, typeof decisions)
 }
 
 async function listDecisions(source: string, status: string, startDate: string, endDate: string) {

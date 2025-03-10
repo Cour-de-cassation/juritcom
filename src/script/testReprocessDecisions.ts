@@ -23,7 +23,7 @@ async function main(count: string) {
   console.log(process.env)
 
   const decisions = await listDecisions(
-    'juritcom',
+    'jurica',
     'ignored_controleRequis',
     process.env.COMMISSIONING_DATE,
     '2025-03-04'

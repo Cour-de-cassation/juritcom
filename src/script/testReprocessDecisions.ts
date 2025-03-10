@@ -29,7 +29,7 @@ async function main(count: string) {
     '2025-03-04'
   )
 
-  console.log(decisions)
+  console.log(decisions, typeof decisions)
 }
 
 async function listDecisions(source: string, status: string, startDate: string, endDate: string) {
@@ -39,7 +39,7 @@ async function listDecisions(source: string, status: string, startDate: string, 
     .get(urlToCall, {
       params: { source: source, status: status, startDate: startDate, endDate: endDate },
       headers: {
-        'x-api-key': process.env.DBSDER_API_KEY
+        'x-api-key': process.env.DBSDER_OTHER_API_KEY
       }
     })
     .catch((error) => {

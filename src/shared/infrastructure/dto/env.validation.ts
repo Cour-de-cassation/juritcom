@@ -23,6 +23,12 @@ export const envValidationConfig = {
       .guid({
         version: ['uuidv4'],
         separator: true
+      }),
+    DBSDER_OTHER_API_KEY: Joi.string()
+      .required()
+      .guid({
+        version: ['uuidv4'],
+        separator: true
       })
   })
 }

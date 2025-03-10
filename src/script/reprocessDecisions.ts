@@ -28,10 +28,7 @@ async function main(count: string) {
   }
 
   let doneCount = 0
-  const decisions = await listDecisions(
-    'juritcom',
-    'ignored_controleRequis'
-  )
+  const decisions = await listDecisions('juritcom', 'ignored_controleRequis')
   for (let i = 0; i < decisions.length; i++) {
     try {
       const decision = await getDecisionById(decisions[i]._id)
@@ -53,15 +50,12 @@ async function main(count: string) {
   console.log(`Reprocessed ${doneCount} decisions`)
 }
 
-async function listDecisions(
-  source: string,
-  status: string
-) {
+async function listDecisions(source: string, status: string) {
   const urlToCall = process.env.DBSDER_API_URL + '/v1/decisions'
 
   const result = await axios
     .get(urlToCall, {
-      params: { sourceName: source, status: status},
+      params: { sourceName: source, status: status },
       headers: {
         'x-api-key': process.env.DBSDER_OTHER_API_KEY
       }

@@ -30,9 +30,9 @@ async function main(count: string) {
   let doneCount = 0
   const decisions = await listDecisions(
     'juritcom',
-    'ignored_controleRequis',
+    'ignored_controleRequis' /*,
     process.env.COMMISSIONING_DATE,
-    '2025-03-04'
+    '2025-03-04'*/
   )
   for (let i = 0; i < decisions.lenght; i++) {
     try {
@@ -55,12 +55,19 @@ async function main(count: string) {
   console.log(`Reprocessed ${doneCount} decisions`)
 }
 
-async function listDecisions(source: string, status: string, startDate: string, endDate: string) {
+async function listDecisions(
+  source: string,
+  status: string /*, startDate: string, endDate: string*/
+) {
   const urlToCall = process.env.DBSDER_API_URL + '/v1/decisions'
+
+  console.log(
+    `GET ${urlToCall} - sourceName: ${source}, status: ${status} - ${process.env.DBSDER_OTHER_API_KEY}`
+  )
 
   const result = await axios
     .get(urlToCall, {
-      params: { sourceName: source, status: status, startDate: startDate, endDate: endDate },
+      params: { sourceName: source, status: status /*, startDate: startDate, endDate: endDate*/ },
       headers: {
         'x-api-key': process.env.DBSDER_OTHER_API_KEY
       }
@@ -100,6 +107,8 @@ async function listDecisions(source: string, status: string, startDate: string, 
       }
       throw new ServiceUnavailableException('DbSder API is unavailable')
     })
+
+  console.log(result)
 
   return result.data
 }

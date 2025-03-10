@@ -1,3 +1,6 @@
+import * as dotenv from 'dotenv'
+dotenv.config()
+
 import {
   S3Client,
   GetObjectCommand,
@@ -5,9 +8,16 @@ import {
   PutObjectCommand
 } from '@aws-sdk/client-s3'
 
-import { DbSderApiGateway } from '../batch/normalization/repositories/gateways/dbsderApi.gateway'
+import {
+  BadRequestException,
+  ConflictException,
+  HttpStatus,
+  ServiceUnavailableException,
+  UnauthorizedException
+} from '@nestjs/common'
 
-const dbSderApiGateway = new DbSderApiGateway()
+import axios from 'axios'
+
 let batchSize: number
 
 async function main(count: string) {
@@ -18,16 +28,24 @@ async function main(count: string) {
   }
 
   let doneCount = 0
-  const decisions = await dbSderApiGateway.listDecisions(
+  const decisions = await listDecisions(
     'juritcom',
     'ignored_controleRequis',
-    new Date(process.env.COMMISSIONING_DATE).toISOString(),
-    new Date('2025-03-04').toISOString()
+    process.env.COMMISSIONING_DATE,
+    '2025-03-04'
   )
   for (let i = 0; i < decisions.lenght; i++) {
-    const done = await reprocessNormalizedDecisionByFilename(decisions[i].filenameSource)
-    if (done) {
-      doneCount++
+    try {
+      const decision = await getDecisionById(decisions[i]._id)
+      const done = await reprocessNormalizedDecisionByFilename(decision.filenameSource)
+      if (done) {
+        console.log(`Reprocess ${decisions[i]._id}`)
+        doneCount++
+      } else {
+        console.log(`Skip ${decisions[i]._id}`)
+      }
+    } catch (_ignore) {
+      console.log(`Skip ${decisions[i]._id}`)
     }
     if (doneCount === batchSize) {
       break
@@ -35,6 +53,103 @@ async function main(count: string) {
   }
 
   console.log(`Reprocessed ${doneCount} decisions`)
+}
+
+async function listDecisions(source: string, status: string, startDate: string, endDate: string) {
+  const urlToCall = process.env.DBSDER_API_URL + '/v1/decisions'
+
+  const result = await axios
+    .get(urlToCall, {
+      params: { sourceName: source, status: status, startDate: startDate, endDate: endDate },
+      headers: {
+        'x-api-key': process.env.DBSDER_OTHER_API_KEY
+      }
+    })
+    .catch((error) => {
+      if (error.response) {
+        if (error.response.data.statusCode === HttpStatus.BAD_REQUEST) {
+          console.error({
+            msg: error.response.data.message,
+            data: error.response.data,
+            statusCode: HttpStatus.BAD_REQUEST
+          })
+          throw new BadRequestException(
+            'DbSderAPI Bad request error : ' + error.response.data.message
+          )
+        } else if (error.response.data.statusCode === HttpStatus.UNAUTHORIZED) {
+          console.error({
+            msg: error.response.data.message,
+            data: error.response.data,
+            statusCode: HttpStatus.UNAUTHORIZED
+          })
+          throw new UnauthorizedException('You are not authorized to call this route')
+        } else if (error.response.data.statusCode === HttpStatus.CONFLICT) {
+          console.error({
+            msg: error.response.data.message,
+            data: error.response.data,
+            statusCode: HttpStatus.CONFLICT
+          })
+          throw new ConflictException('DbSderAPI error: ' + error.response.data.message)
+        } else {
+          console.error({
+            msg: error.response.data.message,
+            data: error.response.data,
+            statusCode: HttpStatus.SERVICE_UNAVAILABLE
+          })
+        }
+      }
+      throw new ServiceUnavailableException('DbSder API is unavailable')
+    })
+
+  return result.data
+}
+
+async function getDecisionById(id: string) {
+  const urlToCall = process.env.DBSDER_API_URL + `/v1/decisions/${id}`
+
+  const result = await axios
+    .get(urlToCall, {
+      headers: {
+        'x-api-key': process.env.DBSDER_OTHER_API_KEY
+      }
+    })
+    .catch((error) => {
+      if (error.response) {
+        if (error.response.data.statusCode === HttpStatus.BAD_REQUEST) {
+          console.error({
+            msg: error.response.data.message,
+            data: error.response.data,
+            statusCode: HttpStatus.BAD_REQUEST
+          })
+          throw new BadRequestException(
+            'DbSderAPI Bad request error : ' + error.response.data.message
+          )
+        } else if (error.response.data.statusCode === HttpStatus.UNAUTHORIZED) {
+          console.error({
+            msg: error.response.data.message,
+            data: error.response.data,
+            statusCode: HttpStatus.UNAUTHORIZED
+          })
+          throw new UnauthorizedException('You are not authorized to call this route')
+        } else if (error.response.data.statusCode === HttpStatus.CONFLICT) {
+          console.error({
+            msg: error.response.data.message,
+            data: error.response.data,
+            statusCode: HttpStatus.CONFLICT
+          })
+          throw new ConflictException('DbSderAPI error: ' + error.response.data.message)
+        } else {
+          console.error({
+            msg: error.response.data.message,
+            data: error.response.data,
+            statusCode: HttpStatus.SERVICE_UNAVAILABLE
+          })
+        }
+      }
+      throw new ServiceUnavailableException('DbSder API is unavailable')
+    })
+
+  return result.data
 }
 
 async function reprocessNormalizedDecisionByFilename(filename: string): Promise<boolean> {

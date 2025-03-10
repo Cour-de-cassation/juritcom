@@ -29,7 +29,8 @@ async function main(count: string) {
     '2025-03-04'
   )
 
-  console.log(decisions, typeof decisions)
+  console.log(decisions[0])
+  console.log(decisions.length)
 }
 
 async function listDecisions(source: string, status: string, startDate: string, endDate: string) {
@@ -37,7 +38,7 @@ async function listDecisions(source: string, status: string, startDate: string, 
 
   const result = await axios
     .get(urlToCall, {
-      params: { source: source, status: status, startDate: startDate, endDate: endDate },
+      params: { sourceName: source, status: status, startDate: startDate, endDate: endDate },
       headers: {
         'x-api-key': process.env.DBSDER_OTHER_API_KEY
       }

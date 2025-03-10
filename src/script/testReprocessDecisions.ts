@@ -20,6 +20,8 @@ async function main(count: string) {
     batchSize = 100
   }
 
+  console.log(process.env)
+
   const decisions = await listDecisions(
     'juritcom',
     'ignored_controleRequis',

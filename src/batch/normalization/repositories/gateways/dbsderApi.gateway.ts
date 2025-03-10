@@ -140,7 +140,7 @@ export class DbSderApiGateway {
 
     const result = await axios
       .get(urlToCall, {
-        params: { source: source, status: status, startDate: startDate, endDate: endDate },
+        params: { sourceName: source, status: status, startDate: startDate, endDate: endDate },
         headers: {
           'x-api-key': process.env.DBSDER_OTHER_API_KEY
         }

@@ -31,6 +31,10 @@ async function main(count: string) {
 
   console.log(decisions[0])
   console.log(decisions.length)
+
+  const decision = await getDecisionById(decisions[0]._id)
+
+  console.log(decision)
 }
 
 async function listDecisions(source: string, status: string, startDate: string, endDate: string) {
@@ -39,6 +43,54 @@ async function listDecisions(source: string, status: string, startDate: string, 
   const result = await axios
     .get(urlToCall, {
       params: { sourceName: source, status: status, startDate: startDate, endDate: endDate },
+      headers: {
+        'x-api-key': process.env.DBSDER_OTHER_API_KEY
+      }
+    })
+    .catch((error) => {
+      if (error.response) {
+        if (error.response.data.statusCode === HttpStatus.BAD_REQUEST) {
+          console.error({
+            msg: error.response.data.message,
+            data: error.response.data,
+            statusCode: HttpStatus.BAD_REQUEST
+          })
+          throw new BadRequestException(
+            'DbSderAPI Bad request error : ' + error.response.data.message
+          )
+        } else if (error.response.data.statusCode === HttpStatus.UNAUTHORIZED) {
+          console.error({
+            msg: error.response.data.message,
+            data: error.response.data,
+            statusCode: HttpStatus.UNAUTHORIZED
+          })
+          throw new UnauthorizedException('You are not authorized to call this route')
+        } else if (error.response.data.statusCode === HttpStatus.CONFLICT) {
+          console.error({
+            msg: error.response.data.message,
+            data: error.response.data,
+            statusCode: HttpStatus.CONFLICT
+          })
+          throw new ConflictException('DbSderAPI error: ' + error.response.data.message)
+        } else {
+          console.error({
+            msg: error.response.data.message,
+            data: error.response.data,
+            statusCode: HttpStatus.SERVICE_UNAVAILABLE
+          })
+        }
+      }
+      throw new ServiceUnavailableException('DbSder API is unavailable')
+    })
+
+  return result.data
+}
+
+async function getDecisionById(id: string) {
+  const urlToCall = process.env.DBSDER_API_URL + `/v1/decisions/${id}`
+
+  const result = await axios
+    .get(urlToCall, {
       headers: {
         'x-api-key': process.env.DBSDER_OTHER_API_KEY
       }

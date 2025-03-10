@@ -25,6 +25,9 @@
             containers:
               - name: "{{ api_app_id }}"
                 image: "{{ juritcom_api_image }}"
+                env:
+                  - name: COMMISSIONING_DATE
+                    value: "{{ commissioning_date }}"
                 ports:
                   - containerPort: 3000
                 envFrom:

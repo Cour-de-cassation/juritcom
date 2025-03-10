@@ -39,7 +39,7 @@ async function listDecisions(source: string, status: string, startDate: string, 
     .get(urlToCall, {
       params: { source: source, status: status, startDate: startDate, endDate: endDate },
       headers: {
-        'x-api-key': process.env.DBSDER_API_KEY
+        'x-api-key': process.env.DBSDER_OTHER_API_KEY
       }
     })
     .catch((error) => {

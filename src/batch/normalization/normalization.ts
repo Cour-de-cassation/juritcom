@@ -169,9 +169,9 @@ export async function normalizationJob(): Promise<ConvertedDecisionWithMetadonne
         })
         // To avoid too many request errors (as in Label):
         if (error instanceof PostponeException) {
-          await new Promise((_) => setTimeout(_, 10 * 1000))
+          await new Promise((_) => setTimeout(_, 15 * 1000))
         } else {
-          await new Promise((_) => setTimeout(_, 2 * 1000))
+          await new Promise((_) => setTimeout(_, 5 * 1000))
         }
         continue
       }

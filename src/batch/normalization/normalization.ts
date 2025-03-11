@@ -17,6 +17,7 @@ import {
   isEmptyText
 } from './services/PDFToText'
 import { PostponeException } from './infrastructure/nlp.exception'
+import ms from 'ms'
 
 const dbSderApiGateway = new DbSderApiGateway()
 const bucketNameIntegre = process.env.S3_BUCKET_NAME_RAW
@@ -169,9 +170,9 @@ export async function normalizationJob(): Promise<ConvertedDecisionWithMetadonne
         })
         // To avoid too many request errors (as in Label):
         if (error instanceof PostponeException) {
-          await new Promise((_) => setTimeout(_, 10000))
+          await new Promise((_) => setTimeout(_, ms('10s')))
         } else {
-          await new Promise((_) => setTimeout(_, 500))
+          await new Promise((_) => setTimeout(_, ms('2s')))
         }
         continue
       }

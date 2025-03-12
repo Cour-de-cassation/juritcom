@@ -56,7 +56,8 @@ export async function fetchNLPDataFromPDF(pdfFile: Buffer, pdfFilename: string):
       const formatLogs: LogsFormat = {
         ...normalizationFormatLogs,
         operationName: 'fetchNLPDataFromPDF',
-        msg: `performed pdf-to-text on file ${pdfFilename}`
+        msg: `performed pdf-to-text on file ${pdfFilename}`,
+        statusCode: response.status
       }
       logger.info({
         ...formatLogs,

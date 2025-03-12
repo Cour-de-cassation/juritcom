@@ -39,6 +39,7 @@ export async function fetchNLPDataFromPDF(pdfFile: Buffer, pdfFilename: string):
   const formData: FormData = new FormData()
   formData.append('pdf_file', pdfFile, pdfFilename)
   try {
+    const t0 = new Date()
     const response: AxiosResponse = await axios.post(
       `${process.env.NLP_PSEUDONYMISATION_API_URL}/pdf-to-text`,
       formData,
@@ -48,6 +49,23 @@ export async function fetchNLPDataFromPDF(pdfFile: Buffer, pdfFilename: string):
         }
       }
     )
+    if (response && response.data && response.data.pdfPageCount) {
+      const t1 = new Date()
+      const delta = (t1.getTime() - t0.getTime()) / 1000
+      const perPage = delta / response.data.pdfPageCount
+      const formatLogs: LogsFormat = {
+        ...normalizationFormatLogs,
+        operationName: 'fetchNLPDataFromPDF',
+        msg: `performed pdf-to-text on file ${pdfFilename}`
+      }
+      logger.info({
+        ...formatLogs,
+        pdfType: response.data.pdfType,
+        pdfPageCount: response.data.pdfPageCount,
+        duration: delta.toFixed(4),
+        durationPerPage: perPage.toFixed(4)
+      })
+    }
     return response.data
   } catch (error) {
     const formatLogs: LogsFormat = {

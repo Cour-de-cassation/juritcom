@@ -63,7 +63,9 @@ export async function fetchNLPDataFromPDF(pdfFile: Buffer, pdfFilename: string):
         pdfType: response.data.pdfType,
         pdfPageCount: response.data.pdfPageCount,
         duration: delta.toFixed(4),
-        durationPerPage: perPage.toFixed(4)
+        durationAsNumber: delta,
+        durationPerPage: perPage.toFixed(4),
+        durationPerPageAsNumber: perPage
       })
     }
     return response.data

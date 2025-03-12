@@ -23,20 +23,18 @@ async function main(id: string) {
       }
     )
     const t1 = new Date()
-    const delta = t1.getTime() - t0.getTime()
+    const delta = (t1.getTime() - t0.getTime()) / 1000
     const perPage = (delta / response.data.pdfPageCount).toFixed(2)
-    console.log(response.status)
-    console.log(response.statusText)
-    console.log(response.data)
-    console.log(typeof response.data.markdownText)
-    console.log(`PDF type: ${response.data.pdfType}`)
-    console.log(`PDF page count: ${response.data.pdfPageCount}`)
-    console.log(`total duration: ${delta} msec`)
-    console.log(`duration per page: ${perPage} page/msec`)
     const plainText = new Marked({ gfm: true })
       .use(markedPlaintify())
       .parse(response.data.markdownText, { async: false })
     console.log(plainText)
+    console.log(response.status)
+    console.log(response.statusText)
+    console.log(`PDF type: ${response.data.pdfType}`)
+    console.log(`PDF page count: ${response.data.pdfPageCount}`)
+    console.log(`Total duration: ${delta.toFixed(2)} s`)
+    console.log(`Duration per page: ${perPage} page/s`)
   } catch (error: any) {
     if (error instanceof AxiosError) {
       console.error(error.code)

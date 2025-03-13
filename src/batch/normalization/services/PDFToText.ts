@@ -66,7 +66,8 @@ export async function fetchNLPDataFromPDF(pdfFile: Buffer, pdfFilename: string):
         duration: delta.toFixed(4),
         durationAsNumber: delta,
         durationPerPage: perPage.toFixed(4),
-        durationPerPageAsNumber: perPage
+        durationPerPageAsNumber: perPage,
+        statusCodeAsString: `${response.status}`
       })
     }
     return response.data
@@ -76,21 +77,22 @@ export async function fetchNLPDataFromPDF(pdfFile: Buffer, pdfFilename: string):
       operationName: 'fetchNLPDataFromPDF',
       msg: error.message
     }
-    logger.error({
-      ...formatLogs
-    })
     if (error instanceof AxiosError) {
       formatLogs.msg = error.code
       formatLogs.statusCode = error.status
+      logger.error({
+        ...formatLogs,
+        statusCodeAsString: `${error.status}`
+      })
       if (error.status === 429 || error.status === 500) {
-        // @TODO add postpone counter per decision
-        // if counter <= 2 then postpone
-        // else exception
         throw new PostponeException(error.message)
       } else {
         throw new InfrastructureException(error.message)
       }
     } else {
+      logger.error({
+        ...formatLogs
+      })
       throw new InfrastructureException(error.message)
     }
   }

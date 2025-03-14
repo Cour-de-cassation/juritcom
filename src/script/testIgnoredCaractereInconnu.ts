@@ -30,9 +30,9 @@ async function main() {
           !authorizedCharactersdSet.has(cleanedDecision[j]) &&
           charHistory.indexOf(cleanedDecision[j].charCodeAt(0)) === -1
         ) {
-          if (fileHistory.indexOf(decisions[i].filenameSource) === -1) {
-            console.log(`----- ${decisions[i].filenameSource} -----`)
-            fileHistory.push(decisions[i].filenameSource)
+          if (fileHistory.indexOf(decision.filenameSource) === -1) {
+            console.log(`----- ${decision.filenameSource} -----`)
+            fileHistory.push(decision.filenameSource)
           } else {
             console.log('-----')
           }

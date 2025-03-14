@@ -19,16 +19,27 @@ import axios from 'axios'
 
 async function main() {
   const decisions = await listDecisions('juritcom', 'ignored_caractereInconnu')
+  const fileHistory = []
+  const charHistory = []
   for (let i = 0; i < decisions.length; i++) {
     try {
       const decision = await getDecisionById(decisions[i]._id)
       const cleanedDecision = replaceUnknownCharacters(decision.originalText)
       for (let i = 0; i < cleanedDecision.length; i++) {
-        if (!authorizedCharactersdSet.has(cleanedDecision[i])) {
-          console.log('-----')
+        if (
+          !authorizedCharactersdSet.has(cleanedDecision[i]) &&
+          charHistory.indexOf(cleanedDecision[i].charCodeAt(0)) === -1
+        ) {
+          if (fileHistory.indexOf(decisions[i].filenameSourc) === -1) {
+            console.log(`----- ${decisions[i].filenameSource} -----`)
+            fileHistory.push(decisions[i].filenameSource)
+          } else {
+            console.log('-----')
+          }
           console.log(cleanedDecision.slice(i - 10, i + 10))
           console.log(cleanedDecision[i])
           console.log(cleanedDecision[i].charCodeAt(0))
+          charHistory.push(cleanedDecision[i].charCodeAt(0))
         }
       }
     } catch (_ignore) {

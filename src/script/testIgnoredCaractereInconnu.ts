@@ -25,10 +25,10 @@ async function main() {
     try {
       const decision = await getDecisionById(decisions[i]._id)
       const cleanedDecision = replaceUnknownCharacters(decision.originalText)
-      for (let i = 0; i < cleanedDecision.length; i++) {
+      for (let j = 0; j < cleanedDecision.length; j++) {
         if (
-          !authorizedCharactersdSet.has(cleanedDecision[i]) &&
-          charHistory.indexOf(cleanedDecision[i].charCodeAt(0)) === -1
+          !authorizedCharactersdSet.has(cleanedDecision[j]) &&
+          charHistory.indexOf(cleanedDecision[j].charCodeAt(0)) === -1
         ) {
           if (fileHistory.indexOf(decisions[i].filenameSource) === -1) {
             console.log(`----- ${decisions[i].filenameSource} -----`)
@@ -36,10 +36,10 @@ async function main() {
           } else {
             console.log('-----')
           }
-          console.log(cleanedDecision.slice(i - 10, i + 10))
-          console.log(cleanedDecision[i])
-          console.log(cleanedDecision[i].charCodeAt(0))
-          charHistory.push(cleanedDecision[i].charCodeAt(0))
+          console.log(cleanedDecision.slice(j - 10, j + 10))
+          console.log(cleanedDecision[j])
+          console.log(cleanedDecision[j].charCodeAt(0))
+          charHistory.push(cleanedDecision[j].charCodeAt(0))
         }
       }
     } catch (e) {

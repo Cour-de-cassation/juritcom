@@ -30,7 +30,7 @@ async function main() {
           !authorizedCharactersdSet.has(cleanedDecision[i]) &&
           charHistory.indexOf(cleanedDecision[i].charCodeAt(0)) === -1
         ) {
-          if (fileHistory.indexOf(decisions[i].filenameSourc) === -1) {
+          if (fileHistory.indexOf(decisions[i].filenameSource) === -1) {
             console.log(`----- ${decisions[i].filenameSource} -----`)
             fileHistory.push(decisions[i].filenameSource)
           } else {
@@ -42,8 +42,8 @@ async function main() {
           charHistory.push(cleanedDecision[i].charCodeAt(0))
         }
       }
-    } catch (_ignore) {
-      console.log(`Skip ${decisions[i]._id}`)
+    } catch (e) {
+      console.log(`Skip ${decisions[i]._id}`, e)
     }
   }
 }

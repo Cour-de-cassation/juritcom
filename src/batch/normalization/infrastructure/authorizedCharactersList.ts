@@ -354,6 +354,17 @@ export const authorizedCharacters = [
   '∫',
   '∬',
   '∭',
+  '▶',
+  '□',
+  '▫',
+  '▲',
+  '△',
+  '▷',
+  '▼',
+  '▽',
+  '◀',
+  '◁',
+  '★',
 
   // Caractères spécifiques à la langue polonaise
   'Ą',

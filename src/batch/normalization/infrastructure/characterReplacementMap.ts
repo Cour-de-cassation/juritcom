@@ -3,6 +3,7 @@ const characterReplacementMapUnicode = {
   '4013': ' ',
   '64257': 'fi',
   '3844': 'É',
+  '24213': 'É',
   '3845': '',
   '173': '',
   '768': '',
@@ -187,6 +188,12 @@ const characterReplacementMapUnicode = {
   '8222': ',',
   '807': '',
   '184': ',',
+  '33258': '',
+  '65509': '¥',
+  '21475': '',
+  '12290': '0',
+  '12304': '',
+  '923': 'A',
 
   // Nouvelles correspondances pour les caractères polonais
   '260': 'A', // Ą -> A
@@ -291,9 +298,6 @@ const characterReplacementMapUnicode = {
   '9665': '◁', // ◁ -> ◁ (flèche gauche vide)
 
   // Correspondances pour les symboles monétaires
-  '162': 'c', // ¢ -> c
-  '163': 'L', // £ -> L
-  '165': 'Y', // ¥ -> Y
   '8355': 'Fr', // ₣ -> Fr
   '8356': 'L', // ₤ -> L
   '8359': 'Pts', // ₧ -> Pts

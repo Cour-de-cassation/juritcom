@@ -36,7 +36,7 @@ async function main() {
           } else {
             console.log('-----')
           }
-          console.log(cleanedDecision.slice(j - 10, j + 10))
+          console.log(cleanedDecision.slice(j - 20, j + 20))
           console.log(cleanedDecision[j])
           console.log(cleanedDecision[j].charCodeAt(0))
           charHistory.push(cleanedDecision[j].charCodeAt(0))

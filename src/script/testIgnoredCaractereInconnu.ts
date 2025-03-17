@@ -18,7 +18,7 @@ import {
 import axios from 'axios'
 
 async function main() {
-  const decisions = await listDecisions('juritcom', 'ignored_caractereInconnu')
+  const decisions = await listDecisions('juritcom' /*, 'ignored_caractereInconnu'*/)
   const fileHistory = []
   const charHistory = []
   for (let i = 0; i < decisions.length; i++) {
@@ -36,7 +36,7 @@ async function main() {
           } else {
             console.log('-----')
           }
-          console.log(cleanedDecision.slice(j - 10, j + 10))
+          console.log(cleanedDecision.slice(j - 20, j + 20))
           console.log(cleanedDecision[j])
           console.log(cleanedDecision[j].charCodeAt(0))
           charHistory.push(cleanedDecision[j].charCodeAt(0))
@@ -48,12 +48,12 @@ async function main() {
   }
 }
 
-async function listDecisions(source: string, status: string) {
+async function listDecisions(source: string /*, status: string*/) {
   const urlToCall = process.env.DBSDER_API_URL + '/v1/decisions'
 
   const result = await axios
     .get(urlToCall, {
-      params: { sourceName: source, status: status },
+      params: { sourceName: source /*, status: status*/ },
       headers: {
         'x-api-key': process.env.DBSDER_OTHER_API_KEY
       }

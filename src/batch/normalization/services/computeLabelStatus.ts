@@ -2,10 +2,10 @@ import { DecisionTCOMDTO, LabelStatus } from 'dbsder-api-types'
 import { logger } from '../index'
 import { LogsFormat } from '../../../shared/infrastructure/utils/logsFormat.utils'
 import { normalizationFormatLogs } from '../index'
-import { authorizedCharacters } from '../infrastructure/authorizedCharactersList'
+// import { authorizedCharacters } from '../infrastructure/authorizedCharactersList'
 
 const dateMiseEnService = getMiseEnServiceDate()
-const authorizedCharactersdSet = new Set(authorizedCharacters)
+// const authorizedCharactersdSet = new Set(authorizedCharacters)
 
 export function computeLabelStatus(decisionDto: DecisionTCOMDTO): LabelStatus {
   const dateCreation = new Date(decisionDto.dateCreation)
@@ -49,6 +49,7 @@ export function computeLabelStatus(decisionDto: DecisionTCOMDTO): LabelStatus {
     return LabelStatus.IGNORED_DATE_AVANT_MISE_EN_SERVICE
   }
 
+  /* NO MORE IGNORED_CARACTERE_INCONNU
   if (!decisionContainsOnlyAuthorizedCharacters(decisionDto.originalText)) {
     logger.error({
       ...formatLogs,
@@ -56,6 +57,7 @@ export function computeLabelStatus(decisionDto: DecisionTCOMDTO): LabelStatus {
     })
     return LabelStatus.IGNORED_CARACTERE_INCONNU
   }
+  */
 
   return decisionDto.labelStatus
 }
@@ -68,6 +70,7 @@ function isDecisionOlderThanMiseEnService(dateDecision: Date): boolean {
   return dateDecision < dateMiseEnService
 }
 
+/*
 function decisionContainsOnlyAuthorizedCharacters(originalText: string): boolean {
   for (let i = 0; i < originalText.length; i++) {
     if (!authorizedCharactersdSet.has(originalText[i])) {
@@ -77,6 +80,7 @@ function decisionContainsOnlyAuthorizedCharacters(originalText: string): boolean
   }
   return true
 }
+*/
 
 function getMiseEnServiceDate(): Date {
   if (!isNaN(new Date(process.env.COMMISSIONING_DATE).getTime())) {

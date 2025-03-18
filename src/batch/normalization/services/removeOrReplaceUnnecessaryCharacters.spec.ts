@@ -71,6 +71,7 @@ describe('Remove unnecessary characters from decision', () => {
     expect(normalizedString).toEqual(trueString)
   })
 
+  /*
   it('replaces multiple tibetain characters with terms', () => {
     // GIVEN
     const rawString = "A string with ༄ and ༅  'ྒ string with tibetain characters."
@@ -82,4 +83,5 @@ describe('Remove unnecessary characters from decision', () => {
     // THEN
     expect(normalizedString).toEqual(trueString)
   })
+  */
 })

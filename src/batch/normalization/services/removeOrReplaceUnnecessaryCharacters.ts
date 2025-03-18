@@ -1,3 +1,4 @@
+/*
 import { characterReplacementMap } from '../infrastructure/characterReplacementMap'
 
 export const replaceUnknownCharacters = (text: string) => {
@@ -11,6 +12,7 @@ export const replaceUnknownCharacters = (text: string) => {
   }
   return replacedText
 }
+*/
 
 export const removeOrReplaceUnnecessaryCharacters = (rawString: string): string => {
   // Regular expressions to remove specific characters
@@ -25,13 +27,12 @@ export const removeOrReplaceUnnecessaryCharacters = (rawString: string): string 
   const stringWithoutCarriageReturn = stringWithoutTabOrPageBreak.replace(carriageReturnRegex, '\n')
 
   // Replace multiple consecutive spaces with a white space
-  const stringWithoutConsecutiveSpaces = stringWithoutCarriageReturn.replace(
-    multipleSpaceRegex,
-    ' '
-  )
+  const normalizedText = stringWithoutCarriageReturn.replace(multipleSpaceRegex, ' ')
 
-  //replace tibetain characters
+  // DO NOT replace tibetain characters
+  /*
   const normalizedText = replaceUnknownCharacters(stringWithoutConsecutiveSpaces)
+  */
 
   return normalizedText
 }

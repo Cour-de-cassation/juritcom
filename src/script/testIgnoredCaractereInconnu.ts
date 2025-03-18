@@ -18,7 +18,7 @@ import {
 import axios from 'axios'
 
 async function main() {
-  const decisions = await listDecisions('juritj', 'ignored_caractereInconnu')
+  const decisions = await listDecisions('juritcom', 'ignored_caractereInconnu')
   const fileHistory = []
   const charHistory = []
   for (let i = 0; i < decisions.length; i++) {

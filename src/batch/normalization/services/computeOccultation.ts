@@ -26,8 +26,6 @@ export function computeOccultation(metadonnees: MetadonneeDto): DecisionOccultat
     msg: `motivationOccultation computed ${motivationOccultation}`
   })
 
-  categoriesToOmitRaw.push(Categories.PROFESSIONNELAVOCAT)
-
   if (occultationsComplementaires.personneMorale !== true) {
     categoriesToOmitRaw.push(Categories.PERSONNEMORALE)
     categoriesToOmitRaw.push(Categories.NUMEROSIRETSIREN)

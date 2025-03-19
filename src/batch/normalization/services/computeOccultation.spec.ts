@@ -17,7 +17,7 @@ describe('compute occultation', () => {
     const metadonnees = new MockUtils().metadonneeDtoMock as unknown as MetadonneeDto
     const expectedResponse: DecisionOccultation = {
       additionalTerms: '',
-      categoriesToOmit: [],
+      categoriesToOmit: ['professionnelAvocat', 'professionnelMagistratGreffier'],
       motivationOccultation: false
     }
 
@@ -50,7 +50,7 @@ describe('compute occultation', () => {
     const metadonnees = new MockUtils().metadonneeDtoMock as unknown as MetadonneeDto
     const expectedResponse: DecisionOccultation = {
       additionalTerms: '#magistratGreffe|+fiat rouge|volvo verte',
-      categoriesToOmit: [],
+      categoriesToOmit: ['professionnelAvocat'],
       motivationOccultation: false
     }
 
@@ -83,7 +83,7 @@ describe('compute occultation', () => {
     const metadonnees = new MockUtils().metadonneeDtoMock as unknown as MetadonneeDto
     const expectedResponse: DecisionOccultation = {
       additionalTerms: '',
-      categoriesToOmit: [],
+      categoriesToOmit: ['professionnelAvocat', 'professionnelMagistratGreffier'],
       motivationOccultation: true
     }
 

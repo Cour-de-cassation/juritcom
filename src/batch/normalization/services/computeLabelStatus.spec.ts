@@ -15,12 +15,12 @@ describe('updateLabelStatus', () => {
   describe('Returns provided labelStatus', () => {
     it('when decision is not ignored', () => {
       // GIVEN
-      const dateDecember2023 = new Date(2024, 12, 25)
-      const dateMarch2024 = new Date(2024, 12, 29)
+      const dateDecision = new Date(2025, 1, 12)
+      const dateCreation = new Date(2025, 1, 13)
       const mockDecisionLabel = {
         ...mockUtils.decisionMock,
-        dateDecision: dateDecember2023.toISOString(),
-        dateCreation: dateMarch2024.toISOString(),
+        dateDecision: dateDecision.toISOString(),
+        dateCreation: dateCreation.toISOString(),
         public: true
       }
       const expectedLabelStatus = LabelStatus.TOBETREATED
@@ -34,6 +34,28 @@ describe('updateLabelStatus', () => {
   })
 
   describe('changes labelStatus if it has exceptions', () => {
+    describe('returns ignored_juridictionEnPhaseDeTest', () => {
+      it('when jurisdiction is not in whitelist', () => {
+        // GIVEN
+        const dateDecision = new Date(2025, 1, 12)
+        const dateCreation = new Date(2025, 1, 13)
+        const mockDecisionLabel = {
+          ...mockUtils.decisionMock,
+          jurisdictionId: '7501',
+          dateDecision: dateDecision.toISOString(),
+          dateCreation: dateCreation.toISOString(),
+          public: true
+        }
+        const expectedLabelStatus = LabelStatus.IGNORED_JURIDICTION_EN_PHASE_DE_TEST
+
+        // WHEN
+        mockDecisionLabel.labelStatus = computeLabelStatus(mockDecisionLabel)
+
+        // THEN
+        expect(mockDecisionLabel.labelStatus).toEqual(expectedLabelStatus)
+      })
+    })
+
     describe('returns ignored_decisionDateIncoherente', () => {
       it('when dateDecision is in the future compared to dateCreation', () => {
         // GIVEN

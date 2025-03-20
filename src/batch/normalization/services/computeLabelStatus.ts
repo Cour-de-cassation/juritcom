@@ -3,9 +3,11 @@ import { logger } from '../index'
 import { LogsFormat } from '../../../shared/infrastructure/utils/logsFormat.utils'
 import { normalizationFormatLogs } from '../index'
 // import { authorizedCharacters } from '../infrastructure/authorizedCharactersList'
+import { authorizedJurisdictions } from '../infrastructure/authorizedJurisdictionsList'
 
 const dateMiseEnService = getMiseEnServiceDate()
 // const authorizedCharactersdSet = new Set(authorizedCharacters)
+const authorizedJurisdictionsSet = new Set(authorizedJurisdictions)
 
 export function computeLabelStatus(decisionDto: DecisionTCOMDTO): LabelStatus {
   const dateCreation = new Date(decisionDto.dateCreation)
@@ -49,6 +51,14 @@ export function computeLabelStatus(decisionDto: DecisionTCOMDTO): LabelStatus {
     return LabelStatus.IGNORED_DATE_AVANT_MISE_EN_SERVICE
   }
 
+  if (isDecisionJurisdictionNotInWhiteList(decisionDto.jurisdictionId)) {
+    logger.error({
+      ...formatLogs,
+      msg: `Jurisdiction ${decisionDto.jurisdictionId} in testing phase. Changing LabelStatus to ${LabelStatus.IGNORED_JURIDICTION_EN_PHASE_DE_TEST}.`
+    })
+    return LabelStatus.IGNORED_JURIDICTION_EN_PHASE_DE_TEST
+  }
+
   /* NO MORE IGNORED_CARACTERE_INCONNU
   if (!decisionContainsOnlyAuthorizedCharacters(decisionDto.originalText)) {
     logger.error({
@@ -68,6 +78,10 @@ function isDecisionInTheFuture(dateCreation: Date, dateDecision: Date): boolean 
 
 function isDecisionOlderThanMiseEnService(dateDecision: Date): boolean {
   return dateDecision < dateMiseEnService
+}
+
+function isDecisionJurisdictionNotInWhiteList(jurisdictionId: string): boolean {
+  return !authorizedJurisdictionsSet.has(jurisdictionId)
 }
 
 /*

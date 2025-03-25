@@ -52,10 +52,15 @@ async function main(jurisdiction: string) {
 
 async function listDecisions(source: string, jurisdiction: string) {
   const urlToCall = process.env.DBSDER_API_URL + '/v1/decisions'
-
+  const params: any = {
+    sourceName: source
+  }
+  if (jurisdiction !== 'all' && jurisdiction !== '*') {
+    params.jurisdiction = jurisdiction
+  }
   const result = await axios
     .get(urlToCall, {
-      params: { sourceName: source, jurisdiction: jurisdiction },
+      params: params,
       headers: {
         'x-api-key': process.env.DBSDER_OTHER_API_KEY
       }

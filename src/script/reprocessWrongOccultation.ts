@@ -33,8 +33,9 @@ async function main(jurisdiction: string) {
     try {
       const decision: DecisionTCOMDTO = await getDecisionById(decisions[i]._id)
       if (
-        /ignored/i.test(decision.labelStatus) === false &&
-        /blocked/i.test(decision.labelStatus) === false
+        /controlerequis/i.test(decision.labelStatus) === true ||
+        (/ignored/i.test(decision.labelStatus) === false &&
+          /blocked/i.test(decision.labelStatus) === false)
       ) {
         const done = await reprocessDecision(decision)
         if (done) {
@@ -234,10 +235,7 @@ async function reprocessDecision(decision: DecisionTCOMDTO): Promise<boolean> {
       }
       decision.occultation = computeOccultation(objectDecision.metadonnees)
       decision.labelStatus = LabelStatus.TOBETREATED
-
-      // @FIXME that's a huge problem!!!!
       delete decision._id
-
       await saveDecision(decision)
       return true
     } else {

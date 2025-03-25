@@ -152,6 +152,7 @@ async function getDecisionById(id: string): Promise<DecisionTCOMDTO> {
   return result.data
 }
 
+/*
 async function saveDecision(decisionToSave: DecisionTCOMDTO) {
   const urlToCall = process.env.DBSDER_API_URL + '/v1/decisions'
 
@@ -204,6 +205,7 @@ async function saveDecision(decisionToSave: DecisionTCOMDTO) {
 
   return result.data
 }
+*/
 
 async function reprocessDecision(decision: DecisionTCOMDTO): Promise<boolean> {
   const s3Client = new S3Client({
@@ -235,6 +237,7 @@ async function reprocessDecision(decision: DecisionTCOMDTO): Promise<boolean> {
           Categories.PROFESSIONNELMAGISTRATGREFFIER
         ) === false
       ) {
+        const oldOccultation = JSON.stringify(decision.occultation.categoriesToOmit)
         const newOccultation = computeOccultation(objectDecision.metadonnees)
         newOccultation.categoriesToOmit = newOccultation.categoriesToOmit.concat(
           decision.occultation.categoriesToOmit
@@ -247,7 +250,10 @@ async function reprocessDecision(decision: DecisionTCOMDTO): Promise<boolean> {
         decision.occultation.motivationOccultation = newOccultation.motivationOccultation
         decision.labelStatus = LabelStatus.TOBETREATED
         delete decision._id
-        await saveDecision(decision)
+        console.log(
+          `OLD: ${oldOccultation} --> NEW: ${JSON.stringify(decision.occultation.categoriesToOmit)}`
+        )
+        // await saveDecision(decision)
         return true
       } else {
         throw new Error(
@@ -258,7 +264,7 @@ async function reprocessDecision(decision: DecisionTCOMDTO): Promise<boolean> {
       throw new Error('Decision incomplete or ID mismatch')
     }
   } catch (error) {
-    console.error(error)
+    console.log(error.message)
     return false
   }
 }

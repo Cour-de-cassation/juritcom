@@ -33,9 +33,8 @@ async function main(jurisdiction: string) {
     try {
       const decision: DecisionTCOMDTO = await getDecisionById(decisions[i]._id)
       if (
-        /controlerequis/i.test(decision.labelStatus) === true ||
-        (/ignored/i.test(decision.labelStatus) === false &&
-          /blocked/i.test(decision.labelStatus) === false)
+        /ignored/i.test(decision.labelStatus) === false &&
+        /blocked/i.test(decision.labelStatus) === false
       ) {
         const done = await reprocessDecision(decision)
         if (done) {

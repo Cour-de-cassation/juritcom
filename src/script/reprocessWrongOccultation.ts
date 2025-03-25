@@ -223,7 +223,13 @@ async function reprocessDecision(decision: DecisionTCOMDTO): Promise<boolean> {
       objectDecision.metadonnees &&
       `${objectDecision.metadonnees.idDecision}.json` === decision.filenameSource
     ) {
-      if (decision.occultation.categoriesToOmit.length < 3) {
+      if (
+        decision.occultation.categoriesToOmit.includes(Categories.PERSONNEMORALE) === false ||
+        decision.occultation.categoriesToOmit.includes(Categories.NUMEROSIRETSIREN) === false ||
+        decision.occultation.categoriesToOmit.includes(
+          Categories.PROFESSIONNELMAGISTRATGREFFIER
+        ) === false
+      ) {
         decision.occultation = {
           additionalTerms: '',
           categoriesToOmit: [],

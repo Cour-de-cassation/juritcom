@@ -235,12 +235,16 @@ async function reprocessDecision(decision: DecisionTCOMDTO): Promise<boolean> {
           Categories.PROFESSIONNELMAGISTRATGREFFIER
         ) === false
       ) {
-        decision.occultation = {
-          additionalTerms: '',
-          categoriesToOmit: [],
-          motivationOccultation: false
-        }
-        decision.occultation = computeOccultation(objectDecision.metadonnees)
+        const newOccultation = computeOccultation(objectDecision.metadonnees)
+        newOccultation.categoriesToOmit = newOccultation.categoriesToOmit.concat(
+          decision.occultation.categoriesToOmit
+        )
+        newOccultation.categoriesToOmit = newOccultation.categoriesToOmit.filter(
+          (value, index, array) => array.indexOf(value) === index
+        )
+        decision.occultation.additionalTerms = newOccultation.additionalTerms
+        decision.occultation.categoriesToOmit = newOccultation.categoriesToOmit
+        decision.occultation.motivationOccultation = newOccultation.motivationOccultation
         decision.labelStatus = LabelStatus.TOBETREATED
         delete decision._id
         await saveDecision(decision)

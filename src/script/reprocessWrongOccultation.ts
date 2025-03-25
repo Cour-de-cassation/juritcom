@@ -234,6 +234,10 @@ async function reprocessDecision(decision: DecisionTCOMDTO): Promise<boolean> {
       }
       decision.occultation = computeOccultation(objectDecision.metadonnees)
       decision.labelStatus = LabelStatus.TOBETREATED
+
+      // @FIXME that's a huge problem!!!!
+      delete decision._id
+
       await saveDecision(decision)
       return true
     } else {

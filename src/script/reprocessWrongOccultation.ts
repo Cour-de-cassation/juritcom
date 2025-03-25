@@ -152,7 +152,6 @@ async function getDecisionById(id: string): Promise<DecisionTCOMDTO> {
   return result.data
 }
 
-/*
 async function saveDecision(decisionToSave: DecisionTCOMDTO) {
   const urlToCall = process.env.DBSDER_API_URL + '/v1/decisions'
 
@@ -205,7 +204,6 @@ async function saveDecision(decisionToSave: DecisionTCOMDTO) {
 
   return result.data
 }
-*/
 
 async function reprocessDecision(decision: DecisionTCOMDTO): Promise<boolean> {
   const s3Client = new S3Client({
@@ -239,12 +237,6 @@ async function reprocessDecision(decision: DecisionTCOMDTO): Promise<boolean> {
       ) {
         const oldOccultation = JSON.stringify(decision.occultation.categoriesToOmit)
         const newOccultation = computeOccultation(objectDecision.metadonnees)
-        newOccultation.categoriesToOmit = newOccultation.categoriesToOmit.concat(
-          decision.occultation.categoriesToOmit
-        )
-        newOccultation.categoriesToOmit = newOccultation.categoriesToOmit.filter(
-          (value, index, array) => array.indexOf(value) === index
-        )
         decision.occultation.additionalTerms = newOccultation.additionalTerms
         decision.occultation.categoriesToOmit = newOccultation.categoriesToOmit
         decision.occultation.motivationOccultation = newOccultation.motivationOccultation
@@ -253,7 +245,7 @@ async function reprocessDecision(decision: DecisionTCOMDTO): Promise<boolean> {
         console.log(
           `OLD: ${oldOccultation} --> NEW: ${JSON.stringify(decision.occultation.categoriesToOmit)}`
         )
-        // await saveDecision(decision)
+        await saveDecision(decision)
         return true
       } else {
         throw new Error(

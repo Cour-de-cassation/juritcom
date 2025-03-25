@@ -230,7 +230,6 @@ async function reprocessDecision(decision: DecisionTCOMDTO): Promise<boolean> {
       objectDecision.metadonnees &&
       `${objectDecision.metadonnees.idDecision}.json` === decision.filenameSource
     ) {
-
       if (
         decision.occultation.categoriesToOmit.includes(Categories.PERSONNEMORALE) === false ||
         decision.occultation.categoriesToOmit.includes(Categories.NUMEROSIRETSIREN) === false ||
@@ -251,7 +250,9 @@ async function reprocessDecision(decision: DecisionTCOMDTO): Promise<boolean> {
         decision.occultation.motivationOccultation = newOccultation.motivationOccultation
         decision.labelStatus = LabelStatus.TOBETREATED
         delete decision._id
-        console.log(`OLD: ${oldOccultation} --> NEW: ${JSON.stringify(decision.occultation.categoriesToOmit)}`)
+        console.log(
+          `OLD: ${oldOccultation} --> NEW: ${JSON.stringify(decision.occultation.categoriesToOmit)}`
+        )
         // await saveDecision(decision)
         return true
       } else {

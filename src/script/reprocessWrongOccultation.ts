@@ -33,19 +33,14 @@ async function main(jurisdiction: string) {
     try {
       const decision: DecisionTCOMDTO = await getDecisionById(decisions[i]._id)
       if (
-        /controlerequis/i.test(decision.labelStatus) === true ||
-        (/ignored/i.test(decision.labelStatus) === false &&
-          /blocked/i.test(decision.labelStatus) === false)
+        /ignored/i.test(decision.labelStatus) === false &&
+        /blocked/i.test(decision.labelStatus) === false
       ) {
         const done = await reprocessDecision(decision)
         if (done) {
           console.log(`Reprocess ${decisions[i]._id}`)
           doneCount++
-        } else {
-          console.log(`Skip ${decisions[i]._id}: could not be reprocessed`)
         }
-      } else {
-        console.log(`Skip ${decisions[i]._id}: labelStatus = ${decision.labelStatus}`)
       }
     } catch (e) {
       console.log(`Skip ${decisions[i]._id}: error`, e)
@@ -228,25 +223,27 @@ async function reprocessDecision(decision: DecisionTCOMDTO): Promise<boolean> {
       objectDecision.metadonnees &&
       `${objectDecision.metadonnees.idDecision}.json` === decision.filenameSource
     ) {
-      decision.occultation = {
-        additionalTerms: '',
-        categoriesToOmit: [],
-        motivationOccultation: false
+      if (decision.occultation.categoriesToOmit.length < 3) {
+        decision.occultation = {
+          additionalTerms: '',
+          categoriesToOmit: [],
+          motivationOccultation: false
+        }
+        decision.occultation = computeOccultation(objectDecision.metadonnees)
+        decision.labelStatus = LabelStatus.TOBETREATED
+        delete decision._id
+        await saveDecision(decision)
+        return true
+      } else {
+        throw new Error(
+          `Keep occultations ${JSON.stringify(decision.occultation.categoriesToOmit)}`
+        )
       }
-      decision.occultation = computeOccultation(objectDecision.metadonnees)
-      decision.labelStatus = LabelStatus.TOBETREATED
-      delete decision._id
-      await saveDecision(decision)
-      return true
     } else {
       throw new Error('Decision incomplete or ID mismatch')
     }
   } catch (error) {
-    console.log({
-      operationName: 'reprocessDecision',
-      msg: error.message,
-      data: error
-    })
+    console.error(error)
     return false
   }
 }

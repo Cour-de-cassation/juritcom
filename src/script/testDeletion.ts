@@ -12,7 +12,6 @@ import {
   ListObjectsCommandOutput
 } from '@aws-sdk/client-s3'
 
-/*
 import {
   BadRequestException,
   ConflictException,
@@ -22,29 +21,25 @@ import {
 } from '@nestjs/common'
 
 import axios from 'axios'
-*/
 
 async function main() {
-  await listDeletionRequests()
-  /*
   let doneCount = 0
-  const decisions = await listDecisions('juritcom', 'ignored_controleRequis')
-  for (let i = 0; i < decisions.length; i++) {
+  const deletionRequests = await listDeletionRequests()
+  for (let i = 0; i < deletionRequests.length; i++) {
     try {
-      const decision = await getDecisionById(decisions[i]._id)
-      const done = await reprocessNormalizedDecisionByFilename(decision.filenameSource)
-      if (done) {
-        console.log(`Reprocess ${decisions[i]._id}`)
-        doneCount++
-      } else {
-        console.log(`Skip ${decisions[i]._id}`)
-      }
-    } catch (_ignore) {
-      console.log(`Skip ${decisions[i]._id}`)
+      const decision = await getDecisionBySourceId(deletionRequests[i].sourceId)
+      console.log(deletionRequests[i])
+      console.log(decision)
+      console.log('-----')
+      doneCount++
+    } catch (e) {
+      console.error(
+        `Error while processing deletion request for decision ${deletionRequests[i].s3Key} (sourceId: ${deletionRequests[i].sourceId})`,
+        e
+      )
     }
   }
-  console.log(`Reprocessed ${doneCount} decisions`)
-  */
+  console.log(`Processed ${doneCount} deletion requests`)
 }
 
 async function listDeletionRequests(): Promise<Array<any>> {
@@ -74,11 +69,6 @@ async function listDeletionRequests(): Promise<Array<any>> {
       )
       listObjects.Contents.forEach(async (item) => {
         const deletionItem = await getDeletionRequest(item.Key)
-        console.log({
-          s3Key: `${item.Key}`.replace(/\.deletion$/, ''),
-          sourceId: hashDecisionId(`${item.Key}`.replace(/\.json\.deletion$/, '')),
-          deletionDate: new Date(deletionItem.date)
-        })
         list.push({
           s3Key: `${item.Key}`.replace(/\.deletion$/, ''),
           sourceId: hashDecisionId(`${item.Key}`.replace(/\.json\.deletion$/, '')),
@@ -115,13 +105,12 @@ async function getDeletionRequest(key: string): Promise<any> {
   return JSON.parse(stringifiedDeletion)
 }
 
-/*
-async function listDecisions(source: string, status: string) {
+async function getDecisionBySourceId(sourceId: number) {
   const urlToCall = process.env.DBSDER_API_URL + '/v1/decisions'
 
   const result = await axios
     .get(urlToCall, {
-      params: { sourceName: source, status: status },
+      params: { sourceName: 'juritcom', sourceId: sourceId },
       headers: {
         'x-api-key': process.env.DBSDER_OTHER_API_KEY
       }
@@ -162,9 +151,13 @@ async function listDecisions(source: string, status: string) {
       throw new ServiceUnavailableException('DbSder API is unavailable')
     })
 
-  return result.data
+  if (result.data && Array.isArray(result.data) && result.data.length > 0) {
+    return result.data[0]
+  }
+  return null
 }
 
+/*
 async function getDecisionById(id: string) {
   const urlToCall = process.env.DBSDER_API_URL + `/v1/decisions/${id}`
 

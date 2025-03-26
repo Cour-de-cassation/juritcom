@@ -25,7 +25,6 @@ import axios from 'axios'
 async function main() {
   let doneCount = 0
   const deletionRequests = await listDeletionRequests()
-  console.log(deletionRequests)
   for (let i = 0; i < deletionRequests.length; i++) {
     try {
       const decision = await getDecisionBySourceId(deletionRequests[i].sourceId)
@@ -71,11 +70,6 @@ async function listDeletionRequests(): Promise<Array<any>> {
       for (let i = 0; i < listObjects.Contents.length; i++) {
         const item = listObjects.Contents[i]
         const deletionItem = await getDeletionRequest(item.Key)
-        console.log({
-          s3Key: `${item.Key}`.replace(/\.deletion$/, ''),
-          sourceId: hashDecisionId(`${item.Key}`.replace(/\.json\.deletion$/, '')),
-          deletionDate: new Date(deletionItem.date)
-        })
         list.push({
           s3Key: `${item.Key}`.replace(/\.deletion$/, ''),
           sourceId: hashDecisionId(`${item.Key}`.replace(/\.json\.deletion$/, '')),
@@ -159,12 +153,15 @@ async function getDecisionBySourceId(sourceId: number) {
     })
 
   if (result.data && Array.isArray(result.data) && result.data.length > 0) {
-    return result.data[0]
+    try {
+      return await getDecisionById(result.data[0]._id)
+    } catch (e) {
+      console.error(e)
+    }
   }
   return null
 }
 
-/*
 async function getDecisionById(id: string) {
   const urlToCall = process.env.DBSDER_API_URL + `/v1/decisions/${id}`
 
@@ -213,6 +210,7 @@ async function getDecisionById(id: string) {
   return result.data
 }
 
+/*
 async function reprocessNormalizedDecisionByFilename(filename: string): Promise<boolean> {
   const s3Client = new S3Client({
     endpoint: process.env.S3_URL,
@@ -261,6 +259,6 @@ async function reprocessNormalizedDecisionByFilename(filename: string): Promise<
     return false
   }
 }
-  */
+*/
 
 main()

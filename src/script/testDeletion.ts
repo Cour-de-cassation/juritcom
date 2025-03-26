@@ -3,7 +3,7 @@ dotenv.config()
 
 import {
   S3Client,
-  // GetObjectCommand,
+  GetObjectCommand,
   // DeleteObjectCommand,
   // PutObjectCommand,
   ListObjectsCommand,
@@ -70,8 +70,10 @@ async function listDeletionRequests(): Promise<Array<string>> {
       const listObjects: ListObjectsCommandOutput = await s3Client.send(
         new ListObjectsCommand(reqParams)
       )
-      listObjects.Contents.forEach((item) => {
+      listObjects.Contents.forEach(async (item) => {
+        const deletionItem = await getDeletionRequest(item.Key)
         console.log(item)
+        console.log(deletionItem)
         list.push(item.Key)
         marker = item.Key
       })
@@ -83,6 +85,25 @@ async function listDeletionRequests(): Promise<Array<string>> {
     }
   }
   return list
+}
+
+async function getDeletionRequest(key: string): Promise<any> {
+  const s3Client = new S3Client({
+    endpoint: process.env.S3_URL,
+    forcePathStyle: true,
+    region: process.env.S3_REGION,
+    credentials: {
+      accessKeyId: process.env.S3_ACCESS_KEY,
+      secretAccessKey: process.env.S3_SECRET_KEY
+    }
+  })
+  const reqParams = {
+    Bucket: process.env.S3_BUCKET_NAME_DELETION,
+    Key: key
+  }
+  const deletionFromS3 = await s3Client.send(new GetObjectCommand(reqParams))
+  const stringifiedDeletion = await deletionFromS3.Body?.transformToString()
+  return JSON.parse(stringifiedDeletion)
 }
 
 /*

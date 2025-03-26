@@ -28,9 +28,24 @@ async function main() {
   for (let i = 0; i < deletionRequests.length; i++) {
     try {
       const decision = await getDecisionBySourceId(deletionRequests[i].sourceId)
-      console.log(deletionRequests[i])
-      console.log(decision)
-      console.log('-----')
+      if (decision === null) {
+        // @TODO 1. decision not in DBSDER --> Delete documents in all buckets
+        console.log('decision not in DBSDER --> Delete documents in all buckets')
+      } else {
+        const deletionAfterLastImport =
+          deletionRequests[i].deletionDate.getTime() > new Date(decision.lastImportDate).getTime()
+        if (deletionAfterLastImport === true) {
+          // @TODO 2. deletion after last import --> Delete/unpublish in SDER + delete documents in all buckets
+          console.log(
+            'deletion after last import --> Delete/remove from Label/unpublish in SDER + delete documents in all buckets'
+          )
+          // @TODO many more cases there...
+        } else {
+          // @TODO 3. deletion before last import --> Do nothing
+          console.log('deletion before last import --> Do nothing')
+        }
+      }
+      // @TODO 4. Delete deletion document from bucket
       doneCount++
     } catch (e) {
       console.error(

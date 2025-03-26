@@ -68,7 +68,8 @@ async function listDeletionRequests(): Promise<Array<any>> {
       const listObjects: ListObjectsCommandOutput = await s3Client.send(
         new ListObjectsCommand(reqParams)
       )
-      listObjects.Contents.forEach(async (item) => {
+      for (let i = 0; i < listObjects.Contents.length; i++) {
+        const item = listObjects.Contents[i]
         const deletionItem = await getDeletionRequest(item.Key)
         console.log({
           s3Key: `${item.Key}`.replace(/\.deletion$/, ''),
@@ -81,7 +82,7 @@ async function listDeletionRequests(): Promise<Array<any>> {
           deletionDate: new Date(deletionItem.date)
         })
         marker = item.Key
-      })
+      }
       if (listObjects.IsTruncated === false) {
         done = true
       }

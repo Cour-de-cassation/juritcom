@@ -21,6 +21,11 @@ export class BatchService implements OnModuleInit {
       process.env.S3_ARCHIVE_SCHEDULE,
       this.archiveFilesToS3.bind(this)
     )
+    this.addCronJob(
+      `process_deletion_requests`,
+      process.env.S3_ARCHIVE_SCHEDULE,
+      this.processDeletionRequests.bind(this)
+    )
   }
 
   async archiveFilesToS3() {
@@ -54,6 +59,22 @@ export class BatchService implements OnModuleInit {
     }
 
     this.logger.log({ operationName: 'archiveFilesToS3', msg: `End of scan` })
+  }
+
+  async processDeletionRequests() {
+    this.logger.log({ operationName: 'processDeletionRequests', msg: `Starting process` })
+
+    try {
+      // @TODO
+    } catch (error) {
+      this.logger.error({
+        operationName: 'processDeletionRequests',
+        msg: error.message,
+        data: error
+      })
+    }
+
+    this.logger.log({ operationName: 'processDeletionRequests', msg: `End of process` })
   }
 
   /**

@@ -25,6 +25,7 @@ import axios from 'axios'
 async function main() {
   let doneCount = 0
   const deletionRequests = await listDeletionRequests()
+  console.log(deletionRequests)
   for (let i = 0; i < deletionRequests.length; i++) {
     try {
       const decision = await getDecisionBySourceId(deletionRequests[i].sourceId)

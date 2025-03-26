@@ -70,6 +70,11 @@ async function listDeletionRequests(): Promise<Array<any>> {
       )
       listObjects.Contents.forEach(async (item) => {
         const deletionItem = await getDeletionRequest(item.Key)
+        console.log({
+          s3Key: `${item.Key}`.replace(/\.deletion$/, ''),
+          sourceId: hashDecisionId(`${item.Key}`.replace(/\.json\.deletion$/, '')),
+          deletionDate: new Date(deletionItem.date)
+        })
         list.push({
           s3Key: `${item.Key}`.replace(/\.deletion$/, ''),
           sourceId: hashDecisionId(`${item.Key}`.replace(/\.json\.deletion$/, '')),

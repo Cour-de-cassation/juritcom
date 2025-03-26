@@ -1,6 +1,8 @@
 import * as dotenv from 'dotenv'
 dotenv.config()
 
+import { hashDecisionId } from '../shared/infrastructure/utils/hash.utils'
+
 import {
   S3Client,
   GetObjectCommand,
@@ -73,12 +75,14 @@ async function listDeletionRequests(): Promise<Array<any>> {
       listObjects.Contents.forEach(async (item) => {
         const deletionItem = await getDeletionRequest(item.Key)
         console.log({
-          key: `${item.Key}`.replace(/\.deletion$/, ''),
-          date: new Date(deletionItem.date)
+          s3Key: `${item.Key}`.replace(/\.deletion$/, ''),
+          sourceId: hashDecisionId(`${item.Key}`.replace(/\.json\.deletion$/, '')),
+          deletionDate: new Date(deletionItem.date)
         })
         list.push({
-          key: `${item.Key}`.replace(/\.deletion$/, ''),
-          date: new Date(deletionItem.date)
+          s3Key: `${item.Key}`.replace(/\.deletion$/, ''),
+          sourceId: hashDecisionId(`${item.Key}`.replace(/\.json\.deletion$/, '')),
+          deletionDate: new Date(deletionItem.date)
         })
         marker = item.Key
       })

@@ -45,7 +45,7 @@ async function main() {
   */
 }
 
-async function listDeletionRequests(): Promise<Array<string>> {
+async function listDeletionRequests(): Promise<Array<any>> {
   const list = []
   const s3Client = new S3Client({
     endpoint: process.env.S3_URL,
@@ -72,9 +72,14 @@ async function listDeletionRequests(): Promise<Array<string>> {
       )
       listObjects.Contents.forEach(async (item) => {
         const deletionItem = await getDeletionRequest(item.Key)
-        console.log(item)
-        console.log(deletionItem)
-        list.push(item.Key)
+        console.log({
+          key: `${item.Key}`.replace(/\.deletion$/, ''),
+          date: new Date(deletionItem.date)
+        })
+        list.push({
+          key: `${item.Key}`.replace(/\.deletion$/, ''),
+          date: new Date(deletionItem.date)
+        })
         marker = item.Key
       })
       if (listObjects.IsTruncated === false) {

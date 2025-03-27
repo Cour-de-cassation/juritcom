@@ -39,16 +39,20 @@ async function getCollectedIDs(): Promise<Array<object>> {
       const listObjects: ListObjectsCommandOutput = await s3Client.send(
         new ListObjectsCommand(reqParams)
       )
-      listObjects.Contents.forEach((item) => {
-        list.push({
-          id: `${item.Key}`.replace('.json', ''),
-          date: `${item.LastModified.toISOString()}`.split('T')[0],
-          size: item.Size
+      if (listObjects && listObjects.Contents) {
+        listObjects.Contents.forEach((item) => {
+          list.push({
+            id: `${item.Key}`.replace('.json', ''),
+            date: `${item.LastModified.toISOString()}`.split('T')[0],
+            size: item.Size
+          })
+          marker = item.Key
         })
-        marker = item.Key
-      })
 
-      if (listObjects.IsTruncated === false) {
+        if (listObjects.IsTruncated === false) {
+          done = true
+        }
+      } else {
         done = true
       }
     } catch (error) {

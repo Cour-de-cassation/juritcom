@@ -51,11 +51,15 @@ async function listFailedDecisions(): Promise<Array<string>> {
       const listObjects: ListObjectsCommandOutput = await s3Client.send(
         new ListObjectsCommand(reqParams)
       )
-      listObjects.Contents.forEach((item) => {
-        list.push(item.Key)
-        marker = item.Key
-      })
-      if (listObjects.IsTruncated === false) {
+      if (listObjects && listObjects.Contents) {
+        listObjects.Contents.forEach((item) => {
+          list.push(item.Key)
+          marker = item.Key
+        })
+        if (listObjects.IsTruncated === false) {
+          done = true
+        }
+      } else {
         done = true
       }
     } catch (error) {

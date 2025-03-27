@@ -6,8 +6,7 @@ import { hashDecisionId } from '../shared/infrastructure/utils/hash.utils'
 import {
   S3Client,
   GetObjectCommand,
-  // DeleteObjectCommand,
-  // PutObjectCommand,
+  DeleteObjectCommand,
   ListObjectsCommand,
   ListObjectsCommandOutput
 } from '@aws-sdk/client-s3'
@@ -24,37 +23,159 @@ import axios from 'axios'
 
 async function main() {
   let doneCount = 0
+  const s3Client = new S3Client({
+    endpoint: process.env.S3_URL,
+    forcePathStyle: true,
+    region: process.env.S3_REGION,
+    credentials: {
+      accessKeyId: process.env.S3_ACCESS_KEY,
+      secretAccessKey: process.env.S3_SECRET_KEY
+    }
+  })
   const deletionRequests = await listDeletionRequests()
   for (let i = 0; i < deletionRequests.length; i++) {
     try {
+      let deleteFromBuckets = false
+      let deleteFromDBSDER = false
+      let removeFromLabel = false
+      let unpublishFromJudilibre = false
       const decision = await getDecisionBySourceId(deletionRequests[i].sourceId)
       if (decision === null) {
-        // @TODO 1. decision not in DBSDER --> Delete documents in all buckets
-        console.log('decision not in DBSDER --> Delete documents in all buckets')
+        deleteFromBuckets = true
       } else {
         const deletionAfterLastImport =
           deletionRequests[i].deletionDate.getTime() > new Date(decision.lastImportDate).getTime()
         if (deletionAfterLastImport === true) {
-          // @TODO 2. deletion after last import --> Delete/unpublish in SDER + delete documents in all buckets
-          console.log(
-            'deletion after last import --> Delete/remove from Label/unpublish in SDER + delete documents in all buckets'
-          )
-          // @TODO many more cases there...
+          if (decision.labelStatus === 'toBeTreated' || decision.labelStatus === 'done') {
+            if (decision.publishDate !== null) {
+              unpublishFromJudilibre = true
+            } else {
+              deleteFromDBSDER = true
+              deleteFromBuckets = true
+            }
+          } else if (decision.labelStatus === 'loaded') {
+            removeFromLabel = true
+            if (decision.publishDate !== null) {
+              unpublishFromJudilibre = true
+            }
+          } else if (decision.labelStatus === 'exported') {
+            unpublishFromJudilibre = true
+          } else {
+            deleteFromDBSDER = true
+            deleteFromBuckets = true
+          }
         } else {
-          // @TODO 3. deletion before last import --> Do nothing
-          console.log('deletion before last import --> Do nothing')
+          console.log(
+            `TCOM deletion request ${deletionRequests[i].s3Key} (sourceId: ${deletionRequests[i].sourceId}) ignored because lastImportDate (${decision.lastImportDate}) >  deletionDate (${deletionRequests[i].deletionDate})`
+          )
         }
       }
-      // @TODO 4. Delete deletion document from bucket
+      if (deleteFromBuckets) {
+        console.log(`TCOM decision ${deletionRequests[i].s3Key} will be deleted from all buckets`)
+        const pdfKey = `${deletionRequests[i].s3Key}`.replace(/\.json/, '.pdf')
+        try {
+          const deleteRawParams = {
+            Bucket: process.env.S3_BUCKET_NAME_RAW,
+            Key: deletionRequests[i].s3Key
+          }
+          await s3Client.send(new DeleteObjectCommand(deleteRawParams))
+        } catch (e) {
+          console.warn(
+            `Could not delete document ${deletionRequests[i].s3Key} from bucket ${process.env.S3_BUCKET_NAME_RAW}`,
+            e
+          )
+        }
+        try {
+          const deleteNormalizedParams = {
+            Bucket: process.env.S3_BUCKET_NAME_NORMALIZED,
+            Key: deletionRequests[i].s3Key
+          }
+          await s3Client.send(new DeleteObjectCommand(deleteNormalizedParams))
+        } catch (e) {
+          console.warn(
+            `Could not delete document ${deletionRequests[i].s3Key} from bucket ${process.env.S3_BUCKET_NAME_NORMALIZED}`,
+            e
+          )
+        }
+        try {
+          const deletePDFParams = {
+            Bucket: process.env.S3_BUCKET_NAME_PDF,
+            Key: pdfKey
+          }
+          await s3Client.send(new DeleteObjectCommand(deletePDFParams))
+        } catch (e) {
+          console.warn(
+            `Could not delete document ${pdfKey} from bucket ${process.env.S3_BUCKET_NAME_PDF}`,
+            e
+          )
+        }
+        try {
+          const deletePDFSuccessParams = {
+            Bucket: process.env.S3_BUCKET_NAME_PDF2TEXT_SUCCESS,
+            Key: pdfKey
+          }
+          await s3Client.send(new DeleteObjectCommand(deletePDFSuccessParams))
+        } catch (e) {
+          console.warn(
+            `Could not delete document ${pdfKey} from bucket ${process.env.S3_BUCKET_NAME_PDF2TEXT_SUCCESS}`,
+            e
+          )
+        }
+        try {
+          const deletePDFFailedParams = {
+            Bucket: process.env.S3_BUCKET_NAME_PDF2TEXT_FAILED,
+            Key: pdfKey
+          }
+          await s3Client.send(new DeleteObjectCommand(deletePDFFailedParams))
+        } catch (e) {
+          console.warn(
+            `Could not delete document ${pdfKey} from bucket ${process.env.S3_BUCKET_NAME_PDF2TEXT_FAILED}`,
+            e
+          )
+        }
+      }
+      if (deleteFromDBSDER) {
+        try {
+          console.log(
+            `TCOM decision ${deletionRequests[i].s3Key} (sourceId: ${deletionRequests[i].sourceId}) will be deleted from DBSDER`
+          )
+          await deleteDecisionById(decision._id)
+        } catch (e) {
+          console.warn(
+            `Could not delete TCOM decision ${deletionRequests[i].s3Key} (${decision._id}) from DBSDER`,
+            e
+          )
+        }
+      }
+      if (removeFromLabel) {
+        console.warn(
+          `TCOM decision ${deletionRequests[i].s3Key} (sourceId: ${deletionRequests[i].sourceId}) SHOULD be removed from Label`
+        )
+        // @TODO Tchap notif ?
+      }
+      if (unpublishFromJudilibre) {
+        console.warn(
+          `TCOM decision ${deletionRequests[i].s3Key} (sourceId: ${deletionRequests[i].sourceId}) SHOULD be unpublished from Judilibre`
+        )
+        // @TODO Tchap notif ?
+      }
+      console.log(
+        `TCOM deletion request ${deletionRequests[i].s3Key}.deletion (sourceId: ${deletionRequests[i].sourceId}) will be deleted`
+      )
+      const deleteDeletionRequestParams = {
+        Bucket: process.env.S3_BUCKET_NAME_DELETION,
+        Key: `${deletionRequests[i].s3Key}.deletion`
+      }
+      await s3Client.send(new DeleteObjectCommand(deleteDeletionRequestParams))
       doneCount++
     } catch (e) {
       console.error(
-        `Error while processing deletion request for decision ${deletionRequests[i].s3Key} (sourceId: ${deletionRequests[i].sourceId})`,
+        `Error while processing TCOM deletion request ${deletionRequests[i].s3Key}.deletion (sourceId: ${deletionRequests[i].sourceId})`,
         e
       )
     }
   }
-  console.log(`Processed ${doneCount} deletion requests`)
+  console.log(`Processed ${doneCount} TCOM deletion requests`)
 }
 
 async function listDeletionRequests(): Promise<Array<any>> {
@@ -225,55 +346,52 @@ async function getDecisionById(id: string) {
   return result.data
 }
 
-/*
-async function reprocessNormalizedDecisionByFilename(filename: string): Promise<boolean> {
-  const s3Client = new S3Client({
-    endpoint: process.env.S3_URL,
-    forcePathStyle: true,
-    region: process.env.S3_REGION,
-    credentials: {
-      accessKeyId: process.env.S3_ACCESS_KEY,
-      secretAccessKey: process.env.S3_SECRET_KEY
-    }
-  })
-  const reqParams = {
-    Bucket: process.env.S3_BUCKET_NAME_NORMALIZED,
-    Key: filename
-  }
-  try {
-    const decisionFromS3 = await s3Client.send(new GetObjectCommand(reqParams))
-    const stringifiedDecision = await decisionFromS3.Body?.transformToString()
-    const objectDecision = JSON.parse(stringifiedDecision)
-    // 1. Check .metadonnees.idDecision + '.json' === filename:
-    if (
-      objectDecision &&
-      objectDecision.metadonnees &&
-      `${objectDecision.metadonnees.idDecision}.json` === filename
-    ) {
-      // 2. remove texteDecisionIntegre
-      objectDecision.texteDecisionIntegre = null
-      // 3. copy to raw:
-      const reqCopyParams = {
-        Body: JSON.stringify(objectDecision),
-        Bucket: process.env.S3_BUCKET_NAME_RAW,
-        Key: filename
+async function deleteDecisionById(id: string) {
+  const urlToCall = process.env.DBSDER_API_URL + `/v1/decisions/${id}`
+
+  const result = await axios
+    .delete(urlToCall, {
+      headers: {
+        'x-api-key': process.env.DBSDER_OTHER_API_KEY
       }
-      await s3Client.send(new PutObjectCommand(reqCopyParams))
-      // 4. Delete from normalized:
-      await s3Client.send(new DeleteObjectCommand(reqParams))
-      return true
-    } else {
-      throw new Error('Decision incomplete or ID mismatch')
-    }
-  } catch (error) {
-    console.log({
-      operationName: 'reprocessNormalizedDecisionByFilename',
-      msg: error.message,
-      data: error
     })
-    return false
-  }
+    .catch((error) => {
+      if (error.response) {
+        if (error.response.data.statusCode === HttpStatus.BAD_REQUEST) {
+          console.error({
+            msg: error.response.data.message,
+            data: error.response.data,
+            statusCode: HttpStatus.BAD_REQUEST
+          })
+          throw new BadRequestException(
+            'DbSderAPI Bad request error : ' + error.response.data.message
+          )
+        } else if (error.response.data.statusCode === HttpStatus.UNAUTHORIZED) {
+          console.error({
+            msg: error.response.data.message,
+            data: error.response.data,
+            statusCode: HttpStatus.UNAUTHORIZED
+          })
+          throw new UnauthorizedException('You are not authorized to call this route')
+        } else if (error.response.data.statusCode === HttpStatus.CONFLICT) {
+          console.error({
+            msg: error.response.data.message,
+            data: error.response.data,
+            statusCode: HttpStatus.CONFLICT
+          })
+          throw new ConflictException('DbSderAPI error: ' + error.response.data.message)
+        } else {
+          console.error({
+            msg: error.response.data.message,
+            data: error.response.data,
+            statusCode: HttpStatus.SERVICE_UNAVAILABLE
+          })
+        }
+      }
+      throw new ServiceUnavailableException('DbSder API is unavailable')
+    })
+
+  return result.data
 }
-*/
 
 main()

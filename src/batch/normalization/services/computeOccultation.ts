@@ -69,9 +69,7 @@ export function computeOccultation(metadonnees: MetadonneeDto): DecisionOccultat
     categoriesToOmitRaw.push(Categories.TELEPHONEFAX)
   }
 
-  if (occultationsComplementaires.professionnelMagistratGreffier === true) {
-    additionalTermsRaw.push('#magistratGreffe')
-  } else {
+  if (occultationsComplementaires.professionnelMagistratGreffier !== true) {
     categoriesToOmitRaw.push(Categories.PROFESSIONNELMAGISTRATGREFFIER)
   }
 

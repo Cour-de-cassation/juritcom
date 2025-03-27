@@ -356,7 +356,7 @@ async function deleteDecisionById(id: string) {
   const result = await axios
     .delete(urlToCall, {
       headers: {
-        'x-api-key': process.env.DBSDER_OTHER_API_KEY
+        'x-api-key': process.env.DBSDER_POWERFUL_API_KEY
       }
     })
     .catch((error) => {

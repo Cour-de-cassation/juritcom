@@ -203,17 +203,21 @@ async function listDeletionRequests(): Promise<Array<any>> {
       const listObjects: ListObjectsCommandOutput = await s3Client.send(
         new ListObjectsCommand(reqParams)
       )
-      for (let i = 0; i < listObjects.Contents.length; i++) {
-        const item = listObjects.Contents[i]
-        const deletionItem = await getDeletionRequest(item.Key)
-        list.push({
-          s3Key: `${item.Key}`.replace(/\.deletion$/, ''),
-          sourceId: hashDecisionId(`${item.Key}`.replace(/\.json\.deletion$/, '')),
-          deletionDate: new Date(deletionItem.date)
-        })
-        marker = item.Key
-      }
-      if (listObjects.IsTruncated === false) {
+      if (listObjects && listObjects.Contents && listObjects.Contents.length) {
+        for (let i = 0; i < listObjects.Contents.length; i++) {
+          const item = listObjects.Contents[i]
+          const deletionItem = await getDeletionRequest(item.Key)
+          list.push({
+            s3Key: `${item.Key}`.replace(/\.deletion$/, ''),
+            sourceId: hashDecisionId(`${item.Key}`.replace(/\.json\.deletion$/, '')),
+            deletionDate: new Date(deletionItem.date)
+          })
+          marker = item.Key
+        }
+        if (listObjects.IsTruncated === false) {
+          done = true
+        }
+      } else {
         done = true
       }
     } catch (error) {

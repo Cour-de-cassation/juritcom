@@ -6,6 +6,8 @@ import { DecisionRepository } from '../api/domain/decisions/repositories/decisio
 import { DecisionS3Repository } from '../shared/infrastructure/repositories/decisionS3.repository'
 import { CronJob } from 'cron'
 
+import { processDeletion } from './deletion/deletion'
+
 @Injectable()
 export class BatchService implements OnModuleInit {
   private readonly folderPath = process.env.AV_PDF_PATH
@@ -65,7 +67,7 @@ export class BatchService implements OnModuleInit {
     this.logger.log({ operationName: 'processDeletionRequests', msg: `Starting process` })
 
     try {
-      // @TODO
+      await processDeletion()
     } catch (error) {
       this.logger.error({
         operationName: 'processDeletionRequests',

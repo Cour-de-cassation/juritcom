@@ -49,7 +49,7 @@ describe('compute occultation', () => {
     // GIVEN
     const metadonnees = new MockUtils().metadonneeDtoMock as unknown as MetadonneeDto
     const expectedResponse: DecisionOccultation = {
-      additionalTerms: '#magistratGreffe|+fiat rouge|volvo verte',
+      additionalTerms: '+fiat rouge|volvo verte',
       categoriesToOmit: [],
       motivationOccultation: false
     }

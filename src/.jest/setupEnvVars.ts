@@ -10,10 +10,12 @@ process.env = {
   S3_BUCKET_NAME_PDF2TEXT_SUCCESS: 'fake-pdf2text-success-bucket-name',
   S3_BUCKET_NAME_PDF2TEXT_FAILED: 'fake-pdf2text-failed-bucket-name',
   S3_BUCKET_NAME_DELETION: 'fake-deletion-bucket-nam',
+  S3_BUCKET_NAME_DELETION_PROCESSED: 'fake-deletion-processed-bucket-nam',
   S3_BUCKET_NAME_NORMALIZED: 'fake-normalized-bucket-name',
   DBSDER_API_URL: 'http://localhost:3000',
   DBSDER_API_KEY: '24277eca-290c-40c3-9bf6-a370880d800b',
   DBSDER_OTHER_API_KEY: '24277eca-290c-40c3-9bf6-a370880d800b',
+  DBSDER_POWERFUL_API_KEY: '24277eca-290c-40c3-9bf6-a370880d800b',
   NLP_PSEUDONYMISATION_API_URL: 'http://localhost:8081',
   USE_AUTH: 'basic'
 }

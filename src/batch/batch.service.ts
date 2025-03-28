@@ -6,6 +6,8 @@ import { DecisionRepository } from '../api/domain/decisions/repositories/decisio
 import { DecisionS3Repository } from '../shared/infrastructure/repositories/decisionS3.repository'
 import { CronJob } from 'cron'
 
+import { processDeletion } from './deletion/deletion'
+
 @Injectable()
 export class BatchService implements OnModuleInit {
   private readonly folderPath = process.env.AV_PDF_PATH
@@ -20,6 +22,11 @@ export class BatchService implements OnModuleInit {
       `archive_files_to_s3`,
       process.env.S3_ARCHIVE_SCHEDULE,
       this.archiveFilesToS3.bind(this)
+    )
+    this.addCronJob(
+      `process_deletion_requests`,
+      process.env.S3_ARCHIVE_SCHEDULE,
+      this.processDeletionRequests.bind(this)
     )
   }
 
@@ -54,6 +61,22 @@ export class BatchService implements OnModuleInit {
     }
 
     this.logger.log({ operationName: 'archiveFilesToS3', msg: `End of scan` })
+  }
+
+  async processDeletionRequests() {
+    this.logger.log({ operationName: 'processDeletionRequests', msg: `Starting process` })
+
+    try {
+      await processDeletion()
+    } catch (error) {
+      this.logger.error({
+        operationName: 'processDeletionRequests',
+        msg: error.message,
+        data: error
+      })
+    }
+
+    this.logger.log({ operationName: 'processDeletionRequests', msg: `End of process` })
   }
 
   /**

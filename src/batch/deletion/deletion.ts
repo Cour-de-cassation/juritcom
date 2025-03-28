@@ -3,6 +3,7 @@ import { hashDecisionId } from '../../shared/infrastructure/utils/hash.utils'
 import {
   S3Client,
   GetObjectCommand,
+  PutObjectCommand,
   DeleteObjectCommand,
   ListObjectsCommand,
   ListObjectsCommandOutput
@@ -176,6 +177,12 @@ export async function processDeletion() {
         operationName: 'processTCOMDeletion',
         msg: `TCOM deletion request ${deletionRequests[i].s3Key}.deletion (sourceId: ${deletionRequests[i].sourceId}) will be deleted`
       })
+      const archiveDeletionRequestParams = {
+        Body: JSON.stringify({ date: deletionRequests[i].deletionDate }),
+        Bucket: process.env.S3_BUCKET_NAME_DELETION_PROCESSED,
+        Key: `${deletionRequests[i].s3Key}.deletion`
+      }
+      await s3Client.send(new PutObjectCommand(archiveDeletionRequestParams))
       const deleteDeletionRequestParams = {
         Bucket: process.env.S3_BUCKET_NAME_DELETION,
         Key: `${deletionRequests[i].s3Key}.deletion`

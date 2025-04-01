@@ -36,6 +36,7 @@ export const envValidationConfig = {
       .guid({
         version: ['uuidv4'],
         separator: true
-      })
+      }),
+    ZONING_API_URL: Joi.string().required()
   })
 }

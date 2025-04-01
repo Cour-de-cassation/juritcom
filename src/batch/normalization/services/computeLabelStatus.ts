@@ -1,17 +1,17 @@
-import { DecisionTCOMDTO, LabelStatus } from 'dbsder-api-types'
+import { Zoning, DecisionTCOMDTO, LabelStatus } from 'dbsder-api-types'
 import { logger } from '../index'
 import { LogsFormat } from '../../../shared/infrastructure/utils/logsFormat.utils'
 import { normalizationFormatLogs } from '../index'
-// import { authorizedCharacters } from '../infrastructure/authorizedCharactersList'
 import { authorizedJurisdictions } from '../infrastructure/authorizedJurisdictionsList'
+import { ZoningApiService } from './zoningApi.service'
 
 const dateMiseEnService = getMiseEnServiceDate()
-// const authorizedCharactersdSet = new Set(authorizedCharacters)
 const authorizedJurisdictionsSet = new Set(authorizedJurisdictions)
 
-export function computeLabelStatus(decisionDto: DecisionTCOMDTO): LabelStatus {
+export async function computeLabelStatus(decisionDto: DecisionTCOMDTO): Promise<LabelStatus> {
   const dateCreation = new Date(decisionDto.dateCreation)
   const dateDecision = new Date(decisionDto.dateDecision)
+  const zoningApiService: ZoningApiService = new ZoningApiService()
 
   const formatLogs: LogsFormat = {
     ...normalizationFormatLogs,
@@ -33,6 +33,31 @@ export function computeLabelStatus(decisionDto: DecisionTCOMDTO): LabelStatus {
       msg: `Decision is not public. Changing LabelStatus to ${LabelStatus.IGNORED_DECISION_NON_PUBLIQUE}.`
     })
     return LabelStatus.IGNORED_DECISION_NON_PUBLIQUE
+  }
+
+  try {
+    const decisionZoning: Zoning = await zoningApiService.getDecisionZoning(decisionDto)
+    decisionDto.originalTextZoning = decisionZoning
+    if (decisionZoning.is_public === 0) {
+      logger.error({
+        ...formatLogs,
+        msg: `Decision is not public *according to Zoning*. Changing LabelStatus to ${LabelStatus.IGNORED_DECISION_NON_PUBLIQUE}.`
+      })
+      return LabelStatus.IGNORED_DECISION_NON_PUBLIQUE
+    }
+    if (decisionZoning.is_public === 2) {
+      logger.error({
+        ...formatLogs,
+        msg: `Decision debates are not public *according to Zoning*. Changing LabelStatus to ${LabelStatus.IGNORED_DEBAT_NON_PUBLIC}.`
+      })
+      return LabelStatus.IGNORED_DEBAT_NON_PUBLIC
+    }
+  } catch (error) {
+    logger.error({
+      ...formatLogs,
+      msg: `Error while calling zoning.`,
+      data: error
+    })
   }
 
   if (isDecisionInTheFuture(dateCreation, dateDecision)) {
@@ -59,16 +84,6 @@ export function computeLabelStatus(decisionDto: DecisionTCOMDTO): LabelStatus {
     return LabelStatus.IGNORED_JURIDICTION_EN_PHASE_DE_TEST
   }
 
-  /* NO MORE IGNORED_CARACTERE_INCONNU
-  if (!decisionContainsOnlyAuthorizedCharacters(decisionDto.originalText)) {
-    logger.error({
-      ...formatLogs,
-      msg: `Decision can not be treated by Judilibre because its text contains unknown characters. Changing LabelStatus to ${LabelStatus.IGNORED_CARACTERE_INCONNU}.`
-    })
-    return LabelStatus.IGNORED_CARACTERE_INCONNU
-  }
-  */
-
   return decisionDto.labelStatus
 }
 
@@ -83,18 +98,6 @@ function isDecisionOlderThanMiseEnService(dateDecision: Date): boolean {
 function isDecisionJurisdictionNotInWhiteList(jurisdictionId: string): boolean {
   return !authorizedJurisdictionsSet.has(jurisdictionId)
 }
-
-/*
-function decisionContainsOnlyAuthorizedCharacters(originalText: string): boolean {
-  for (let i = 0; i < originalText.length; i++) {
-    if (!authorizedCharactersdSet.has(originalText[i])) {
-      // Character not found in authorizedSet
-      return false
-    }
-  }
-  return true
-}
-*/
 
 function getMiseEnServiceDate(): Date {
   if (!isNaN(new Date(process.env.COMMISSIONING_DATE).getTime())) {

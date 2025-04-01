@@ -1,38 +1,17 @@
-/*
-import { characterReplacementMap } from '../infrastructure/characterReplacementMap'
-
-export const replaceUnknownCharacters = (text: string) => {
-  let replacedText = ''
-  for (const character of text) {
-    if (characterReplacementMap[character] == undefined) {
-      replacedText += character
-    } else {
-      replacedText += characterReplacementMap[character]
-    }
-  }
-  return replacedText
-}
-*/
-
 export const removeOrReplaceUnnecessaryCharacters = (rawString: string): string => {
   // Regular expressions to remove specific characters
   const tabOrPageBreakRegex = /\t|\f/gi
   const carriageReturnRegex = /\r\n|\r/gi
   const multipleSpaceRegex = /[ ]{2,}/gi
 
-  // Replace tab or pageBreak characters with an empty string
+  // Replace every tab or pageBreak character with a single space
   const stringWithoutTabOrPageBreak = rawString.replace(tabOrPageBreakRegex, ' ')
 
-  // Replace carriageReturn characters with a newline character
+  // Replace every carriageReturn character with a newline character
   const stringWithoutCarriageReturn = stringWithoutTabOrPageBreak.replace(carriageReturnRegex, '\n')
 
-  // Replace multiple consecutive spaces with a white space
+  // Replace multiple consecutive spaces with a single space
   const normalizedText = stringWithoutCarriageReturn.replace(multipleSpaceRegex, ' ')
-
-  // DO NOT replace tibetain characters
-  /*
-  const normalizedText = replaceUnknownCharacters(stringWithoutConsecutiveSpaces)
-  */
 
   return normalizedText
 }

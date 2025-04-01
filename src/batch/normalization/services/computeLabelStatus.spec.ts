@@ -13,7 +13,7 @@ jest.mock('../index', () => ({
 describe('updateLabelStatus', () => {
   const mockUtils = new MockUtils()
   describe('Returns provided labelStatus', () => {
-    it('when decision is not ignored', () => {
+    it('when decision is not ignored', async () => {
       // GIVEN
       const dateDecision = new Date(2025, 1, 12)
       const dateCreation = new Date(2025, 1, 13)
@@ -26,7 +26,7 @@ describe('updateLabelStatus', () => {
       const expectedLabelStatus = LabelStatus.TOBETREATED
 
       // WHEN
-      mockDecisionLabel.labelStatus = computeLabelStatus(mockDecisionLabel)
+      mockDecisionLabel.labelStatus = await computeLabelStatus(mockDecisionLabel)
 
       // THEN
       expect(mockDecisionLabel.labelStatus).toEqual(expectedLabelStatus)
@@ -35,7 +35,7 @@ describe('updateLabelStatus', () => {
 
   describe('changes labelStatus if it has exceptions', () => {
     describe('returns ignored_juridictionEnPhaseDeTest', () => {
-      it('when jurisdiction is not in whitelist', () => {
+      it('when jurisdiction is not in whitelist', async () => {
         // GIVEN
         const dateDecision = new Date(2025, 1, 12)
         const dateCreation = new Date(2025, 1, 13)
@@ -49,7 +49,7 @@ describe('updateLabelStatus', () => {
         const expectedLabelStatus = LabelStatus.IGNORED_JURIDICTION_EN_PHASE_DE_TEST
 
         // WHEN
-        mockDecisionLabel.labelStatus = computeLabelStatus(mockDecisionLabel)
+        mockDecisionLabel.labelStatus = await computeLabelStatus(mockDecisionLabel)
 
         // THEN
         expect(mockDecisionLabel.labelStatus).toEqual(expectedLabelStatus)
@@ -57,7 +57,7 @@ describe('updateLabelStatus', () => {
     })
 
     describe('returns ignored_decisionDateIncoherente', () => {
-      it('when dateDecision is in the future compared to dateCreation', () => {
+      it('when dateDecision is in the future compared to dateCreation', async () => {
         // GIVEN
         const dateDecisionInTheFuture = new Date(2023, 7, 20)
         const dateCreation = new Date(2023, 6, 20)
@@ -70,7 +70,7 @@ describe('updateLabelStatus', () => {
         const expectedLabelStatus = LabelStatus.IGNORED_DATE_DECISION_INCOHERENTE
 
         // WHEN
-        mockDecisionLabel.labelStatus = computeLabelStatus(mockDecisionLabel)
+        mockDecisionLabel.labelStatus = await computeLabelStatus(mockDecisionLabel)
 
         // THEN
         expect(mockDecisionLabel.labelStatus).toEqual(expectedLabelStatus)
@@ -78,7 +78,7 @@ describe('updateLabelStatus', () => {
     })
 
     describe('returns ignored_dateAvantMiseEnService', () => {
-      it('when decisionDate is before mise en service date', () => {
+      it('when decisionDate is before mise en service date', async () => {
         // GIVEN
         const dateDecisionBeforeMiseEnService = new Date(2023, 11, 13)
         const mockDecisionLabel = {
@@ -88,13 +88,13 @@ describe('updateLabelStatus', () => {
         const expectedLabelStatus = LabelStatus.IGNORED_DATE_AVANT_MISE_EN_SERVICE
 
         // WHEN
-        mockDecisionLabel.labelStatus = computeLabelStatus(mockDecisionLabel)
+        mockDecisionLabel.labelStatus = await computeLabelStatus(mockDecisionLabel)
 
         // THEN
         expect(mockDecisionLabel.labelStatus).toEqual(expectedLabelStatus)
       })
 
-      it('when decisionDate is in January 2023 and dateCreation is in July 2023', () => {
+      it('when decisionDate is in January 2023 and dateCreation is in July 2023', async () => {
         // GIVEN
         const dateJanuary2023 = new Date(2023, 0, 15)
         const dateJuly2023 = new Date(2023, 6, 20)
@@ -107,12 +107,12 @@ describe('updateLabelStatus', () => {
         const expectedLabelStatus = LabelStatus.IGNORED_DATE_AVANT_MISE_EN_SERVICE
 
         // WHEN
-        mockDecisionLabel.labelStatus = computeLabelStatus(mockDecisionLabel)
+        mockDecisionLabel.labelStatus = await computeLabelStatus(mockDecisionLabel)
 
         // THEN
         expect(mockDecisionLabel.labelStatus).toEqual(expectedLabelStatus)
       })
-      it('when decisionDate is in September 2022 and dateCreation is in March 2023', () => {
+      it('when decisionDate is in September 2022 and dateCreation is in March 2023', async () => {
         // GIVEN
         const dateSeptember2022 = new Date(2022, 8, 20)
         const dateMarch2023 = new Date(2023, 2, 25)
@@ -124,7 +124,7 @@ describe('updateLabelStatus', () => {
         const expectedLabelStatus = LabelStatus.IGNORED_DATE_AVANT_MISE_EN_SERVICE
 
         // WHEN
-        mockDecisionLabel.labelStatus = computeLabelStatus(mockDecisionLabel)
+        mockDecisionLabel.labelStatus = await computeLabelStatus(mockDecisionLabel)
 
         // THEN
         expect(mockDecisionLabel.labelStatus).toEqual(expectedLabelStatus)
@@ -147,7 +147,7 @@ describe('updateLabelStatus', () => {
         const expectedLabelStatus = LabelStatus.IGNORED_CARACTERE_INCONNU
 
         // WHEN
-        mockDecisionLabel.labelStatus = computeLabelStatus(mockDecisionLabel)
+        mockDecisionLabel.labelStatus = await computeLabelStatus(mockDecisionLabel)
 
         // THEN
         expect(mockDecisionLabel.labelStatus).toEqual(expectedLabelStatus)

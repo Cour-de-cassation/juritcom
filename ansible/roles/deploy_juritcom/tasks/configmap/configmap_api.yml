@@ -23,4 +23,5 @@
         OAUTH_TOKEN_URL: "{{ oauth_token_url }}"
         PLAINTEXT_SOURCE: "{{ plaintext_source }}"
         NLP_PSEUDONYMISATION_API_URL: "{{ nlp_pseudonymisation_api_url }}"
+        ZONING_API_URL: '{{ zoning_api_url}}'
 ...

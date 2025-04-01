@@ -114,7 +114,7 @@ export async function normalizationJob(): Promise<ConvertedDecisionWithMetadonne
           decision.metadonnees,
           decisionFilename
         )
-        decisionToSave.labelStatus = computeLabelStatus(decisionToSave)
+        decisionToSave.labelStatus = await computeLabelStatus(decisionToSave)
         decisionToSave.occultation = {
           additionalTerms: '',
           categoriesToOmit: [],

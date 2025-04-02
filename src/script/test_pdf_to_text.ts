@@ -3,7 +3,7 @@ import * as FormData from 'form-data'
 import axios, { AxiosError, AxiosResponse } from 'axios'
 import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3'
 import { Marked, Renderer as x } from 'marked'
-import { decode } from 'html-entities'
+// import { decode } from 'html-entities'
 // import { convert } from 'html-to-text'
 
 async function main(id: string) {
@@ -25,13 +25,13 @@ async function main(id: string) {
     const delta = (t1.getTime() - t0.getTime()) / 1000
     const perPage = (delta / response.data.pdfPageCount).toFixed(2)
 
-    let input = response.data.markdownText
+    const input = response.data.markdownText
     // Remove any <html> and <body> tags, so plaintify does not encode their content:
     // input = input.replace(/<\/?html>/gim, '')
     // input = input.replace(/<\/?body>/gim, '')
 
     // Let's plaintify do... something:
-    let plainText = new Marked({ gfm: true, breaks: true })
+    const plainText = new Marked({ gfm: true, breaks: true })
       .use(markedPlaintify())
       .parse(input, { async: false })
 

@@ -3,9 +3,8 @@ import * as FormData from 'form-data'
 import axios, { AxiosError, AxiosResponse } from 'axios'
 import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3'
 import { Marked, Renderer as x } from 'marked'
-
-// @TODO http://nlp-pseudonymisation-api-service.nlp.svc.cluster.local:8081/pdf-to-text
-// cf. https://stackoverflow.com/a/64169877
+import { decode } from 'html-entities'
+import { convert } from 'html-to-text'
 
 async function main(id: string) {
   const pdf: Buffer = await getPDFByFilename(`${id}.pdf`)
@@ -25,16 +24,32 @@ async function main(id: string) {
     const t1 = new Date()
     const delta = (t1.getTime() - t0.getTime()) / 1000
     const perPage = (delta / response.data.pdfPageCount).toFixed(2)
-    const plainText = new Marked({ gfm: true })
-      .use(markedPlaintify())
-      .parse(response.data.markdownText, { async: false })
+
+    let input = response.data.markdownText
+    // Remove any <html> and <body> tags, so plaintify does not encode their content:
+    input = input.replace(/<\/?html>/gim, '')
+    input = input.replace(/<\/?body>/gim, '')
+
+    // Let's plaintify do... something:
+    let plainText = new Marked({ gfm: true, breaks: true }).use(markedPlaintify()).parse(input, { async: false })
+
+    // Remove any remaining HTML tags:
+    // 1. markedPlaintify could have encode some HTML elements anyway:
+    plainText = decode(plainText)
+    // 2. add a space to every table cell:
+    plainText = plainText.replace(/<\/td>/gim, ' </td>')
+    // 3. convert:
+    plainText = convert(plainText, { wordwrap: false, preserveNewlines: true })
+    // 4. remove every tag that could remain:
+    plainText = plainText.replace(/<\/?[^>]+(>|$)/gm, '').trim()
+
     console.log(plainText)
-    console.log(response.status)
-    console.log(response.statusText)
-    console.log(`PDF type: ${response.data.pdfType}`)
-    console.log(`PDF page count: ${response.data.pdfPageCount}`)
-    console.log(`Total duration: ${delta.toFixed(2)} s`)
-    console.log(`Duration per page: ${perPage} page/s`)
+    // console.log(response.status)
+    // console.log(response.statusText)
+    // console.log(`PDF type: ${response.data.pdfType}`)
+    // console.log(`PDF page count: ${response.data.pdfPageCount}`)
+    // console.log(`Total duration: ${delta.toFixed(2)} s`)
+    // console.log(`Duration per page: ${perPage} page/s`)
   } catch (error: any) {
     if (error instanceof AxiosError) {
       console.error(error.code)

@@ -43,7 +43,7 @@ async function main(id: string) {
     // 5. remove every tag that could remain:
     plainText = plainText.replace(/<\/?[^>]+(>|$)/gm, '')
     // 6. remove extra \n
-    plainText = plainText.replace(/\n{2,}/gm, '\n').trim()
+    plainText = plainText.replace(/\n{3,}/gm, '\n\n').trim()
 
     console.log(JSON.stringify(plainText))
     // console.log(response.status)

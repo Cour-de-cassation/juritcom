@@ -43,7 +43,7 @@ async function main(id: string) {
     // 3. convert:
     // plainText = convert(plainText, { wordwrap: false, preserveNewlines: true })
     // 4. remove every tag that could remain:
-    plainText = plainText.replace(/<\/?[^>]+(>|$)/gm, '').trim()
+    // plainText = plainText.replace(/<\/?[^>]+(>|$)/gm, '').trim()
 
     console.log(JSON.stringify(plainText))
     // console.log(response.status)

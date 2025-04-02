@@ -4,7 +4,7 @@ import axios, { AxiosError, AxiosResponse } from 'axios'
 import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3'
 import { Marked, Renderer as x } from 'marked'
 import { decode } from 'html-entities'
-import { convert } from 'html-to-text'
+// import { convert } from 'html-to-text'
 
 async function main(id: string) {
   const pdf: Buffer = await getPDFByFilename(`${id}.pdf`)
@@ -41,11 +41,11 @@ async function main(id: string) {
     // 2. add a space to every table cell:
     plainText = plainText.replace(/<\/td>/gim, ' </td>')
     // 3. convert:
-    plainText = convert(plainText, { wordwrap: false, preserveNewlines: true })
+    // plainText = convert(plainText, { wordwrap: false, preserveNewlines: true })
     // 4. remove every tag that could remain:
     plainText = plainText.replace(/<\/?[^>]+(>|$)/gm, '').trim()
 
-    console.log(plainText)
+    console.log(JSON.stringify(plainText))
     // console.log(response.status)
     // console.log(response.statusText)
     // console.log(`PDF type: ${response.data.pdfType}`)

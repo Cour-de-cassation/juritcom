@@ -1,9 +1,9 @@
 import * as FormData from 'form-data'
 import axios, { AxiosError, AxiosResponse } from 'axios'
 import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3'
-import { Marked /*, Renderer as x*/ } from 'marked'
-// import { decode } from 'html-entities'
-// import { convert } from 'html-to-text'
+import { Marked } from 'marked'
+import { decode } from 'html-entities'
+import { convert } from 'html-to-text'
 
 async function main(id: string) {
   const pdf: Buffer = await getPDFByFilename(`${id}.pdf`)
@@ -25,24 +25,25 @@ async function main(id: string) {
     const perPage = (delta / response.data.pdfPageCount).toFixed(2)
 
     const input = response.data.markdownText
-    // Remove any <html> and <body> tags, so plaintify does not encode their content:
-    // input = input.replace(/<\/?html>/gim, '')
-    // input = input.replace(/<\/?body>/gim, '')
+    const htmlText = new Marked({ gfm: true, breaks: true }).parse(input, { async: false })
 
-    // Let's plaintify do... something:
-    const plainText = new Marked({ gfm: true, breaks: true })
-      // .use(markedPlaintify())
-      .parse(input, { async: false })
-
-    // Remove any remaining HTML tags:
-    // 1. markedPlaintify could have encode some HTML elements anyway:
-    // plainText = decode(plainText)
+    // Remove any HTML stuff:
+    // 1. HTML elements:
+    let plainText = decode(htmlText)
     // 2. add a space to every table cell:
-    // plainText = plainText.replace(/<\/td>/gim, ' </td>')
-    // 3. convert:
-    // plainText = convert(plainText, { wordwrap: false, preserveNewlines: true })
-    // 4. remove every tag that could remain:
-    // plainText = plainText.replace(/<\/?[^>]+(>|$)/gm, '').trim()
+    plainText = plainText.replace(/<\/td>/gim, ' </td>')
+    // 3.a. replace <br> with \n:
+    plainText = plainText.replace(/<br\/?>/gim, '\n')
+    // 3.b. add a \n after each paragraph:
+    plainText = plainText.replace(/<\/p>/gim, '</p>\n')
+    // 3.c. add a \n after each title:
+    plainText = plainText.replace(/<\/h(\d+)>/gim, '</h$1>\n')
+    // 4. convert:
+    plainText = convert(plainText, { wordwrap: false, preserveNewlines: true })
+    // 5. remove every tag that could remain:
+    plainText = plainText.replace(/<\/?[^>]+(>|$)/gm, '')
+    // 6. remove extra \n
+    plainText = plainText.replace(/\n{2,}/gm, '\n').trim()
 
     console.log(JSON.stringify(plainText))
     // console.log(response.status)
@@ -85,106 +86,5 @@ async function getPDFByFilename(filename: string): Promise<Buffer> {
     console.log({ operationName: 'getPDFByFilename', msg: error.message, data: error })
   }
 }
-
-/*
-function markedPlaintify(c = {}) {
-  const s = {},
-    a = ['constructor', 'hr', 'checkbox', 'br', 'space'],
-    h = ['strong', 'em', 'del'],
-    d = ['html', 'code']
-  let f = []
-  return (
-    Object.getOwnPropertyNames(x.prototype).forEach((t) => {
-      a.includes(t)
-        ? (s[t] = () => '')
-        : h.includes(t)
-          ? (s[t] = function (e) {
-              return this.parser.parseInline(e.tokens)
-            })
-          : d.includes(t)
-            ? (s[t] = (e) => o(e.text) + '\n\n')
-            : t === 'codespan'
-              ? (s[t] = (e) => o(e.text))
-              : t === 'list'
-                ? (s[t] = function (e) {
-                    let n = ''
-                    for (let i = 0; i < e.items.length; i++) {
-                      const r = e.items[i],
-                        l = this.listitem(r)
-                      typeof l == 'string' && (n += l.replace(/\n{2,}/g, '\n'))
-                    }
-                    return '\n' + n.trim() + '\n\n'
-                  })
-                : t === 'listitem'
-                  ? (s[t] = function (e) {
-                      return '\n' + this.parser.parse(e.tokens).trim()
-                    })
-                  : t === 'blockquote'
-                    ? (s[t] = function (e) {
-                        return this.parser.parse(e.tokens).trim() + '\n\n'
-                      })
-                    : t === 'table'
-                      ? (s[t] = function (e) {
-                          f = []
-                          for (let i = 0; i < e.header.length; i++) this.tablecell(e.header[i])
-                          let n = ''
-                          for (let i = 0; i < e.rows.length; i++) {
-                            const r = e.rows[i]
-                            let l = ''
-                            for (let u = 0; u < r.length; u++) l += this.tablecell(r[u])
-                            n += this.tablerow({ text: l })
-                          }
-                          return n
-                        })
-                      : t === 'tablerow'
-                        ? (s[t] = (e) => {
-                            const n = e.text.split('__CELL_PAD__').filter(Boolean)
-                            return f.map((i, r) => i + ': ' + n[r]).join('\n') + '\n\n'
-                          })
-                        : t === 'tablecell'
-                          ? (s[t] = function (e) {
-                              const n = this.parser.parseInline(e.tokens)
-                              return e.header && f.push(n), n + '__CELL_PAD__'
-                            })
-                          : t === 'link'
-                            ? (s[t] = function (e) {
-                                return this.parser.parseInline(e.tokens) + '\n\n'
-                              })
-                            : t === 'image'
-                              ? (s[t] = (e) => e.text + '\n\n')
-                              : t === 'paragraph'
-                                ? (s[t] = function (e) {
-                                    let n = this.parser.parseInline(e.tokens)
-                                    return (n = n.replace(/\n{2,}/g, '')), n + '\n\n'
-                                  })
-                                : t === 'heading'
-                                  ? (s[t] = function (e) {
-                                      return this.parser.parseInline(e.tokens) + '\n\n'
-                                    })
-                                  : (s[t] = function (e) {
-                                      return 'tokens' in e && e.tokens
-                                        ? this.parser.parseInline(e.tokens)
-                                        : e.text
-                                    })
-    }),
-    {
-      renderer: {
-        ...s,
-        ...c
-      }
-    }
-  )
-}
-function o(c) {
-  const s = {
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#39;'
-  }
-  return c.replace(/[&<>"']/g, (a) => s[a])
-}
-*/
 
 main(process.argv[2])

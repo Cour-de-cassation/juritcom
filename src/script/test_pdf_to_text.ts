@@ -38,6 +38,10 @@ async function main(id: string) {
     plainText = plainText.replace(/<\/p>/gim, '</p>\n')
     // 3.c. add a \n after each title:
     plainText = plainText.replace(/<\/h(\d+)>/gim, '</h$1>\n')
+    // 3.d. add a \n after each tr:
+    plainText = plainText.replace(/<\/tr>/gim, '</tr>\n')
+    // 3.e add a \n after each table:
+    plainText = plainText.replace(/<\/table>/gim, '</table>\n')
     // 4. convert:
     plainText = convert(plainText, { wordwrap: false, preserveNewlines: true })
     // 5. remove every tag that could remain:

@@ -104,7 +104,9 @@ export function markdownToPlainText(input: string): string {
   input = input.replace(/<\/?body>/gim, '')
 
   // Let's plaintify do... something:
-  let plainText = new Marked({ gfm: true, breaks: true }).use(markedPlaintify()).parse(input, { async: false })
+  let plainText = new Marked({ gfm: true, breaks: true })
+    .use(markedPlaintify())
+    .parse(input, { async: false })
 
   // Remove any remaining HTML tags:
   // 1. markedPlaintify could have encode some HTML elements anyway:

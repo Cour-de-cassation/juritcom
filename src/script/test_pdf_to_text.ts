@@ -31,7 +31,9 @@ async function main(id: string) {
     input = input.replace(/<\/?body>/gim, '')
 
     // Let's plaintify do... something:
-    let plainText = new Marked({ gfm: true, breaks: true }).use(markedPlaintify()).parse(input, { async: false })
+    let plainText = new Marked({ gfm: true, breaks: true })
+      .use(markedPlaintify())
+      .parse(input, { async: false })
 
     // Remove any remaining HTML tags:
     // 1. markedPlaintify could have encode some HTML elements anyway:
@@ -49,7 +51,7 @@ async function main(id: string) {
     // console.log(`PDF type: ${response.data.pdfType}`)
     // console.log(`PDF page count: ${response.data.pdfPageCount}`)
     // console.log(`Total duration: ${delta.toFixed(2)} s`)
-    // console.log(`Duration per page: ${perPage} page/s`)
+    console.log(`Duration per page: ${perPage} page/s`)
   } catch (error: any) {
     if (error instanceof AxiosError) {
       console.error(error.code)

@@ -102,11 +102,7 @@ function markedPlaintify(c = {}) {
               return this.parser.parseInline(e.tokens)
             })
           : d.includes(t)
-            ? (s[t] = (e) =>
-                o(e.text) +
-                `
-
-`)
+            ? (s[t] = (e) => o(e.text) + '\n')
             : t === 'codespan'
               ? (s[t] = (e) => o(e.text))
               : t === 'list'
@@ -115,37 +111,17 @@ function markedPlaintify(c = {}) {
                     for (let i = 0; i < e.items.length; i++) {
                       const r = e.items[i],
                         l = this.listitem(r)
-                      typeof l == 'string' &&
-                        (n += l.replace(
-                          /\n{2,}/g,
-                          `
-`
-                        ))
+                      typeof l == 'string' && (n += l.replace(/\n{2,}/g, '\n'))
                     }
-                    return (
-                      `
-` +
-                      n.trim() +
-                      `
-
-`
-                    )
+                    return '\n' + n.trim() + '\n'
                   })
                 : t === 'listitem'
                   ? (s[t] = function (e) {
-                      return (
-                        `
-` + this.parser.parse(e.tokens).trim()
-                      )
+                      return '\n' + this.parser.parse(e.tokens).trim()
                     })
                   : t === 'blockquote'
                     ? (s[t] = function (e) {
-                        return (
-                          this.parser.parse(e.tokens).trim() +
-                          `
-
-`
-                        )
+                        return this.parser.parse(e.tokens).trim() + '\n'
                       })
                     : t === 'table'
                       ? (s[t] = function (e) {
@@ -163,13 +139,7 @@ function markedPlaintify(c = {}) {
                       : t === 'tablerow'
                         ? (s[t] = (e) => {
                             const n = e.text.split('__CELL_PAD__').filter(Boolean)
-                            return (
-                              f.map((i, r) => i + ': ' + n[r]).join(`
-`) +
-                              `
-
-`
-                            )
+                            return f.map((i, r) => i + ': ' + n[r]).join('\n') + '\n'
                           })
                         : t === 'tablecell'
                           ? (s[t] = function (e) {
@@ -178,38 +148,18 @@ function markedPlaintify(c = {}) {
                             })
                           : t === 'link'
                             ? (s[t] = function (e) {
-                                return (
-                                  this.parser.parseInline(e.tokens) +
-                                  `
-
-`
-                                )
+                                return this.parser.parseInline(e.tokens) + '\n'
                               })
                             : t === 'image'
-                              ? (s[t] = (e) =>
-                                  e.text +
-                                  `
-
-`)
+                              ? (s[t] = (e) => e.text + '\n')
                               : t === 'paragraph'
                                 ? (s[t] = function (e) {
                                     let n = this.parser.parseInline(e.tokens)
-                                    return (
-                                      (n = n.replace(/\n{2,}/g, '')),
-                                      n +
-                                        `
-
-`
-                                    )
+                                    return (n = n.replace(/\n{2,}/g, '')), n + '\n'
                                   })
                                 : t === 'heading'
                                   ? (s[t] = function (e) {
-                                      return (
-                                        this.parser.parseInline(e.tokens) +
-                                        `
-
-`
-                                      )
+                                      return this.parser.parseInline(e.tokens) + '\n'
                                     })
                                   : (s[t] = function (e) {
                                       return 'tokens' in e && e.tokens

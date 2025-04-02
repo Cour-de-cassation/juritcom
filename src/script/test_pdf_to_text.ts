@@ -1,8 +1,7 @@
-/* eslint-disable @typescript-eslint/no-unused-expressions */
 import * as FormData from 'form-data'
 import axios, { AxiosError, AxiosResponse } from 'axios'
 import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3'
-import { Marked, Renderer as x } from 'marked'
+import { Marked /*, Renderer as x*/ } from 'marked'
 // import { decode } from 'html-entities'
 // import { convert } from 'html-to-text'
 
@@ -32,7 +31,7 @@ async function main(id: string) {
 
     // Let's plaintify do... something:
     const plainText = new Marked({ gfm: true, breaks: true })
-      .use(markedPlaintify())
+      // .use(markedPlaintify())
       .parse(input, { async: false })
 
     // Remove any remaining HTML tags:
@@ -87,13 +86,13 @@ async function getPDFByFilename(filename: string): Promise<Buffer> {
   }
 }
 
+/*
 function markedPlaintify(c = {}) {
   const s = {},
     a = ['constructor', 'hr', 'checkbox', 'br', 'space'],
     h = ['strong', 'em', 'del'],
     d = ['html', 'code']
   let f = []
-  console.log('*****')
   return (
     Object.getOwnPropertyNames(x.prototype).forEach((t) => {
       a.includes(t)
@@ -186,5 +185,6 @@ function o(c) {
   }
   return c.replace(/[&<>"']/g, (a) => s[a])
 }
+*/
 
 main(process.argv[2])

@@ -38,7 +38,7 @@ async function job() {
         `${_id}.json`
       )
       decisionNormalized.pseudoText = decisionNormalized.originalText
-      decisionNormalized.labelStatus = computeLabelStatus(decisionNormalized)
+      decisionNormalized.labelStatus = await computeLabelStatus(decisionNormalized)
       decisionNormalized.occultation = {
         additionalTerms: '',
         categoriesToOmit: [],

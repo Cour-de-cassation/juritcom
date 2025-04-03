@@ -59,11 +59,11 @@ async function main(id: string) {
     // 4. convert:
     plainText = convert(plainText, { wordwrap: false, preserveNewlines: true })
     // 5. remove extra \n
-    plainText = plainText.replace(/\n{2}/gm, '\n')
+    plainText = plainText.replace(/\n{2,}/gm, '\n')
     // 6. remove every tag that could remain:
     plainText = plainText.replace(/<\/?[^>]+(>|$)/gm, '')
     // 7. remove extra \n again (after tag collapsing)
-    plainText = plainText.replace(/\n{2,}/gm, '\n\n').trim()
+    // plainText = plainText.replace(/\n{2,}/gm, '\n\n').trim()
 
     console.log(JSON.stringify(plainText))
     // console.log(response.status)

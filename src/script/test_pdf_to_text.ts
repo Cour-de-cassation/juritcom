@@ -62,9 +62,16 @@ async function main(id: string) {
     plainText = convert(plainText, {
       wordwrap: false,
       preserveNewlines: true,
-      uppercase: false,
-      ignoreHref: true,
-      uppercaseHeaderCells: false
+      selectors: [
+        {
+          selector: '*',
+          options: {
+            uppercase: false,
+            ignoreHref: true,
+            uppercaseHeaderCells: false
+          }
+        }
+      ]
     })
     // 6. remove every tag that could remain:
     plainText = plainText.replace(/<\/?[^>]+(>|$)/gm, '')

@@ -64,7 +64,7 @@ async function main(id: string) {
     plainText = plainText.replace(/<\/?[^>]+(>|$)/gm, '')
     // 7. remove extra \n again (after tag collapsing)
     plainText = plainText.replace(/\n{2,}/gm, '\n\n').trim()
-    
+
     console.log(JSON.stringify(plainText))
     // console.log(response.status)
     // console.log(response.statusText)

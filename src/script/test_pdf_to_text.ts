@@ -57,9 +57,9 @@ async function main(id: string) {
     // 3.i. add a \n after each li:
     plainText = plainText.replace(/<\/li>/gim, '</li>\n')
     // 4. remove extra \n
-    plainText = plainText.replace(/\n{2,}/gm, '\n')
+    plainText = plainText.replace(/\n+/gm, '\n')
     // 5. convert:
-    plainText = convert(plainText, { wordwrap: false, preserveNewlines: true })
+    plainText = convert(plainText, { wordwrap: false, preserveNewlines: true, uppercase: false, ignoreHref: true, uppercaseHeaderCells: false })
     // 6. remove every tag that could remain:
     plainText = plainText.replace(/<\/?[^>]+(>|$)/gm, '')
     // 7. remove extra \n again (after tag collapsing)

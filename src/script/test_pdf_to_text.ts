@@ -30,23 +30,31 @@ async function main(id: string) {
     // Remove any HTML stuff:
     // 1. HTML elements:
     let plainText = decode(htmlText)
-    // 2. add a space to every table cell:
+    // 2. add a space at the end of every table cell:
     plainText = plainText.replace(/<\/td>/gim, ' </td>')
     // 3.a. replace <br> with \n:
     plainText = plainText.replace(/<br\/?>/gim, '\n')
-    // 3.b. add a \n after each paragraph:
-    plainText = plainText.replace(/<\/p>/gim, '</p>\n')
+    // 3.b. add \n\n after each paragraph:
+    plainText = plainText.replace(/<\/p>/gim, '</p>\n\n')
     // 3.c. add a \n after each title:
     plainText = plainText.replace(/<\/h(\d+)>/gim, '</h$1>\n')
     // 3.d. add a \n after each tr:
     plainText = plainText.replace(/<\/tr>/gim, '</tr>\n')
-    // 3.e add a \n after each table:
-    plainText = plainText.replace(/<\/table>/gim, '</table>\n')
+    // 3.e add \n\n after each table:
+    plainText = plainText.replace(/<\/table>/gim, '</table>\n\n')
+    // 3.f. replace <hr> with \n\n:
+    plainText = plainText.replace(/<hr\/?>/gim, '\n\n')
+    // 3.g. add \n\n after each ol:
+    plainText = plainText.replace(/<\/ol>/gim, '</ol>\n')
+    // 3.h. add \n\n after each ul:
+    plainText = plainText.replace(/<\/ul>/gim, '</ul>\n')
+    // 3.h. add a \n after each li:
+    plainText = plainText.replace(/<\/li>/gim, '</li>\n')
     // 4. convert:
     plainText = convert(plainText, { wordwrap: false, preserveNewlines: true })
     // 5. remove every tag that could remain:
     plainText = plainText.replace(/<\/?[^>]+(>|$)/gm, '')
-    // 6. remove extra \n
+    // 6. remove extra (3+) \n
     plainText = plainText.replace(/\n{3,}/gm, '\n\n').trim()
 
     console.log(JSON.stringify(plainText))

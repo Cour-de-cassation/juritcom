@@ -30,25 +30,31 @@ async function main(id: string) {
     // Remove any HTML stuff:
     // 1. HTML elements:
     let plainText = decode(htmlText)
-    // 2. add a space at the end of every table cell:
+    // 2. insert a space at the end of every table cell:
     plainText = plainText.replace(/<\/td>/gim, ' </td>')
-    // 3.a. replace <br> with \n:
-    plainText = plainText.replace(/<br\/?>/gim, '\n')
-    // 3.b. add \n\n after each paragraph:
-    plainText = plainText.replace(/<\/p>/gim, '</p>\n\n')
-    // 3.c. add a \n after each title:
+    // 3.a. add a \n after each <br>:
+    plainText = plainText.replace(/<br\/?>/gim, '<br>\n')
+    // 3.b. add a \n before and after each paragraph:
+    plainText = plainText.replace(/<p>/gim, '\n<p>')
+    plainText = plainText.replace(/<\/p>/gim, '</p>\n')
+    // 3.c. add a \n before and after each heading:
+    plainText = plainText.replace(/<h(\d+)>/gim, '\n</h$1>')
     plainText = plainText.replace(/<\/h(\d+)>/gim, '</h$1>\n')
-    // 3.d. add a \n after each tr:
+    // 3.d. add a \n before and after each tr:
+    plainText = plainText.replace(/<tr>/gim, '\n<tr>')
     plainText = plainText.replace(/<\/tr>/gim, '</tr>\n')
-    // 3.e add \n\n after each table:
-    plainText = plainText.replace(/<\/table>/gim, '</table>\n\n')
-    // 3.f. replace <hr> with \n\n:
-    plainText = plainText.replace(/<hr\/?>/gim, '\n\n')
-    // 3.g. add \n\n after each ol:
+    // 3.e. add a \n before and after each table:
+    plainText = plainText.replace(/<table>/gim, '\n<table>')
+    plainText = plainText.replace(/<\/table>/gim, '</table>\n')
+    // 3.f. add a \n before and after each hr:
+    plainText = plainText.replace(/<hr\/?>/gim, '\n<hr>\n')
+    // 3.g. add a \n before and after each ol:
+    plainText = plainText.replace(/<ol>/gim, '\n<ol>')
     plainText = plainText.replace(/<\/ol>/gim, '</ol>\n')
-    // 3.h. add \n\n after each ul:
+    // 3.h. add a \n before and after each ul:
+    plainText = plainText.replace(/<ul>/gim, '\n<ul>')
     plainText = plainText.replace(/<\/ul>/gim, '</ul>\n')
-    // 3.h. add a \n after each li:
+    // 3.i. add a \n after each li:
     plainText = plainText.replace(/<\/li>/gim, '</li>\n')
     // 4. convert:
     plainText = convert(plainText, { wordwrap: false, preserveNewlines: true })

@@ -38,7 +38,7 @@ async function main(id: string) {
     plainText = plainText.replace(/<p>/gim, '\n<p>')
     plainText = plainText.replace(/<\/p>/gim, '</p>\n')
     // 3.c. add a \n before and after each heading:
-    plainText = plainText.replace(/<h(\d+)>/gim, '\n</h$1>')
+    plainText = plainText.replace(/<h(\d+)>/gim, '\n<h$1>')
     plainText = plainText.replace(/<\/h(\d+)>/gim, '</h$1>\n')
     // 3.d. add a \n before and after each tr:
     plainText = plainText.replace(/<tr>/gim, '\n<tr>')

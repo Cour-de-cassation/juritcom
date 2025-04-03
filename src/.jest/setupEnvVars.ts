@@ -17,5 +17,6 @@ process.env = {
   DBSDER_OTHER_API_KEY: '24277eca-290c-40c3-9bf6-a370880d800b',
   DBSDER_POWERFUL_API_KEY: '24277eca-290c-40c3-9bf6-a370880d800b',
   NLP_PSEUDONYMISATION_API_URL: 'http://localhost:8081',
-  USE_AUTH: 'basic'
+  USE_AUTH: 'basic',
+  ZONING_API_URL: 'http://localhost:8090'
 }

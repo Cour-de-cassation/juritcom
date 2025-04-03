@@ -56,7 +56,6 @@
     "jsonwebtoken": "^9.0.2",
     "jwks-rsa": "^3.1.0",
     "marked": "^15.0.7",
-    "marked-plaintify": "^1.1.1",
     "minio": "^8.0.2",
     "nestjs-pino": "4.1.0",
     "passport": "^0.7.0",

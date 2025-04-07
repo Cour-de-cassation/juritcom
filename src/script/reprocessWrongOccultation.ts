@@ -228,30 +228,18 @@ async function reprocessDecision(decision: DecisionTCOMDTO): Promise<boolean> {
       objectDecision.metadonnees &&
       `${objectDecision.metadonnees.idDecision}.json` === decision.filenameSource
     ) {
-      if (
-        decision.occultation.categoriesToOmit.includes(Categories.PERSONNEMORALE) === false ||
-        decision.occultation.categoriesToOmit.includes(Categories.NUMEROSIRETSIREN) === false ||
-        decision.occultation.categoriesToOmit.includes(
-          Categories.PROFESSIONNELMAGISTRATGREFFIER
-        ) === false
-      ) {
-        const oldOccultation = JSON.stringify(decision.occultation.categoriesToOmit)
-        const newOccultation = computeOccultation(objectDecision.metadonnees)
-        decision.occultation.additionalTerms = newOccultation.additionalTerms
-        decision.occultation.categoriesToOmit = newOccultation.categoriesToOmit
-        decision.occultation.motivationOccultation = newOccultation.motivationOccultation
-        decision.labelStatus = LabelStatus.TOBETREATED
-        delete decision._id
-        console.log(
-          `OLD: ${oldOccultation} --> NEW: ${JSON.stringify(decision.occultation.categoriesToOmit)}`
-        )
-        await saveDecision(decision)
-        return true
-      } else {
-        throw new Error(
-          `Keep occultations ${JSON.stringify(decision.occultation.categoriesToOmit)}`
-        )
-      }
+      const oldOccultation = JSON.stringify(decision.occultation.categoriesToOmit)
+      const newOccultation = computeOccultation(objectDecision.metadonnees)
+      decision.occultation.additionalTerms = newOccultation.additionalTerms
+      decision.occultation.categoriesToOmit = newOccultation.categoriesToOmit
+      decision.occultation.motivationOccultation = newOccultation.motivationOccultation
+      decision.labelStatus = LabelStatus.TOBETREATED
+      delete decision._id
+      console.log(
+        `OLD: ${oldOccultation} --> NEW: ${JSON.stringify(decision.occultation.categoriesToOmit)}`
+      )
+      await saveDecision(decision)
+      return true
     } else {
       throw new Error('Decision incomplete or ID mismatch')
     }
@@ -260,52 +248,170 @@ async function reprocessDecision(decision: DecisionTCOMDTO): Promise<boolean> {
     return false
   }
 }
+function isNonEmptyString(str: string | undefined): str is string {
+  return typeof str === 'string' && str.trim() !== ''
+}
+
+function occultationsDataAreEmpty(
+  occultationsComplementaires: OccultationComplementaireDto
+): boolean {
+  if (occultationsComplementaires.personneMorale === true) {
+    return false
+  }
+  if (occultationsComplementaires.personnePhysicoMoraleGeoMorale === true) {
+    return false
+  }
+  if (occultationsComplementaires.adresse === true) {
+    return false
+  }
+  if (occultationsComplementaires.dateCivile === true) {
+    return false
+  }
+  if (occultationsComplementaires.plaqueImmatriculation === true) {
+    return false
+  }
+  if (occultationsComplementaires.cadastre === true) {
+    return false
+  }
+  if (occultationsComplementaires.chaineNumeroIdentifiante === true) {
+    return false
+  }
+  if (occultationsComplementaires.coordonneeElectronique === true) {
+    return false
+  }
+  if (occultationsComplementaires.professionnelMagistratGreffier === true) {
+    return false
+  }
+  if (occultationsComplementaires.motifsDebatsChambreConseil === true) {
+    return false
+  }
+  if (occultationsComplementaires.motifsSecretAffaires === true) {
+    return false
+  }
+  if (isNonEmptyString(occultationsComplementaires.conserverElement)) {
+    return false
+  }
+  if (isNonEmptyString(occultationsComplementaires.supprimerElement)) {
+    return false
+  }
+  return true
+}
 
 function computeOccultation(metadonnees: MetadonneeDto): DecisionOccultation {
   const occultationsComplementaires: OccultationComplementaireDto =
     metadonnees.occultationsComplementaires
-  const categoriesToOmitRaw = []
-  const additionalTermsRaw = []
 
-  const motivationOccultation =
-    occultationsComplementaires.motifsDebatsChambreConseil === true ||
-    occultationsComplementaires.motifsSecretAffaires === true
+  if (occultationsDataAreEmpty(occultationsComplementaires)) {
+    console.warn({
+      msg: `Empty occultations form received, applying the default "bloc 3" signature`
+    })
 
-  // Apply block 3:
-  categoriesToOmitRaw.push(Categories.PERSONNEMORALE)
-  categoriesToOmitRaw.push(Categories.NUMEROSIRETSIREN)
-  categoriesToOmitRaw.push(Categories.PROFESSIONNELMAGISTRATGREFFIER)
+    return {
+      additionalTerms: '',
+      categoriesToOmit: [
+        Categories.PERSONNEMORALE,
+        Categories.NUMEROSIRETSIREN,
+        Categories.PROFESSIONNELMAGISTRATGREFFIER
+      ],
+      motivationOccultation: false
+    }
+  } else {
+    const categoriesToOmitRaw = []
+    const additionalTermsRaw = []
+    const motivationOccultation =
+      occultationsComplementaires.motifsDebatsChambreConseil === true ||
+      occultationsComplementaires.motifsSecretAffaires === true
 
-  const categoriesToOmit = categoriesToOmitRaw.filter(
-    (value, index, array) => array.indexOf(value) === index
-  )
+    console.info({
+      msg: `motivationOccultation computed ${motivationOccultation}`
+    })
 
-  if (occultationsComplementaires.conserverElement) {
-    for (let item of `${occultationsComplementaires.conserverElement}`.split('|')) {
-      item = item.trim()
-      if (item !== '') {
-        additionalTermsRaw.push(`+${item}`)
+    if (occultationsComplementaires.personneMorale !== true) {
+      categoriesToOmitRaw.push(Categories.PERSONNEMORALE)
+      categoriesToOmitRaw.push(Categories.NUMEROSIRETSIREN)
+    }
+
+    if (occultationsComplementaires.personnePhysicoMoraleGeoMorale !== true) {
+      categoriesToOmitRaw.push(Categories.PERSONNEMORALE)
+      categoriesToOmitRaw.push(Categories.LOCALITE)
+      categoriesToOmitRaw.push(Categories.NUMEROSIRETSIREN)
+    }
+
+    if (occultationsComplementaires.adresse !== true) {
+      categoriesToOmitRaw.push(Categories.ADRESSE)
+      categoriesToOmitRaw.push(Categories.LOCALITE)
+      categoriesToOmitRaw.push(Categories.ETABLISSEMENT)
+    }
+
+    if (occultationsComplementaires.dateCivile !== true) {
+      categoriesToOmitRaw.push(Categories.DATENAISSANCE)
+      categoriesToOmitRaw.push(Categories.DATEDECES)
+      categoriesToOmitRaw.push(Categories.DATEMARIAGE)
+    }
+
+    if (occultationsComplementaires.plaqueImmatriculation !== true) {
+      categoriesToOmitRaw.push(Categories.PLAQUEIMMATRICULATION)
+    }
+
+    if (occultationsComplementaires.cadastre !== true) {
+      categoriesToOmitRaw.push(Categories.CADASTRE)
+    }
+
+    if (occultationsComplementaires.chaineNumeroIdentifiante !== true) {
+      categoriesToOmitRaw.push(Categories.INSEE)
+      categoriesToOmitRaw.push(Categories.NUMEROIDENTIFIANT)
+      categoriesToOmitRaw.push(Categories.COMPTEBANCAIRE)
+      categoriesToOmitRaw.push(Categories.PLAQUEIMMATRICULATION)
+    }
+
+    if (occultationsComplementaires.coordonneeElectronique !== true) {
+      categoriesToOmitRaw.push(Categories.SITEWEBSENSIBLE)
+      categoriesToOmitRaw.push(Categories.TELEPHONEFAX)
+    }
+
+    if (occultationsComplementaires.professionnelMagistratGreffier !== true) {
+      categoriesToOmitRaw.push(Categories.PROFESSIONNELMAGISTRATGREFFIER)
+    }
+
+    const categoriesToOmit = categoriesToOmitRaw.filter(
+      (value, index, array) => array.indexOf(value) === index
+    )
+
+    console.info({
+      msg: `categoriesToOmit computed ${categoriesToOmit}`
+    })
+
+    if (occultationsComplementaires.conserverElement) {
+      for (let item of `${occultationsComplementaires.conserverElement}`.split('|')) {
+        item = item.trim()
+        if (item !== '') {
+          additionalTermsRaw.push(`+${item}`)
+        }
       }
     }
-  }
 
-  if (occultationsComplementaires.supprimerElement) {
-    for (let item of `${occultationsComplementaires.supprimerElement}`.split('|')) {
-      item = item.trim()
-      if (item !== '') {
-        additionalTermsRaw.push(item)
+    if (occultationsComplementaires.supprimerElement) {
+      for (let item of `${occultationsComplementaires.supprimerElement}`.split('|')) {
+        item = item.trim()
+        if (item !== '') {
+          additionalTermsRaw.push(item)
+        }
       }
     }
-  }
 
-  const additionalTerms = additionalTermsRaw
-    .filter((value, index, array) => array.indexOf(value) === index)
-    .join('|')
+    const additionalTerms = additionalTermsRaw
+      .filter((value, index, array) => array.indexOf(value) === index)
+      .join('|')
 
-  return {
-    additionalTerms,
-    categoriesToOmit,
-    motivationOccultation
+    console.info({
+      msg: `additionalTerms computed ${additionalTerms}`
+    })
+
+    return {
+      additionalTerms,
+      categoriesToOmit,
+      motivationOccultation
+    }
   }
 }
 

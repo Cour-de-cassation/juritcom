@@ -228,30 +228,18 @@ async function reprocessDecision(decision: DecisionTCOMDTO): Promise<boolean> {
       objectDecision.metadonnees &&
       `${objectDecision.metadonnees.idDecision}.json` === decision.filenameSource
     ) {
-      if (
-        decision.occultation.categoriesToOmit.includes(Categories.PERSONNEMORALE) === false ||
-        decision.occultation.categoriesToOmit.includes(Categories.NUMEROSIRETSIREN) === false ||
-        decision.occultation.categoriesToOmit.includes(
-          Categories.PROFESSIONNELMAGISTRATGREFFIER
-        ) === false
-      ) {
-        const oldOccultation = JSON.stringify(decision.occultation.categoriesToOmit)
-        const newOccultation = computeOccultation(objectDecision.metadonnees)
-        decision.occultation.additionalTerms = newOccultation.additionalTerms
-        decision.occultation.categoriesToOmit = newOccultation.categoriesToOmit
-        decision.occultation.motivationOccultation = newOccultation.motivationOccultation
-        decision.labelStatus = LabelStatus.TOBETREATED
-        delete decision._id
-        console.log(
-          `OLD: ${oldOccultation} --> NEW: ${JSON.stringify(decision.occultation.categoriesToOmit)}`
-        )
-        await saveDecision(decision)
-        return true
-      } else {
-        throw new Error(
-          `Keep occultations ${JSON.stringify(decision.occultation.categoriesToOmit)}`
-        )
-      }
+      const oldOccultation = JSON.stringify(decision.occultation.categoriesToOmit)
+      const newOccultation = computeOccultation(objectDecision.metadonnees)
+      decision.occultation.additionalTerms = newOccultation.additionalTerms
+      decision.occultation.categoriesToOmit = newOccultation.categoriesToOmit
+      decision.occultation.motivationOccultation = newOccultation.motivationOccultation
+      decision.labelStatus = LabelStatus.TOBETREATED
+      delete decision._id
+      console.log(
+        `OLD: ${oldOccultation} --> NEW: ${JSON.stringify(decision.occultation.categoriesToOmit)}`
+      )
+      await saveDecision(decision)
+      return true
     } else {
       throw new Error('Decision incomplete or ID mismatch')
     }

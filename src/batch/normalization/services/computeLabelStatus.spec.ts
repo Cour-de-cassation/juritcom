@@ -34,6 +34,7 @@ describe('updateLabelStatus', () => {
   })
 
   describe('changes labelStatus if it has exceptions', () => {
+    /*
     describe('returns ignored_juridictionEnPhaseDeTest', () => {
       it('when jurisdiction is not in whitelist', async () => {
         // GIVEN
@@ -55,6 +56,7 @@ describe('updateLabelStatus', () => {
         expect(mockDecisionLabel.labelStatus).toEqual(expectedLabelStatus)
       })
     })
+    */
 
     describe('returns ignored_decisionDateIncoherente', () => {
       it('when dateDecision is in the future compared to dateCreation', async () => {

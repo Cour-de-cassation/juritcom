@@ -2,11 +2,11 @@ import { Zoning, DecisionTCOMDTO, LabelStatus } from 'dbsder-api-types'
 import { logger } from '../index'
 import { LogsFormat } from '../../../shared/infrastructure/utils/logsFormat.utils'
 import { normalizationFormatLogs } from '../index'
-import { authorizedJurisdictions } from '../infrastructure/authorizedJurisdictionsList'
+// import { authorizedJurisdictions } from '../infrastructure/authorizedJurisdictionsList'
 import { ZoningApiService } from './zoningApi.service'
 
 const dateMiseEnService = getMiseEnServiceDate()
-const authorizedJurisdictionsSet = new Set(authorizedJurisdictions)
+// const authorizedJurisdictionsSet = new Set(authorizedJurisdictions)
 
 export async function computeLabelStatus(decisionDto: DecisionTCOMDTO): Promise<LabelStatus> {
   const dateCreation = new Date(decisionDto.dateCreation)
@@ -88,6 +88,7 @@ export async function computeLabelStatus(decisionDto: DecisionTCOMDTO): Promise<
     return LabelStatus.IGNORED_DATE_AVANT_MISE_EN_SERVICE
   }
 
+  /*
   if (isDecisionJurisdictionNotInWhiteList(decisionDto.jurisdictionId)) {
     logger.error({
       ...formatLogs,
@@ -97,6 +98,7 @@ export async function computeLabelStatus(decisionDto: DecisionTCOMDTO): Promise<
     })
     return LabelStatus.IGNORED_JURIDICTION_EN_PHASE_DE_TEST
   }
+  */
 
   return decisionDto.labelStatus
 }
@@ -109,9 +111,11 @@ function isDecisionOlderThanMiseEnService(dateDecision: Date): boolean {
   return dateDecision < dateMiseEnService
 }
 
+/*
 function isDecisionJurisdictionNotInWhiteList(jurisdictionId: string): boolean {
   return !authorizedJurisdictionsSet.has(jurisdictionId)
 }
+*/
 
 function getMiseEnServiceDate(): Date {
   if (!isNaN(new Date(process.env.COMMISSIONING_DATE).getTime())) {

@@ -74,7 +74,9 @@ export function computeOccultation(metadonnees: MetadonneeDto): DecisionOccultat
   if (occultationsDataAreEmpty(occultationsComplementaires)) {
     logger.warn({
       ...formatLogs,
-      msg: `Empty occultations form received, applying the default "bloc 3" signature`
+      msg: `Empty occultations form received, applying the default "bloc 3" signature`,
+      idJuridiction: metadonnees.idJuridiction,
+      libelleJuridiction: metadonnees.libelleJuridiction
     })
 
     return {

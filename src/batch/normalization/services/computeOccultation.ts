@@ -46,10 +46,16 @@ function occultationsDataAreEmpty(
   if (occultationsComplementaires.motifsSecretAffaires === true) {
     return false
   }
-  if (isNonEmptyString(occultationsComplementaires.conserverElement)) {
+  if (
+    occultationsComplementaires.conserverElement &&
+    isNonEmptyString(occultationsComplementaires.conserverElement)
+  ) {
     return false
   }
-  if (isNonEmptyString(occultationsComplementaires.supprimerElement)) {
+  if (
+    occultationsComplementaires.supprimerElement &&
+    isNonEmptyString(occultationsComplementaires.supprimerElement)
+  ) {
     return false
   }
   return true

@@ -163,14 +163,18 @@ export async function processDeletion() {
         logger.warn({
           operationName: 'processTCOMDeletionNotifyLabel',
           msg: `TCOM decision ${deletionRequests[i].s3Key} (sourceId: ${deletionRequests[i].sourceId}) should be removed from Label`,
-          data: deletionRequests[i]
+          data: deletionRequests[i],
+          idJuridiction: decision.jurisdictionId,
+          libelleJuridiction: decision.jurisdictionName
         })
       }
       if (unpublishFromJudilibre) {
         logger.warn({
           operationName: 'processTCOMDeletionNotifyJudilibre',
           msg: `TCOM decision ${deletionRequests[i].s3Key} (sourceId: ${deletionRequests[i].sourceId}) should be unpublished from Judilibre`,
-          data: deletionRequests[i]
+          data: deletionRequests[i],
+          idJuridiction: decision.jurisdictionId,
+          libelleJuridiction: decision.jurisdictionName
         })
       }
       logger.log({

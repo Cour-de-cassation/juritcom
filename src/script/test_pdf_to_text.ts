@@ -27,6 +27,10 @@ async function main(id: string) {
     const input = response.data.markdownText
     const htmlText = new Marked({ gfm: true, breaks: true }).parse(input, { async: false })
 
+    console.log('---HTML BEGIN---')
+    console.log(JSON.stringify(htmlText))
+    console.log('---HTML END---')
+
     // Remove any HTML stuff:
     // 1. HTML elements:
     let plainText = decode(htmlText)
@@ -68,6 +72,14 @@ async function main(id: string) {
           options: {
             ignoreHref: true
           }
+        },
+        {
+          selector: 'img',
+          format: 'skip'
+        },
+        {
+          selector: 'a',
+          format: 'skip'
         },
         {
           selector: 'h1',
@@ -113,7 +125,10 @@ async function main(id: string) {
     plainText = plainText.replace(/\n\n/gm, '\n')
     plainText = plainText.trim()
 
+    console.log('---TXT BEGIN---')
     console.log(JSON.stringify(plainText))
+    console.log('---TXT END---')
+
     // console.log(response.status)
     // console.log(response.statusText)
     // console.log(`PDF type: ${response.data.pdfType}`)

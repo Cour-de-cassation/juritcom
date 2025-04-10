@@ -68,6 +68,12 @@ async function main(id: string) {
       preserveNewlines: true,
       selectors: [
         {
+          selector: '*',
+          options: {
+            ignoreHref: true
+          }
+        },
+        {
           selector: 'img',
           format: 'skip'
         },

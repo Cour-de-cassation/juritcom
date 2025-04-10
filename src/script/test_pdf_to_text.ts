@@ -5,8 +5,6 @@ import { Marked } from 'marked'
 import { decode } from 'html-entities'
 import { convert } from 'html-to-text'
 
-// 7202_2024000142_2025-04-08_10
-
 async function main(id: string) {
   const pdf: Buffer = await getPDFByFilename(`${id}.pdf`)
   const formdata: FormData = new FormData()
@@ -70,10 +68,12 @@ async function main(id: string) {
       preserveNewlines: true,
       selectors: [
         {
-          selector: '*',
-          options: {
-            ignoreHref: true
-          }
+          selector: 'img',
+          format: 'skip'
+        },
+        {
+          selector: 'a',
+          format: 'skip'
         },
         {
           selector: 'h1',

@@ -143,6 +143,14 @@ export function markdownToPlainText(input: string): string {
         }
       },
       {
+        selector: 'img',
+        format: 'skip'
+      },
+      {
+        selector: 'a',
+        format: 'skip'
+      },
+      {
         selector: 'h1',
         options: {
           uppercase: false

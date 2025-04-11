@@ -6,6 +6,8 @@ import {
   MetadonneeDto
 } from '../../../shared/infrastructure/dto/metadonnee.dto'
 
+const jurisdictionsWithErroneousOccultations = ['7501']
+
 function isNonEmptyString(str: string | undefined): str is string {
   return typeof str === 'string' && str.trim() !== ''
 }
@@ -71,7 +73,10 @@ export function computeOccultation(metadonnees: MetadonneeDto): DecisionOccultat
     msg: 'Starting computeOccultation...'
   }
 
-  if (occultationsDataAreEmpty(occultationsComplementaires)) {
+  if (
+    jurisdictionsWithErroneousOccultations.includes(metadonnees.idJuridiction) &&
+    occultationsDataAreEmpty(occultationsComplementaires)
+  ) {
     logger.warn({
       ...formatLogs,
       msg: `Empty occultations form received, applying the default "bloc 3" signature`,

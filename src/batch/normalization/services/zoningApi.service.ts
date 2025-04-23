@@ -8,7 +8,6 @@ import {
   UnprocessableEntityException
 } from '@nestjs/common'
 import { Sources, Zoning, DecisionTCOMDTO } from 'dbsder-api-types'
-import curlirize from 'axios-curlirize'
 
 export class ZoningApiService {
   private readonly logger = new Logger()
@@ -20,8 +19,6 @@ export class ZoningApiService {
         msg: 'Call to zoning API is disabled by env variable. Skiping.'
       })
     } else {
-      curlirize(axios)
-
       let zonageSource: string
       switch (decision.sourceName) {
         case Sources.CC:
@@ -44,6 +41,12 @@ export class ZoningApiService {
         text: decision.originalText
       })
       const zoningApiUrl = process.env.ZONING_API_URL
+
+      this.logger.log({
+        operationName: 'getDecisionZoning',
+        msg: 'Calling Zoning API',
+        data: zoningRequestParameters
+      })
 
       const result = await axios({
         data: zoningRequestParameters,

@@ -8,6 +8,7 @@ import {
   UnprocessableEntityException
 } from '@nestjs/common'
 import { Sources, Zoning, DecisionTCOMDTO } from 'dbsder-api-types'
+import curlirize from 'axios-curlirize'
 
 export class ZoningApiService {
   private readonly logger = new Logger()
@@ -19,6 +20,8 @@ export class ZoningApiService {
         msg: 'Call to zoning API is disabled by env variable. Skiping.'
       })
     } else {
+      curlirize(axios)
+
       let zonageSource: string
       switch (decision.sourceName) {
         case Sources.CC:

@@ -101,8 +101,14 @@ export function markdownToPlainText(input: string): string {
   let plainText = new Marked({ gfm: true, breaks: true }).parse(input, { async: false })
 
   // Remove any HTML stuff:
-  // 1. HTML elements:
+  // 1.a HTML elements:
   plainText = decode(plainText)
+  // 1.b Remove every <html> tag:
+  plainText = plainText.replace(/<html>/gim, '\n')
+  plainText = plainText.replace(/<\/html>/gim, '\n')
+  // 1.c Remove every <body> tag:
+  plainText = plainText.replace(/<body>/gim, '\n')
+  plainText = plainText.replace(/<\/body>/gim, '\n')
   // 2. insert a space at the end of every table cell:
   plainText = plainText.replace(/<\/td>/gim, ' </td>')
   // 3.a. add a \n after each <br>:

@@ -34,6 +34,9 @@ async function main(id: string) {
     // Remove any HTML stuff:
     // 1. HTML elements:
     let plainText = decode(htmlText)
+    console.log('---PLAINTEXT 0 BEGIN---')
+    console.log(JSON.stringify(plainText))
+    console.log('---PLAINTEXT 0 END---')
     // 2. insert a space at the end of every table cell:
     plainText = plainText.replace(/<\/td>/gim, ' </td>')
     // 3.a. add a \n after each <br>:
@@ -62,6 +65,9 @@ async function main(id: string) {
     plainText = plainText.replace(/<\/li>/gim, '</li>\n')
     // 4. remove extra \n
     plainText = plainText.replace(/\n+/gm, '\n')
+    console.log('---PLAINTEXT 1 BEGIN---')
+    console.log(JSON.stringify(plainText))
+    console.log('---PLAINTEXT 1 END---')
     // 5. convert:
     plainText = convert(plainText, {
       wordwrap: false,
@@ -119,6 +125,9 @@ async function main(id: string) {
         }
       ]
     })
+    console.log('---PLAINTEXT 2 BEGIN---')
+    console.log(JSON.stringify(plainText))
+    console.log('---PLAINTEXT 2 END---')
     // 6. remove every tag that could remain:
     plainText = plainText.replace(/<\/?[^>]+(>|$)/gm, '')
     // 7. remove extra \n again (after tag collapsing)

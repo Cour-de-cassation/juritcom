@@ -14,7 +14,7 @@ import { sdkStreamMixin } from '@smithy/util-stream'
 import { DbSderApiGateway } from './repositories/gateways/dbsderApi.gateway'
 import { InfrastructureException } from '../../shared/infrastructure/exceptions/infrastructure.exception'
 // import { LabelStatus } from 'dbsder-api-types'
-import { CollectDto } from 'src/shared/infrastructure/dto/collect.dto'
+import { CollectDto } from '../../shared/infrastructure/dto/collect.dto'
 // import { ConvertedDecisionWithMetadonneesDto } from 'src/shared/infrastructure/dto/convertedDecisionWithMetadonnees.dto'
 
 jest.mock('./index', () => ({

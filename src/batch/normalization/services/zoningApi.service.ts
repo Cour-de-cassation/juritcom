@@ -42,12 +42,6 @@ export class ZoningApiService {
       })
       const zoningApiUrl = process.env.ZONING_API_URL
 
-      this.logger.log({
-        operationName: 'getDecisionZoning',
-        msg: 'Calling Zoning API',
-        data: zoningRequestParameters
-      })
-
       const result = await axios({
         data: zoningRequestParameters,
         headers: { 'Content-Type': 'application/json' },

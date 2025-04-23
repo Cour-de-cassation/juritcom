@@ -200,12 +200,18 @@ export function markdownToPlainText(input: string): string {
   plainText = plainText.replace(/\n\n/gm, '\n')
   plainText = plainText.trim()
 
-  if (!plainText || isEmptyText(plainText)) {
-    const error = new InfrastructureException('Le texte retourné est vide')
+  if (!plainText || isEmptyText(plainText) || hasNoBreak(plainText)) {
+    const error = new InfrastructureException(
+      'Le texte retourné est vide ou potentiellement incomplet'
+    )
     const formatLogs: LogsFormat = {
       ...normalizationFormatLogs,
       operationName: 'markdownToPlainText',
-      msg: error.message
+      msg: error.message,
+      data: {
+        input: input,
+        output: plainText
+      }
     }
     logger.error({
       ...formatLogs
@@ -218,4 +224,9 @@ export function markdownToPlainText(input: string): string {
 export function isEmptyText(text: string): boolean {
   text = `${text}`.replace(/[\t\s\r\n]/gm, '').trim()
   return text.length === 0
+}
+
+export function hasNoBreak(text: string): boolean {
+  const hasBreak = `${text}`.includes('\n')
+  return hasBreak === false
 }

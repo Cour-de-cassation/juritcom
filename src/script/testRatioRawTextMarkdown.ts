@@ -124,6 +124,15 @@ async function main() {
       const plainTextLen = plainText.trim().length
       const markdownTextLen = markdownText.trim().length
       const diff = Math.abs(plainTextLen - markdownTextLen)
+      if (diff > 1000) {
+        console.log('\n*=*=*=*=*=*=*=*=*=*=*\n')
+        console.log(items[i])
+        console.log('* * * * * * * * * * *')
+        console.log(markdownText)
+        console.log('* * * * * * * * * * *')
+        console.log(plainText)
+        console.log('\n*=*=*=*=*=*=*=*=*=*=*\n')
+      }
       if (init === true) {
         init = false
         max = diff

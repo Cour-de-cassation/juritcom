@@ -48,13 +48,13 @@ import { DecisionS3Repository } from '../../../../shared/infrastructure/reposito
 import { JwtAuthGuard } from '../../../../shared/infrastructure/security/auth/auth.guard'
 
 const FILE_MAX_SIZE = {
-  size: 10000000,
-  readSize: '10Mo'
+  size: 31457280,
+  readSize: '30Mo'
 } as const
 
 const MULTER_OPTIONS = {
   limits: {
-    fieldSize: 4 * 1024 * 1024 // 4 Mo
+    fieldSize: 10 * 1024 * 1024 // 10 Mo
   }
 } as MulterOptions
 

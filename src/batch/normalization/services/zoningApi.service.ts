@@ -7,12 +7,12 @@ import {
   ServiceUnavailableException,
   UnprocessableEntityException
 } from '@nestjs/common'
-import { Sources, Zoning, DecisionTCOMDTO } from 'dbsder-api-types'
+import { UnIdentifiedDecisionTcom } from 'dbsder-api-types'
 
 export class ZoningApiService {
   private readonly logger = new Logger()
 
-  async getDecisionZoning(decision: DecisionTCOMDTO): Promise<Zoning> {
+  async getDecisionZoning(decision: UnIdentifiedDecisionTcom): Promise<UnIdentifiedDecisionTcom["zoning"]> {
     if (process.env.ZONING_DISABLED === 'true') {
       this.logger.warn({
         operationName: 'getDecisionZoning',
@@ -21,18 +21,11 @@ export class ZoningApiService {
     } else {
       let zonageSource: string
       switch (decision.sourceName) {
-        case Sources.CC:
-          zonageSource = 'cc'
-          break
-        case Sources.CA:
-          zonageSource = 'ca'
-          break
-        case Sources.TJ:
-          zonageSource = 'tj'
-          break
-        case Sources.TCOM:
+        case 'juritcom':
           zonageSource = 'tcom'
           break
+        default:
+          throw new BadRequestException(`Juritcom cannot handle this sourcename: ${decision.sourceName}`)
       }
 
       const zoningRequestParameters = JSON.stringify({

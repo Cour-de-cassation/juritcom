@@ -17,6 +17,7 @@ import {
   isEmptyText
 } from './services/PDFToText'
 import { PostponeException } from './infrastructure/nlp.exception'
+import { incrementErrorCount, resetErrorCount } from './errorCounter/errorCounter'
 
 const dbSderApiGateway = new DbSderApiGateway()
 const bucketNameIntegre = process.env.S3_BUCKET_NAME_RAW
@@ -57,13 +58,23 @@ export async function normalizationJob(): Promise<ConvertedDecisionWithMetadonne
             // 3. Store NLP data in -pdf-success bucket:
             await s3Repository.archiveSuccessPDF(NLPData, pdfFilename)
           } catch (error) {
-            if (error instanceof PostponeException === false) {
+            const errorCount = incrementErrorCount(pdfFilename)
+            logger.info({
+              ...normalizationFormatLogs,
+              msg: `NLPPDFToText error count ${errorCount} for decision ${pdfFilename}`
+            })
+            if (errorCount >= 3 || error instanceof PostponeException === false) {
+              logger.info({
+                ...normalizationFormatLogs,
+                msg: `NLPPDFToText error limit reached, move decision ${pdfFilename} to pdf-failed bucket`
+              })
               // *Move* failed PDF to pdf-failed bucket:
               await s3Repository.archiveFailedPDF(pdfFile, pdfFilename)
               await s3Repository.deleteDecision({
                 Bucket: process.env.S3_BUCKET_NAME_PDF,
                 Key: pdfFilename
               })
+              resetErrorCount(pdfFilename)
             }
             throw error
           }
@@ -169,9 +180,9 @@ export async function normalizationJob(): Promise<ConvertedDecisionWithMetadonne
         })
         // To avoid too many request errors (as in Label):
         if (error instanceof PostponeException) {
-          await new Promise((_) => setTimeout(_, 15 * 1000))
+          await new Promise((_) => setTimeout(_, 20 * 1000))
         } else {
-          await new Promise((_) => setTimeout(_, 5 * 1000))
+          await new Promise((_) => setTimeout(_, 10 * 1000))
         }
         continue
       }

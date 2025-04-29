@@ -1,6 +1,6 @@
 import fs from 'fs'
 
-const errorCountFileName = '/tmp/errorCounter.json'
+const errorCountFileName = '/home/node/errorCounter.json'
 
 export function incrementErrorCount(pdfFilename: string): number {
   let errorCountData = {}

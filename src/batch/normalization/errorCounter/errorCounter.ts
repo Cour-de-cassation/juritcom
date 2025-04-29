@@ -1,7 +1,6 @@
 import fs from 'fs'
-import path from 'path'
 
-const errorCountFileName = path.normalize('/tmp/errorCounter.json')
+const errorCountFileName = '/tmp/errorCounter.json'
 
 export function incrementErrorCount(pdfFilename: string): number {
   let errorCountData = {}

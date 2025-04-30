@@ -123,6 +123,7 @@ export async function normalizationJob(): Promise<ConvertedDecisionWithMetadonne
         decisionToSave.occultation = computeOccultation(decision.metadonnees)
 
         // Step 7: Save decision in database
+        console.dir(decisionToSave, { depth: null })
         await dbSderApiGateway.saveDecision(decisionToSave)
         logger.info({ ...normalizationFormatLogs, msg: 'Decision saved in database' })
 

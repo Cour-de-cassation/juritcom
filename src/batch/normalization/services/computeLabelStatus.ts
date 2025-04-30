@@ -1,4 +1,4 @@
-import { Zoning, DecisionTCOMDTO, LabelStatus } from 'dbsder-api-types'
+import { UnIdentifiedDecisionTcom, LabelStatus } from 'dbsder-api-types'
 import { logger } from '../index'
 import { LogsFormat } from '../../../shared/infrastructure/utils/logsFormat.utils'
 import { normalizationFormatLogs } from '../index'
@@ -8,7 +8,7 @@ import { ZoningApiService } from './zoningApi.service'
 const dateMiseEnService = getMiseEnServiceDate()
 // const authorizedJurisdictionsSet = new Set(authorizedJurisdictions)
 
-export async function computeLabelStatus(decisionDto: DecisionTCOMDTO): Promise<LabelStatus> {
+export async function computeLabelStatus(decisionDto: UnIdentifiedDecisionTcom): Promise<LabelStatus> {
   const dateCreation = new Date(decisionDto.dateCreation)
   const dateDecision = new Date(decisionDto.dateDecision)
   const zoningApiService: ZoningApiService = new ZoningApiService()
@@ -40,7 +40,7 @@ export async function computeLabelStatus(decisionDto: DecisionTCOMDTO): Promise<
   }
 
   try {
-    const decisionZoning: Zoning = await zoningApiService.getDecisionZoning(decisionDto)
+    const decisionZoning: UnIdentifiedDecisionTcom["zoning"] = await zoningApiService.getDecisionZoning(decisionDto)
     decisionDto.originalTextZoning = decisionZoning
     if (decisionZoning.is_public === 0) {
       logger.error({

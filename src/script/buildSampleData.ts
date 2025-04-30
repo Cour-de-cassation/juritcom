@@ -52,7 +52,7 @@ async function job() {
 
       // Step 5: Map decisionNormalized to Judilibre API
       const decisionPublished: any = {}
-      decisionPublished.id = decisionNormalized._id
+      decisionPublished.id = undefined
       decisionPublished.version = 1.0
       decisionPublished.source = decisionNormalized.sourceName
       decisionPublished.sourceId = `${decisionNormalized.sourceId}`

@@ -1,5 +1,5 @@
 import { ArgumentMetadata } from '@nestjs/common'
-import { QualitePartie, TypePartie } from 'dbsder-api-types'
+import { QualitePartieExhaustive, TypePartieExhaustive } from 'dbsder-api-types'
 import { MockUtils } from '../utils/mock.utils'
 import { ValidateDtoPipe } from '../../../api/infrastructure/pipes/validateDto.pipe'
 import { BadPropertiesException } from '../../../api/infrastructure/exceptions/missingProperties.exception'
@@ -211,7 +211,7 @@ describe('Validate MetadonneeDTO format', () => {
     it('throws an error when type property on parties does not have valid value', async () => {
       // GIVEN
       const invalidPartieMock = mockUtils.partieDtoMock
-      invalidPartieMock.type = 'A' as TypePartie
+      invalidPartieMock.type = 'A' as TypePartieExhaustive
       const partiesWithMandatoryFields = [invalidPartieMock]
 
       const invalidMetadonnee = {
@@ -227,7 +227,7 @@ describe('Validate MetadonneeDTO format', () => {
     it('throws an error when qualite property on parties does not have valid value', async () => {
       // GIVEN
       const invalidPartieMock = mockUtils.partieDtoMock
-      invalidPartieMock.qualite = 'A' as QualitePartie
+      invalidPartieMock.qualite = 'A' as QualitePartieExhaustive
       const partiesWithMandatoryFields = [invalidPartieMock]
 
       const invalidMetadonnee = {

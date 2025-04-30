@@ -52,7 +52,7 @@ async function main(jurisdiction: string) {
 }
 
 async function listDecisions(source: string, jurisdiction: string) {
-  const urlToCall = process.env.DBSDER_API_URL + '/v1/decisions'
+  const urlToCall = process.env.DBSDER_API_URL + '/decisions'
   const params: any = {
     sourceName: source
   }
@@ -106,7 +106,7 @@ async function listDecisions(source: string, jurisdiction: string) {
 }
 
 async function getDecisionById(id: string): Promise<DecisionTcom> {
-  const urlToCall = process.env.DBSDER_API_URL + `/v1/decisions/${id}`
+  const urlToCall = process.env.DBSDER_API_URL + `/decisions/${id}`
 
   const result = await axios
     .get(urlToCall, {

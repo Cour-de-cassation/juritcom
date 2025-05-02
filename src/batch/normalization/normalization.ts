@@ -17,6 +17,7 @@ import {
   isEmptyText
 } from './services/PDFToText'
 import { PostponeException } from './infrastructure/nlp.exception'
+import { incrementErrorCount, resetErrorCount } from './errorCounter/errorCounter'
 
 const dbSderApiGateway = new DbSderApiGateway()
 const bucketNameIntegre = process.env.S3_BUCKET_NAME_RAW
@@ -33,7 +34,8 @@ export async function normalizationJob(): Promise<ConvertedDecisionWithMetadonne
     for (const decisionFilename of decisionList) {
       try {
         const jobId = uuidv4()
-        normalizationFormatLogs.correlationId = jobId
+        const currentNormalizationFormatLogs = JSON.parse(JSON.stringify(normalizationFormatLogs))
+        currentNormalizationFormatLogs.correlationId = jobId
 
         // Step 1: Fetch decision from S3
         const decision = await s3Repository.getDecisionByFilename(decisionFilename)
@@ -57,19 +59,29 @@ export async function normalizationJob(): Promise<ConvertedDecisionWithMetadonne
             // 3. Store NLP data in -pdf-success bucket:
             await s3Repository.archiveSuccessPDF(NLPData, pdfFilename)
           } catch (error) {
-            if (error instanceof PostponeException === false) {
+            const errorCount = incrementErrorCount(pdfFilename)
+            logger.info({
+              ...currentNormalizationFormatLogs,
+              msg: `NLPPDFToText error count ${errorCount} for decision ${pdfFilename}`
+            })
+            if (errorCount >= 3 || error instanceof PostponeException === false) {
+              logger.info({
+                ...currentNormalizationFormatLogs,
+                msg: `NLPPDFToText error limit reached, move decision ${pdfFilename} to pdf-failed bucket`
+              })
               // *Move* failed PDF to pdf-failed bucket:
               await s3Repository.archiveFailedPDF(pdfFile, pdfFilename)
               await s3Repository.deleteDecision({
                 Bucket: process.env.S3_BUCKET_NAME_PDF,
                 Key: pdfFilename
               })
+              resetErrorCount(pdfFilename)
             }
             throw error
           }
 
           logger.info({
-            ...normalizationFormatLogs,
+            ...currentNormalizationFormatLogs,
             msg: 'Plain text extracted by NLP API from collected PDF file'
           })
         } else {
@@ -80,7 +92,7 @@ export async function normalizationJob(): Promise<ConvertedDecisionWithMetadonne
           }
 
           logger.info({
-            ...normalizationFormatLogs,
+            ...currentNormalizationFormatLogs,
             msg: 'Plain text from collected texteDecisionIntegre property'
           })
         }
@@ -89,21 +101,21 @@ export async function normalizationJob(): Promise<ConvertedDecisionWithMetadonne
         const decisionFromS3Clone = JSON.parse(JSON.stringify(decision))
 
         logger.info({
-          ...normalizationFormatLogs,
+          ...currentNormalizationFormatLogs,
           msg: 'Starting normalization of ' + decisionFilename
         })
 
         // Step 4: Generating unique id for decision
         const _id = decision.metadonnees.idDecision
-        normalizationFormatLogs.data = { decisionId: _id }
+        currentNormalizationFormatLogs.data = { decisionId: _id }
 
-        logger.info({ ...normalizationFormatLogs, msg: 'Generated unique id for decision' })
+        logger.info({ ...currentNormalizationFormatLogs, msg: 'Generated unique id for decision' })
 
         // Step 5: Removing or replace (by other thing) unnecessary characters from decision
         const cleanedDecision = removeOrReplaceUnnecessaryCharacters(decision.texteDecisionIntegre)
 
         logger.info({
-          ...normalizationFormatLogs,
+          ...currentNormalizationFormatLogs,
           msg: 'Removed unnecessary characters'
         })
 
@@ -124,7 +136,7 @@ export async function normalizationJob(): Promise<ConvertedDecisionWithMetadonne
 
         // Step 7: Save decision in database
         await dbSderApiGateway.saveDecision(decisionToSave)
-        logger.info({ ...normalizationFormatLogs, msg: 'Decision saved in database' })
+        logger.info({ ...currentNormalizationFormatLogs, msg: 'Decision saved in database' })
 
         // Step 8: Save decision in normalized bucket
         await s3Repository.saveDecisionNormalisee(
@@ -133,12 +145,12 @@ export async function normalizationJob(): Promise<ConvertedDecisionWithMetadonne
         )
 
         logger.info({
-          ...normalizationFormatLogs,
+          ...currentNormalizationFormatLogs,
           msg: 'Decision saved in normalized bucket. Deleting decision in raw bucket'
         })
 
         logger.info({
-          ...normalizationFormatLogs,
+          ...currentNormalizationFormatLogs,
           msg: 'Decision saved in normalized bucket. Deleting decision in raw bucket'
         })
 
@@ -150,7 +162,7 @@ export async function normalizationJob(): Promise<ConvertedDecisionWithMetadonne
         await s3Repository.deleteDecision(reqParamsDelete)
 
         logger.info({
-          ...normalizationFormatLogs,
+          ...currentNormalizationFormatLogs,
           msg: 'Successful normalization of ' + decisionFilename
         })
         listConvertedDecision.push({
@@ -169,9 +181,9 @@ export async function normalizationJob(): Promise<ConvertedDecisionWithMetadonne
         })
         // To avoid too many request errors (as in Label):
         if (error instanceof PostponeException) {
-          await new Promise((_) => setTimeout(_, 15 * 1000))
+          await new Promise((_) => setTimeout(_, 20 * 1000))
         } else {
-          await new Promise((_) => setTimeout(_, 5 * 1000))
+          await new Promise((_) => setTimeout(_, 10 * 1000))
         }
         continue
       }

@@ -28,27 +28,31 @@ async function main() {
     try {
       const decision = await getDecisionBySourceId(deletionRequests[i].sourceId)
       if (decision !== null) {
-        let unpublishFromJudilibre = false
-        let removeFromLabel = false
-        if (decision.labelStatus === 'toBeTreated' || decision.labelStatus === 'done') {
-          if (decision.publishDate !== null) {
+        const deletionAfterLastImport =
+          deletionRequests[i].deletionDate.getTime() > new Date(decision.lastImportDate).getTime()
+        if (deletionAfterLastImport === true) {
+          let unpublishFromJudilibre = false
+          let removeFromLabel = false
+          if (decision.labelStatus === 'toBeTreated' || decision.labelStatus === 'done') {
+            if (decision.publishDate !== null) {
+              unpublishFromJudilibre = true
+            }
+          } else if (decision.labelStatus === 'loaded') {
+            removeFromLabel = true
+            if (decision.publishDate !== null) {
+              unpublishFromJudilibre = true
+            }
+          } else if (decision.labelStatus === 'exported') {
             unpublishFromJudilibre = true
           }
-        } else if (decision.labelStatus === 'loaded') {
-          removeFromLabel = true
-          if (decision.publishDate !== null) {
-            unpublishFromJudilibre = true
+          if (unpublishFromJudilibre === true) {
+            unpublishFromJudilibreIds.push(`${decision._id}`)
           }
-        } else if (decision.labelStatus === 'exported') {
-          unpublishFromJudilibre = true
-        }
-        if (unpublishFromJudilibre === true) {
-          unpublishFromJudilibreIds.push(`${decision._id}`)
-        }
-        if (removeFromLabel === true) {
-          removeFromLabelIds.push(
-            `--documentNumber ${decision.sourceId} --source ${decision.sourceName}`
-          )
+          if (removeFromLabel === true) {
+            removeFromLabelIds.push(
+              `--documentNumber ${decision.sourceId} --source ${decision.sourceName}`
+            )
+          }
         }
       }
     } catch (e) {

@@ -124,7 +124,7 @@ async function getDeletionRequest(key: string): Promise<any> {
     }
   })
   const reqParams = {
-    Bucket: process.env.S3_BUCKET_NAME_DELETION,
+    Bucket: process.env.S3_BUCKET_NAME_DELETION_PROCESSED,
     Key: key
   }
   const deletionFromS3 = await s3Client.send(new GetObjectCommand(reqParams))

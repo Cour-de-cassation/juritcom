@@ -79,7 +79,7 @@ async function listDeletionRequests(): Promise<Array<any>> {
   let marker = null
   while (done === false) {
     const reqParams = {
-      Bucket: process.env.S3_BUCKET_NAME_DELETION,
+      Bucket: process.env.S3_BUCKET_NAME_DELETION_PROCESSED,
       Marker: undefined
     }
     if (marker !== null) {

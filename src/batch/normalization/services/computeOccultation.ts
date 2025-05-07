@@ -6,7 +6,7 @@ import {
   MetadonneeDto
 } from '../../../shared/infrastructure/dto/metadonnee.dto'
 
-const jurisdictionsWithErroneousOccultations = ['7501']
+const jurisdictionsWithErroneousOccultations = []
 
 function isNonEmptyString(str: string | undefined): str is string {
   return typeof str === 'string' && str.trim() !== ''

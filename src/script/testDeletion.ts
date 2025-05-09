@@ -30,7 +30,9 @@ async function main() {
       if (decision !== null) {
         const deletionAfterLastImport =
           deletionRequests[i].deletionDate.getTime() > new Date(decision.lastImportDate).getTime()
-        if (deletionAfterLastImport === true) {
+        const deletionAfterLastOperation =
+          deletionRequests[i].deletionDate.getTime() > new Date('2025-05-07T17:00:00').getTime()
+        if (deletionAfterLastImport === true && deletionAfterLastOperation === true) {
           let unpublishFromJudilibre = false
           let removeFromLabel = false
           if (decision.labelStatus === 'toBeTreated' || decision.labelStatus === 'done') {

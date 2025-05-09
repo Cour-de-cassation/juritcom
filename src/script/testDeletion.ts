@@ -52,7 +52,7 @@ async function main(date: string) {
           }
           if (removeFromLabel === true) {
             removeFromLabelIds.push(
-              `--documentNumber ${decision.sourceId} --source ${decision.sourceName}`
+              `kubectl exec -it -n label \`kubectl -n label get pods | grep label-backend-deployment-\` -- sh -c "sh ./scripts/runProdScript.sh ./dist/scripts/deleteDocument.js --source=${decision.sourceName} --documentNumber=${decision.sourceId}"`
             )
           }
         }
@@ -65,9 +65,11 @@ async function main(date: string) {
     }
   }
   console.log(`unpublish from Judilibre (${unpublishFromJudilibreIds.length}):`)
-  console.log(unpublishFromJudilibreIds.join(','))
+  console.log(
+    `kubectl exec -it -n judilibre-sder \`kubectl -n judilibre-sder get pods | grep judilibre-sder-deployment-\` -- sh -c "node ./src/scripts/deleteFromJudilibre.js ${unpublishFromJudilibreIds.join(',')}"`
+  )
   console.log(`remove from Label (${removeFromLabelIds.length}):`)
-  console.log(removeFromLabelIds.join('\n'))
+  console.log(removeFromLabelIds.join(';'))
 }
 
 async function listDeletionRequests(): Promise<Array<any>> {

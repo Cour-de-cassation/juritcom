@@ -20,7 +20,7 @@ import {
 
 import axios from 'axios'
 
-async function main() {
+async function main(date: string) {
   const unpublishFromJudilibreIds = []
   const removeFromLabelIds = []
   const deletionRequests = await listDeletionRequests()
@@ -31,7 +31,7 @@ async function main() {
         const deletionAfterLastImport =
           deletionRequests[i].deletionDate.getTime() > new Date(decision.lastImportDate).getTime()
         const deletionAfterLastOperation =
-          deletionRequests[i].deletionDate.getTime() > new Date('2025-05-07T17:00:00').getTime()
+          deletionRequests[i].deletionDate.getTime() > new Date(date).getTime()
         if (deletionAfterLastImport === true && deletionAfterLastOperation === true) {
           let unpublishFromJudilibre = false
           let removeFromLabel = false
@@ -242,4 +242,4 @@ async function getDecisionById(id: string) {
   return result.data
 }
 
-main()
+main(process.argv[2])

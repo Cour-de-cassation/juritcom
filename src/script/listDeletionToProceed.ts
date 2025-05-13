@@ -20,7 +20,11 @@ import {
 
 import axios from 'axios'
 
-async function main(date: string) {
+async function main(datetime: string) {
+  if (!datetime) {
+    throw new Error('Usage: listDeletionToProceed.js <datetime>\nThis script displays the commands that must be manually executed in order to proceed to the deletion requests (on Label and Judilibre) received since the given datetime:\nlistDeletionToProceed.js 2025-05-07T10:00:00')
+  }
+
   const unpublishFromJudilibreIds = []
   const removeFromLabelIds = []
   const deletionRequests = await listDeletionRequests()
@@ -31,7 +35,7 @@ async function main(date: string) {
         const deletionAfterLastImport =
           deletionRequests[i].deletionDate.getTime() > new Date(decision.lastImportDate).getTime()
         const deletionAfterLastOperation =
-          deletionRequests[i].deletionDate.getTime() > new Date(date).getTime()
+          deletionRequests[i].deletionDate.getTime() > new Date(datetime).getTime()
         if (deletionAfterLastImport === true && deletionAfterLastOperation === true) {
           let unpublishFromJudilibre = false
           let removeFromLabel = false
@@ -64,11 +68,11 @@ async function main(date: string) {
       )
     }
   }
-  console.log(`unpublish from Judilibre (${unpublishFromJudilibreIds.length}):`)
+  console.log(`To unpublish from Judilibre (${unpublishFromJudilibreIds.length}):`)
   console.log(
     `kubectl exec -it -n judilibre-sder \`kubectl -n judilibre-sder get pods | grep judilibre-sder-deployment-\` -- sh -c "node ./src/scripts/deleteFromJudilibre.js ${unpublishFromJudilibreIds.join(',')}"`
   )
-  console.log(`remove from Label (${removeFromLabelIds.length}):`)
+  console.log(`To remove from Label (${removeFromLabelIds.length}):`)
   console.log(removeFromLabelIds.join(';'))
 }
 

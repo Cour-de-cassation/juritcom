@@ -6,6 +6,12 @@ import { decode } from 'html-entities'
 import { convert } from 'html-to-text'
 
 async function main(id: string) {
+  if (!id) {
+    throw new Error(
+      'Usage: testPDFToText.js <bucketId>\nThis script allows to debug the pdf-to-text process for the given decision stored in the juritcom-bucket-pdf S3 bucket:\testPDFToText.js 0605_2024G00010_2024-09-13_2'
+    )
+  }
+
   const pdf: Buffer = await getPDFByFilename(`${id}.pdf`)
   const formdata: FormData = new FormData()
   formdata.append('pdf_file', pdf, `${id}.pdf`)

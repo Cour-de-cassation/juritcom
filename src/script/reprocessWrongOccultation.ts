@@ -24,7 +24,9 @@ import axios from 'axios'
 
 async function main(jurisdiction: string) {
   if (!jurisdiction) {
-    throw new Error('Usage: reprocessWrongOccultation.js <jurisdiction>\nThis script re-computes the occultations data of all the collected decisions for the given jurisdiction:\nreprocessWrongOccultation.js 7501 --> reprocess all collected decisions from Paris\nreprocessWrongOccultation.js * or reprocessWrongOccultation all --> reprocess all collected decisions')
+    throw new Error(
+      'Usage: reprocessWrongOccultation.js <jurisdiction>\nThis script re-computes the occultations data of all the collected decisions for the given jurisdiction:\nreprocessWrongOccultation.js 7501 --> reprocess all collected decisions from Paris\nreprocessWrongOccultation.js * or reprocessWrongOccultation all --> reprocess all collected decisions'
+    )
     throw new Error('Usage : <script> jurisdiction')
   }
 

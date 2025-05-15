@@ -22,7 +22,9 @@ import axios from 'axios'
 
 async function main(datetime: string) {
   if (!datetime) {
-    throw new Error('Usage: listDeletionToProceed.js <datetime>\nThis script displays the commands that must be manually executed in order to proceed to the deletion requests (on Label and Judilibre) received since the given datetime:\nlistDeletionToProceed.js 2025-05-07T10:00:00')
+    throw new Error(
+      'Usage: listDeletionToProceed.js <datetime>\nThis script displays the commands that must be manually executed in order to proceed to the deletion requests (on Label and Judilibre) received since the given datetime:\nlistDeletionToProceed.js 2025-05-07T10:00:00'
+    )
   }
 
   const unpublishFromJudilibreIds = []

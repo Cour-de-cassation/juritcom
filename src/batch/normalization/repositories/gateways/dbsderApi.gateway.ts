@@ -7,12 +7,12 @@ import {
 } from '@nestjs/common'
 import axios from 'axios'
 import { logger, normalizationFormatLogs } from '../../index'
-import { DecisionTCOMDTO } from 'dbsder-api-types'
+import { UnIdentifiedDecisionTcom } from 'dbsder-api-types'
 import { LogsFormat } from '../../../../shared/infrastructure/utils/logsFormat.utils'
 
 export class DbSderApiGateway {
-  async saveDecision(decisionToSave: DecisionTCOMDTO) {
-    const urlToCall = process.env.DBSDER_API_URL + '/v1/decisions'
+  async saveDecision(decisionToSave: UnIdentifiedDecisionTcom) {
+    const urlToCall = process.env.DBSDER_API_URL + '/decisions'
 
     const result = await axios
       .put(
@@ -74,7 +74,7 @@ export class DbSderApiGateway {
   }
 
   async updateStatus(id: string, status: string) {
-    const urlToCall = process.env.DBSDER_API_URL + `/v1/${id}/statut`
+    const urlToCall = process.env.DBSDER_API_URL + `/${id}/statut`
 
     const result = await axios
       .put(
@@ -136,7 +136,7 @@ export class DbSderApiGateway {
   }
 
   async listDecisions(source: string, status: string, startDate: string, endDate: string) {
-    const urlToCall = process.env.DBSDER_API_URL + '/v1/decisions'
+    const urlToCall = process.env.DBSDER_API_URL + '/decisions'
 
     const result = await axios
       .get(urlToCall, {
@@ -195,7 +195,7 @@ export class DbSderApiGateway {
   }
 
   async getDecisionById(id: string) {
-    const urlToCall = process.env.DBSDER_API_URL + `/v1/decisions/${id}`
+    const urlToCall = process.env.DBSDER_API_URL + `/decisions/${id}`
 
     const result = await axios
       .get(urlToCall, {

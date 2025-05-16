@@ -344,7 +344,7 @@ async function getDecisionBySourceId(sourceId: number) {
 }
 
 async function getDecisionById(id: string) {
-  const urlToCall = process.env.DBSDER_API_URL + `/v1/decisions/${id}`
+  const urlToCall = process.env.DBSDER_API_URL + `/decisions/${id}`
 
   const result = await axios
     .get(urlToCall, {
@@ -396,7 +396,7 @@ async function getDecisionById(id: string) {
 }
 
 async function deleteDecisionById(id: string) {
-  const urlToCall = process.env.DBSDER_API_URL + `/v1/decisions/${id}`
+  const urlToCall = process.env.DBSDER_API_URL + `/decisions/${id}`
 
   const result = await axios
     .delete(urlToCall, {

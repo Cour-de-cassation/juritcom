@@ -88,8 +88,6 @@ export class MockUtils {
   decisionMock: UnIdentifiedDecisionTcom = {
     __v: 0,
     appeals: [],
-    chamberId: '',
-    chamberName: '',
     dateCreation: new Date(parseInt('2024'), parseInt('12') - 1, parseInt('25')).toISOString(),
     dateDecision: new Date(parseInt('2024'), parseInt('12') - 1, parseInt('24')).toISOString(),
     jurisdictionCode: '01_0605',

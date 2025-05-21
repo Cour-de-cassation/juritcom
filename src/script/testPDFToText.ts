@@ -18,7 +18,7 @@ async function main(id: string) {
   try {
     const t0 = new Date()
     const response: AxiosResponse = await axios.post(
-      'http://nlp-pseudonymisation-api-service.nlp.svc.cluster.local:8081/pdf-to-text',
+      'http://nlp-api-service.nlp.svc.cluster.local:8081/pdf-to-text',
       formdata,
       {
         headers: {

@@ -1,12 +1,12 @@
-import { DecisionTCOMDTO, LabelStatus, QualitePartie, Sources, TypePartie } from 'dbsder-api-types'
 import {
-  AdresseDto,
-  CompositionDto,
-  JusticeFunction,
-  JusticeRole,
-  MetadonneeDto,
-  PartieDto
-} from '../dto/metadonnee.dto'
+  UnIdentifiedDecisionTcom,
+  LabelStatus,
+  QualitePartieExhaustive,
+  TypePartieExhaustive,
+  JusticeFunctionTcom,
+  JusticeRoleTcom
+} from 'dbsder-api-types'
+import { AdresseDto, CompositionDto, MetadonneeDto, PartieDto } from '../dto/metadonnee.dto'
 
 export class MockUtils {
   // Shared context
@@ -20,9 +20,9 @@ export class MockUtils {
 
   mandatoryPartieDtoMock = {
     nom: 'some valid name',
-    type: TypePartie.AA,
-    qualite: QualitePartie.G,
-    role: JusticeRole.AVOCAT
+    type: TypePartieExhaustive.AA,
+    qualite: QualitePartieExhaustive.G,
+    role: JusticeRoleTcom.AVOCAT
   }
 
   adresseDtoMock: AdresseDto = {
@@ -58,7 +58,7 @@ export class MockUtils {
   }
 
   compositionDtoMock: CompositionDto = {
-    fonction: JusticeFunction.GRF,
+    fonction: JusticeFunctionTcom.GRF,
     nom: 'Dupond',
     prenom: 'Henry',
     civilite: 'Monsieur'
@@ -87,10 +87,9 @@ export class MockUtils {
   }
 
   // End of normalization context
-  decisionMock: DecisionTCOMDTO = {
+  decisionMock: UnIdentifiedDecisionTcom = {
+    __v: 0,
     appeals: [],
-    chamberId: '',
-    chamberName: '',
     dateCreation: new Date(parseInt('2024'), parseInt('12') - 1, parseInt('25')).toISOString(),
     dateDecision: new Date(parseInt('2024'), parseInt('12') - 1, parseInt('24')).toISOString(),
     jurisdictionCode: '01_0605',
@@ -105,12 +104,13 @@ export class MockUtils {
     originalText: this.decisionContentNormalized,
     registerNumber: '2001F00930',
     sourceId: 2187651241,
-    sourceName: Sources.TCOM,
+    sourceName: 'juritcom',
     blocOccultation: 0,
     public: true,
     idGroupement: '01',
     debatPublic: true,
     idDecisionTCOM: '0605_2001F00930_2012-12-05_19',
-    selection: false
+    selection: false,
+    filenameSource: 'path'
   }
 }

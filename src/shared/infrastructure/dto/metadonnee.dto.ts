@@ -14,36 +14,24 @@ import {
   ValidateNested
 } from 'class-validator'
 import { Type } from 'class-transformer'
-import { QualitePartie, TypePartie } from 'dbsder-api-types'
-
-export enum JusticeFunction {
-  GRF = 'GRF',
-  JUG = 'JUG',
-  PDT = 'PDT',
-  PRO = 'PRO',
-  JUS = 'JUS'
-}
-
-export enum JusticeRole {
-  AVOCAT = 'AVOCAT',
-  AVOCAT_GENERAL = 'AVOCAT GENERAL',
-  RAPPORTEUR = 'RAPPORTEUR',
-  MANDATAIRE = 'MANDATAIRE',
-  PARTIE = 'PARTIE',
-  AUTRE = 'AUTRE'
-}
+import {
+  JusticeFunctionTcom,
+  JusticeRoleTcom,
+  QualitePartieExhaustive,
+  TypePartieExhaustive
+} from 'dbsder-api-types'
 
 // Qualité du partie de la décision
 
 export class CompositionDto {
   @ApiPropertyOptional({
     description: 'Fonction',
-    enum: JusticeFunction,
-    example: JusticeFunction.GRF
+    enum: JusticeFunctionTcom,
+    example: JusticeFunctionTcom.GRF
   })
-  @IsEnum(JusticeFunction)
+  @IsEnum(JusticeFunctionTcom)
   @IsOptional()
-  fonction?: JusticeFunction
+  fonction?: JusticeFunctionTcom
 
   @ApiProperty({
     description: 'Nom',
@@ -149,19 +137,19 @@ export class AdresseDto {
 export class PartieDto {
   @ApiProperty({
     description: 'Type du partie de la décision',
-    enum: TypePartie,
-    example: TypePartie.PP
+    enum: TypePartieExhaustive,
+    example: TypePartieExhaustive.PP
   })
-  @IsEnum(TypePartie)
-  type: TypePartie
+  @IsEnum(TypePartieExhaustive)
+  type: TypePartieExhaustive
 
   @ApiProperty({
     description: 'Rôle de la partie',
-    enum: JusticeRole,
-    example: JusticeRole.AVOCAT
+    enum: JusticeRoleTcom,
+    example: JusticeRoleTcom.AVOCAT
   })
-  @IsEnum(JusticeRole)
-  role: JusticeRole
+  @IsEnum(JusticeRoleTcom)
+  role: JusticeRoleTcom
 
   @ApiProperty({
     description: 'Nom de la partie (ou nom et prénom)',
@@ -218,11 +206,11 @@ export class PartieDto {
 
   @ApiProperty({
     description: 'Qualité du partie de la décision',
-    enum: QualitePartie,
-    example: QualitePartie.I
+    enum: QualitePartieExhaustive,
+    example: QualitePartieExhaustive.I
   })
-  @IsEnum(QualitePartie)
-  qualite: QualitePartie
+  @IsEnum(QualitePartieExhaustive)
+  qualite: QualitePartieExhaustive
 
   @ApiPropertyOptional({
     description: 'Adresse',
@@ -509,12 +497,12 @@ export class MetadonneeDto {
     type: [PartieDto],
     example: [
       {
-        type: TypePartie.PP,
+        type: TypePartieExhaustive.PP,
         role: 'PARTIE',
         nom: 'Dupond',
         prenom: 'Julien',
         civilite: 'Monsieur',
-        qualite: QualitePartie.I,
+        qualite: QualitePartieExhaustive.I,
         adresse: {
           numero: '20bis',
           type: 'rue',

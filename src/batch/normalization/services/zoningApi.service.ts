@@ -12,7 +12,9 @@ import { UnIdentifiedDecisionTcom } from 'dbsder-api-types'
 export class ZoningApiService {
   private readonly logger = new Logger()
 
-  async getDecisionZoning(decision: UnIdentifiedDecisionTcom): Promise<UnIdentifiedDecisionTcom["zoning"]> {
+  async getDecisionZoning(
+    decision: UnIdentifiedDecisionTcom
+  ): Promise<UnIdentifiedDecisionTcom['zoning']> {
     if (process.env.ZONING_DISABLED === 'true') {
       this.logger.warn({
         operationName: 'getDecisionZoning',
@@ -25,7 +27,9 @@ export class ZoningApiService {
           zonageSource = 'tcom'
           break
         default:
-          throw new BadRequestException(`Juritcom cannot handle this sourcename: ${decision.sourceName}`)
+          throw new BadRequestException(
+            `Juritcom cannot handle this sourcename: ${decision.sourceName}`
+          )
       }
 
       const zoningRequestParameters = JSON.stringify({

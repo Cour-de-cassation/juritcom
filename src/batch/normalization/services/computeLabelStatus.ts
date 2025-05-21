@@ -8,7 +8,9 @@ import { ZoningApiService } from './zoningApi.service'
 const dateMiseEnService = getMiseEnServiceDate()
 // const authorizedJurisdictionsSet = new Set(authorizedJurisdictions)
 
-export async function computeLabelStatus(decisionDto: UnIdentifiedDecisionTcom): Promise<LabelStatus> {
+export async function computeLabelStatus(
+  decisionDto: UnIdentifiedDecisionTcom
+): Promise<LabelStatus> {
   const dateCreation = new Date(decisionDto.dateCreation)
   const dateDecision = new Date(decisionDto.dateDecision)
   const zoningApiService: ZoningApiService = new ZoningApiService()
@@ -40,7 +42,8 @@ export async function computeLabelStatus(decisionDto: UnIdentifiedDecisionTcom):
   }
 
   try {
-    const decisionZoning: UnIdentifiedDecisionTcom["zoning"] = await zoningApiService.getDecisionZoning(decisionDto)
+    const decisionZoning: UnIdentifiedDecisionTcom['zoning'] =
+      await zoningApiService.getDecisionZoning(decisionDto)
     decisionDto.originalTextZoning = decisionZoning
     if (decisionZoning.is_public === 0) {
       logger.error({

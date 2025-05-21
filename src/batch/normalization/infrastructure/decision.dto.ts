@@ -11,8 +11,8 @@ export function mapDecisionNormaliseeToDecisionDto(
   return {
     __v: 0,
     appeals: [],
-    chamberId: metadonnees.idChambre, 
-    chamberName: metadonnees.libelleChambre, 
+    chamberId: metadonnees.idChambre,
+    chamberName: metadonnees.libelleChambre,
     dateCreation: new Date().toISOString(),
     dateDecision: parseDate(metadonnees.dateDecision).toISOString(),
     jurisdictionCode: `${metadonnees.idGroupement}_${metadonnees.idJuridiction}`,

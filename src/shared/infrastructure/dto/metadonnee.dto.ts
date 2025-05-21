@@ -14,7 +14,12 @@ import {
   ValidateNested
 } from 'class-validator'
 import { Type } from 'class-transformer'
-import { JusticeFunctionTcom, JusticeRoleTcom, QualitePartieExhaustive, TypePartieExhaustive } from 'dbsder-api-types'
+import {
+  JusticeFunctionTcom,
+  JusticeRoleTcom,
+  QualitePartieExhaustive,
+  TypePartieExhaustive
+} from 'dbsder-api-types'
 
 // Qualité du partie de la décision
 

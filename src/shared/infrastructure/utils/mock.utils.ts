@@ -1,10 +1,12 @@
-import { UnIdentifiedDecisionTcom, LabelStatus, QualitePartieExhaustive, TypePartieExhaustive, JusticeFunctionTcom, JusticeRoleTcom } from 'dbsder-api-types'
 import {
-  AdresseDto,
-  CompositionDto,
-  MetadonneeDto,
-  PartieDto
-} from '../dto/metadonnee.dto'
+  UnIdentifiedDecisionTcom,
+  LabelStatus,
+  QualitePartieExhaustive,
+  TypePartieExhaustive,
+  JusticeFunctionTcom,
+  JusticeRoleTcom
+} from 'dbsder-api-types'
+import { AdresseDto, CompositionDto, MetadonneeDto, PartieDto } from '../dto/metadonnee.dto'
 
 export class MockUtils {
   // Shared context
@@ -109,6 +111,6 @@ export class MockUtils {
     debatPublic: true,
     idDecisionTCOM: '0605_2001F00930_2012-12-05_19',
     selection: false,
-    filenameSource: "path"
+    filenameSource: 'path'
   }
 }

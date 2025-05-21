@@ -63,7 +63,9 @@ function occultationsDataAreEmpty(
   return true
 }
 
-export function computeOccultation(metadonnees: MetadonneeDto): UnIdentifiedDecisionTcom["occultation"] {
+export function computeOccultation(
+  metadonnees: MetadonneeDto
+): UnIdentifiedDecisionTcom['occultation'] {
   const occultationsComplementaires: OccultationComplementaireDto =
     metadonnees.occultationsComplementaires
 

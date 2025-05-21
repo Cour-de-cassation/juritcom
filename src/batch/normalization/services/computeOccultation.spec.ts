@@ -15,7 +15,7 @@ describe('compute occultation', () => {
   it('returns an empty additionalTerms when recommandations are respected', () => {
     // GIVEN
     const metadonnees = new MockUtils().metadonneeDtoMock as unknown as MetadonneeDto
-    const expectedResponse: UnIdentifiedDecisionTcom["occultation"] = {
+    const expectedResponse: UnIdentifiedDecisionTcom['occultation'] = {
       additionalTerms: '',
       categoriesToOmit: [Category.PROFESSIONNELMAGISTRATGREFFIER],
       motivationOccultation: false
@@ -48,7 +48,7 @@ describe('compute occultation', () => {
   it('returns an additionalTerms equal to the provided "occultations complementaires"', () => {
     // GIVEN
     const metadonnees = new MockUtils().metadonneeDtoMock as unknown as MetadonneeDto
-    const expectedResponse: UnIdentifiedDecisionTcom["occultation"] = {
+    const expectedResponse: UnIdentifiedDecisionTcom['occultation'] = {
       additionalTerms: '+fiat rouge|volvo verte',
       categoriesToOmit: [],
       motivationOccultation: false
@@ -81,7 +81,7 @@ describe('compute occultation', () => {
   it('returns motivationOccultation true when debat are not public', () => {
     // GIVEN
     const metadonnees = new MockUtils().metadonneeDtoMock as unknown as MetadonneeDto
-    const expectedResponse: UnIdentifiedDecisionTcom["occultation"] = {
+    const expectedResponse: UnIdentifiedDecisionTcom['occultation'] = {
       additionalTerms: '',
       categoriesToOmit: [Category.PROFESSIONNELMAGISTRATGREFFIER],
       motivationOccultation: true

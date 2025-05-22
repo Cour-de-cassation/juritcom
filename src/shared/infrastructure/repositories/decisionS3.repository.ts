@@ -208,7 +208,6 @@ export class DecisionS3Repository implements DecisionRepository {
     const reqParams: ListObjectsV2CommandInput = {
       Bucket: process.env.S3_BUCKET_NAME_RAW
     }
-    console.log(`getDecisionList on bucket: ${process.env.S3_BUCKET_NAME_RAW}`)
     if (maxNumberOfDecisionsToRetrieve >= 1 && maxNumberOfDecisionsToRetrieve <= 1000) {
       reqParams.MaxKeys = maxNumberOfDecisionsToRetrieve
     }

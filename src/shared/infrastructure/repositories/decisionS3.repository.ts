@@ -215,10 +215,6 @@ export class DecisionS3Repository implements DecisionRepository {
 
     try {
       const decisionListFromS3 = await this.s3Client.send(new ListObjectsV2Command(reqParams))
-
-      console.log(reqParams)
-      console.log(decisionListFromS3.Contents)
-
       return decisionListFromS3.Contents ? decisionListFromS3.Contents : []
     } catch (error) {
       this.logger.error({ operationName: 'getDecisionList', msg: error.message, data: error })

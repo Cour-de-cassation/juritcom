@@ -23,7 +23,7 @@ describe('mapDecisionNormaliseeToDecisionDto', () => {
       uniqueDecisionId,
       decisionContentNormalized,
       metadonneeDtoMock,
-      'filename'
+      'path'
     )
     mappedDecision.dateCreation = new Date(
       parseInt('2024'),

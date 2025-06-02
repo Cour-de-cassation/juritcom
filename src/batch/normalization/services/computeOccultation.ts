@@ -1,4 +1,4 @@
-import { DecisionOccultation, Categories } from 'dbsder-api-types'
+import { UnIdentifiedDecisionTcom, Category } from 'dbsder-api-types'
 import { logger, normalizationFormatLogs } from '../index'
 import { LogsFormat } from '../../../shared/infrastructure/utils/logsFormat.utils'
 import {
@@ -63,7 +63,9 @@ function occultationsDataAreEmpty(
   return true
 }
 
-export function computeOccultation(metadonnees: MetadonneeDto): DecisionOccultation {
+export function computeOccultation(
+  metadonnees: MetadonneeDto
+): UnIdentifiedDecisionTcom['occultation'] {
   const occultationsComplementaires: OccultationComplementaireDto =
     metadonnees.occultationsComplementaires
 
@@ -87,9 +89,9 @@ export function computeOccultation(metadonnees: MetadonneeDto): DecisionOccultat
     return {
       additionalTerms: '',
       categoriesToOmit: [
-        Categories.PERSONNEMORALE,
-        Categories.NUMEROSIRETSIREN,
-        Categories.PROFESSIONNELMAGISTRATGREFFIER
+        Category.PERSONNEMORALE,
+        Category.NUMEROSIRETSIREN,
+        Category.PROFESSIONNELMAGISTRATGREFFIER
       ],
       motivationOccultation: false
     }
@@ -106,50 +108,50 @@ export function computeOccultation(metadonnees: MetadonneeDto): DecisionOccultat
     })
 
     if (occultationsComplementaires.personneMorale !== true) {
-      categoriesToOmitRaw.push(Categories.PERSONNEMORALE)
-      categoriesToOmitRaw.push(Categories.NUMEROSIRETSIREN)
+      categoriesToOmitRaw.push(Category.PERSONNEMORALE)
+      categoriesToOmitRaw.push(Category.NUMEROSIRETSIREN)
     }
 
     if (occultationsComplementaires.personnePhysicoMoraleGeoMorale !== true) {
-      categoriesToOmitRaw.push(Categories.PERSONNEMORALE)
-      categoriesToOmitRaw.push(Categories.LOCALITE)
-      categoriesToOmitRaw.push(Categories.NUMEROSIRETSIREN)
+      categoriesToOmitRaw.push(Category.PERSONNEMORALE)
+      categoriesToOmitRaw.push(Category.LOCALITE)
+      categoriesToOmitRaw.push(Category.NUMEROSIRETSIREN)
     }
 
     if (occultationsComplementaires.adresse !== true) {
-      categoriesToOmitRaw.push(Categories.ADRESSE)
-      categoriesToOmitRaw.push(Categories.LOCALITE)
-      categoriesToOmitRaw.push(Categories.ETABLISSEMENT)
+      categoriesToOmitRaw.push(Category.ADRESSE)
+      categoriesToOmitRaw.push(Category.LOCALITE)
+      categoriesToOmitRaw.push(Category.ETABLISSEMENT)
     }
 
     if (occultationsComplementaires.dateCivile !== true) {
-      categoriesToOmitRaw.push(Categories.DATENAISSANCE)
-      categoriesToOmitRaw.push(Categories.DATEDECES)
-      categoriesToOmitRaw.push(Categories.DATEMARIAGE)
+      categoriesToOmitRaw.push(Category.DATENAISSANCE)
+      categoriesToOmitRaw.push(Category.DATEDECES)
+      categoriesToOmitRaw.push(Category.DATEMARIAGE)
     }
 
     if (occultationsComplementaires.plaqueImmatriculation !== true) {
-      categoriesToOmitRaw.push(Categories.PLAQUEIMMATRICULATION)
+      categoriesToOmitRaw.push(Category.PLAQUEIMMATRICULATION)
     }
 
     if (occultationsComplementaires.cadastre !== true) {
-      categoriesToOmitRaw.push(Categories.CADASTRE)
+      categoriesToOmitRaw.push(Category.CADASTRE)
     }
 
     if (occultationsComplementaires.chaineNumeroIdentifiante !== true) {
-      categoriesToOmitRaw.push(Categories.INSEE)
-      categoriesToOmitRaw.push(Categories.NUMEROIDENTIFIANT)
-      categoriesToOmitRaw.push(Categories.COMPTEBANCAIRE)
-      categoriesToOmitRaw.push(Categories.PLAQUEIMMATRICULATION)
+      categoriesToOmitRaw.push(Category.INSEE)
+      categoriesToOmitRaw.push(Category.NUMEROIDENTIFIANT)
+      categoriesToOmitRaw.push(Category.COMPTEBANCAIRE)
+      categoriesToOmitRaw.push(Category.PLAQUEIMMATRICULATION)
     }
 
     if (occultationsComplementaires.coordonneeElectronique !== true) {
-      categoriesToOmitRaw.push(Categories.SITEWEBSENSIBLE)
-      categoriesToOmitRaw.push(Categories.TELEPHONEFAX)
+      categoriesToOmitRaw.push(Category.SITEWEBSENSIBLE)
+      categoriesToOmitRaw.push(Category.TELEPHONEFAX)
     }
 
     if (occultationsComplementaires.professionnelMagistratGreffier !== true) {
-      categoriesToOmitRaw.push(Categories.PROFESSIONNELMAGISTRATGREFFIER)
+      categoriesToOmitRaw.push(Category.PROFESSIONNELMAGISTRATGREFFIER)
     }
 
     const categoriesToOmit = categoriesToOmitRaw.filter(

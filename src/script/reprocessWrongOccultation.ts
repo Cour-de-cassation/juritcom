@@ -10,7 +10,7 @@ import {
   MetadonneeDto
 } from '../shared/infrastructure/dto/metadonnee.dto'
 
-import { DecisionTCOMDTO, DecisionOccultation, Categories, LabelStatus } from 'dbsder-api-types'
+import { DecisionTcom, Category, LabelStatus, UnIdentifiedDecisionTcom } from 'dbsder-api-types'
 
 import {
   BadRequestException,
@@ -34,7 +34,7 @@ async function main(jurisdiction: string) {
   const decisions = await listDecisions('juritcom', jurisdiction)
   for (let i = 0; i < decisions.length; i++) {
     try {
-      const decision: DecisionTCOMDTO = await getDecisionById(decisions[i]._id)
+      const decision: DecisionTcom = await getDecisionById(decisions[i]._id)
       if (
         /ignored/i.test(decision.labelStatus) === false &&
         /blocked/i.test(decision.labelStatus) === false
@@ -54,7 +54,7 @@ async function main(jurisdiction: string) {
 }
 
 async function listDecisions(source: string, jurisdiction: string) {
-  const urlToCall = process.env.DBSDER_API_URL + '/v1/decisions'
+  const urlToCall = process.env.DBSDER_API_URL + '/decisions'
   const params: any = {
     sourceName: source
   }
@@ -107,8 +107,8 @@ async function listDecisions(source: string, jurisdiction: string) {
   return result.data
 }
 
-async function getDecisionById(id: string): Promise<DecisionTCOMDTO> {
-  const urlToCall = process.env.DBSDER_API_URL + `/v1/decisions/${id}`
+async function getDecisionById(id: string): Promise<DecisionTcom> {
+  const urlToCall = process.env.DBSDER_API_URL + `/decisions/${id}`
 
   const result = await axios
     .get(urlToCall, {
@@ -155,7 +155,7 @@ async function getDecisionById(id: string): Promise<DecisionTCOMDTO> {
   return result.data
 }
 
-async function saveDecision(decisionToSave: DecisionTCOMDTO) {
+async function saveDecision(decisionToSave: UnIdentifiedDecisionTcom) {
   const urlToCall = process.env.DBSDER_API_URL + '/v1/decisions'
 
   const result = await axios
@@ -208,7 +208,7 @@ async function saveDecision(decisionToSave: DecisionTCOMDTO) {
   return result.data
 }
 
-async function reprocessDecision(decision: DecisionTCOMDTO): Promise<boolean> {
+async function reprocessDecision(decision: DecisionTcom): Promise<boolean> {
   const s3Client = new S3Client({
     endpoint: process.env.S3_URL,
     forcePathStyle: true,
@@ -307,7 +307,7 @@ function occultationsDataAreEmpty(
   return true
 }
 
-function computeOccultation(metadonnees: MetadonneeDto): DecisionOccultation {
+function computeOccultation(metadonnees: MetadonneeDto): UnIdentifiedDecisionTcom['occultation'] {
   const occultationsComplementaires: OccultationComplementaireDto =
     metadonnees.occultationsComplementaires
 
@@ -319,9 +319,9 @@ function computeOccultation(metadonnees: MetadonneeDto): DecisionOccultation {
     return {
       additionalTerms: '',
       categoriesToOmit: [
-        Categories.PERSONNEMORALE,
-        Categories.NUMEROSIRETSIREN,
-        Categories.PROFESSIONNELMAGISTRATGREFFIER
+        Category.PERSONNEMORALE,
+        Category.NUMEROSIRETSIREN,
+        Category.PROFESSIONNELMAGISTRATGREFFIER
       ],
       motivationOccultation: false
     }
@@ -337,50 +337,50 @@ function computeOccultation(metadonnees: MetadonneeDto): DecisionOccultation {
     })
 
     if (occultationsComplementaires.personneMorale !== true) {
-      categoriesToOmitRaw.push(Categories.PERSONNEMORALE)
-      categoriesToOmitRaw.push(Categories.NUMEROSIRETSIREN)
+      categoriesToOmitRaw.push(Category.PERSONNEMORALE)
+      categoriesToOmitRaw.push(Category.NUMEROSIRETSIREN)
     }
 
     if (occultationsComplementaires.personnePhysicoMoraleGeoMorale !== true) {
-      categoriesToOmitRaw.push(Categories.PERSONNEMORALE)
-      categoriesToOmitRaw.push(Categories.LOCALITE)
-      categoriesToOmitRaw.push(Categories.NUMEROSIRETSIREN)
+      categoriesToOmitRaw.push(Category.PERSONNEMORALE)
+      categoriesToOmitRaw.push(Category.LOCALITE)
+      categoriesToOmitRaw.push(Category.NUMEROSIRETSIREN)
     }
 
     if (occultationsComplementaires.adresse !== true) {
-      categoriesToOmitRaw.push(Categories.ADRESSE)
-      categoriesToOmitRaw.push(Categories.LOCALITE)
-      categoriesToOmitRaw.push(Categories.ETABLISSEMENT)
+      categoriesToOmitRaw.push(Category.ADRESSE)
+      categoriesToOmitRaw.push(Category.LOCALITE)
+      categoriesToOmitRaw.push(Category.ETABLISSEMENT)
     }
 
     if (occultationsComplementaires.dateCivile !== true) {
-      categoriesToOmitRaw.push(Categories.DATENAISSANCE)
-      categoriesToOmitRaw.push(Categories.DATEDECES)
-      categoriesToOmitRaw.push(Categories.DATEMARIAGE)
+      categoriesToOmitRaw.push(Category.DATENAISSANCE)
+      categoriesToOmitRaw.push(Category.DATEDECES)
+      categoriesToOmitRaw.push(Category.DATEMARIAGE)
     }
 
     if (occultationsComplementaires.plaqueImmatriculation !== true) {
-      categoriesToOmitRaw.push(Categories.PLAQUEIMMATRICULATION)
+      categoriesToOmitRaw.push(Category.PLAQUEIMMATRICULATION)
     }
 
     if (occultationsComplementaires.cadastre !== true) {
-      categoriesToOmitRaw.push(Categories.CADASTRE)
+      categoriesToOmitRaw.push(Category.CADASTRE)
     }
 
     if (occultationsComplementaires.chaineNumeroIdentifiante !== true) {
-      categoriesToOmitRaw.push(Categories.INSEE)
-      categoriesToOmitRaw.push(Categories.NUMEROIDENTIFIANT)
-      categoriesToOmitRaw.push(Categories.COMPTEBANCAIRE)
-      categoriesToOmitRaw.push(Categories.PLAQUEIMMATRICULATION)
+      categoriesToOmitRaw.push(Category.INSEE)
+      categoriesToOmitRaw.push(Category.NUMEROIDENTIFIANT)
+      categoriesToOmitRaw.push(Category.COMPTEBANCAIRE)
+      categoriesToOmitRaw.push(Category.PLAQUEIMMATRICULATION)
     }
 
     if (occultationsComplementaires.coordonneeElectronique !== true) {
-      categoriesToOmitRaw.push(Categories.SITEWEBSENSIBLE)
-      categoriesToOmitRaw.push(Categories.TELEPHONEFAX)
+      categoriesToOmitRaw.push(Category.SITEWEBSENSIBLE)
+      categoriesToOmitRaw.push(Category.TELEPHONEFAX)
     }
 
     if (occultationsComplementaires.professionnelMagistratGreffier !== true) {
-      categoriesToOmitRaw.push(Categories.PROFESSIONNELMAGISTRATGREFFIER)
+      categoriesToOmitRaw.push(Category.PROFESSIONNELMAGISTRATGREFFIER)
     }
 
     const categoriesToOmit = categoriesToOmitRaw.filter(

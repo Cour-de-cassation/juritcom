@@ -1,4 +1,4 @@
-import { LabelStatus, PublishStatus, Sources, DecisionTCOMDTO } from 'dbsder-api-types'
+import { LabelStatus, PublishStatus, UnIdentifiedDecisionTcom } from 'dbsder-api-types'
 import { hashDecisionId } from '../../../shared/infrastructure/utils/hash.utils'
 import { MetadonneeDto } from '../../../shared/infrastructure/dto/metadonnee.dto'
 
@@ -7,11 +7,12 @@ export function mapDecisionNormaliseeToDecisionDto(
   decisionContent: string,
   metadonnees: MetadonneeDto,
   filename: string
-): DecisionTCOMDTO {
+): UnIdentifiedDecisionTcom {
   return {
+    __v: 0,
     appeals: [],
-    chamberId: metadonnees.idChambre ?? '', // @FIXME Optionnel dans le swagger, mandatory dans dbsder-api
-    chamberName: metadonnees.libelleChambre ?? '', // @FIXME Optionnel dans le swagger, mandatory dans dbsder-api
+    chamberId: metadonnees.idChambre,
+    chamberName: metadonnees.libelleChambre,
     dateCreation: new Date().toISOString(),
     dateDecision: parseDate(metadonnees.dateDecision).toISOString(),
     jurisdictionCode: `${metadonnees.idGroupement}_${metadonnees.idJuridiction}`,
@@ -28,20 +29,20 @@ export function mapDecisionNormaliseeToDecisionDto(
     originalText: decisionContent,
     registerNumber: metadonnees.numeroDossier,
     sourceId: hashDecisionId(generatedId),
-    sourceName: Sources.TCOM,
+    sourceName: 'juritcom',
     blocOccultation: 0,
     filenameSource: filename,
     public: metadonnees.decisionPublique === true,
     solution: metadonnees.libelleProcedure ?? '',
     codeMatiereCivil: metadonnees.idMatiere ?? '',
-    parties: metadonnees.parties ?? [{}],
+    parties: metadonnees.parties ?? [],
     idGroupement: metadonnees.idGroupement,
     debatPublic: metadonnees.debatChambreDuConseil === false,
     idDecisionTCOM: generatedId,
     codeProcedure: metadonnees.idProcedure ?? '',
     libelleMatiere: metadonnees.libelleMatiere ?? '',
     selection: metadonnees.interetParticulier === true,
-    composition: metadonnees.composition ?? [{}]
+    composition: metadonnees.composition ?? []
   }
 }
 

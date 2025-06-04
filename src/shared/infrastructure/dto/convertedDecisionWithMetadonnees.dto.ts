@@ -1,6 +1,6 @@
-import { DecisionTCOMDTO } from 'dbsder-api-types'
+import { UnIdentifiedDecisionTcom } from 'dbsder-api-types'
 
 export class ConvertedDecisionWithMetadonneesDto {
   decisionNormalisee: string
-  metadonnees: DecisionTCOMDTO
+  metadonnees: UnIdentifiedDecisionTcom
 }

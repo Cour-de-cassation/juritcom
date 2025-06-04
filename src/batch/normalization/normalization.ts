@@ -18,6 +18,7 @@ import {
 } from './services/PDFToText'
 import { PostponeException } from './infrastructure/nlp.exception'
 import { incrementErrorCount, resetErrorCount } from './errorCounter/errorCounter'
+import { LabelStatus, PublishStatus } from 'dbsder-api-types'
 
 const dbSderApiGateway = new DbSderApiGateway()
 const bucketNameIntegre = process.env.S3_BUCKET_NAME_RAW
@@ -134,9 +135,43 @@ export async function normalizationJob(): Promise<ConvertedDecisionWithMetadonne
         }
         decisionToSave.occultation = computeOccultation(decision.metadonnees)
 
-        // Step 7: Save decision in database
-        await dbSderApiGateway.saveDecision(decisionToSave)
-        logger.info({ ...currentNormalizationFormatLogs, msg: 'Decision saved in database' })
+        // Step 7.a: check diff (major/minor)
+        let hasMinorChange = false
+        const previousVersion = await dbSderApiGateway.getDecisionBySourceId(
+          decisionToSave.sourceId
+        )
+        if (
+          previousVersion !== null &&
+          decisionToSave.originalText === previousVersion.originalText &&
+          JSON.stringify(decisionToSave.occultation) === JSON.stringify(previousVersion.occultation)
+        ) {
+          hasMinorChange = true
+        }
+
+        if (hasMinorChange === true) {
+          // Step 7.b: Patch decision in database
+          if (previousVersion.labelStatus === LabelStatus.EXPORTED) {
+            decisionToSave.labelStatus = LabelStatus.DONE
+          } else {
+            decisionToSave.labelStatus = previousVersion.labelStatus
+          }
+          if (
+            previousVersion.publishStatus === PublishStatus.SUCCESS ||
+            previousVersion.publishStatus === PublishStatus.UNPUBLISHED ||
+            previousVersion.publishStatus === PublishStatus.FAILURE_PREPARING ||
+            previousVersion.publishStatus === PublishStatus.FAILURE_INDEXING
+          ) {
+            decisionToSave.publishStatus = PublishStatus.TOBEPUBLISHED
+          } else {
+            decisionToSave.publishStatus = previousVersion.publishStatus
+          }
+          await dbSderApiGateway.patchDecision(previousVersion._id, decisionToSave)
+          logger.info({ ...currentNormalizationFormatLogs, msg: 'Decision patched in database' })
+        } else {
+          // Step 7.c: Upsert decision in database
+          await dbSderApiGateway.saveDecision(decisionToSave)
+          logger.info({ ...currentNormalizationFormatLogs, msg: 'Decision saved in database' })
+        }
 
         // Step 8: Save decision in normalized bucket
         await s3Repository.saveDecisionNormalisee(

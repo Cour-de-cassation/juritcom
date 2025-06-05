@@ -332,8 +332,12 @@ function computeDiff(
     diff.minor.push('codeMatiereCivil')
   }
   if (oldDecision.parties.length !== newDecision.parties.length) {
+    console.log(`OLD: ${JSON.stringify(oldDecision.parties)}`)
+    console.log(`NEW: ${JSON.stringify(newDecision.parties)}`)
     diff.minor.push('parties')
   } else if (JSON.stringify(oldDecision.parties) !== JSON.stringify(newDecision.parties)) {
+    console.log(`OLD: ${JSON.stringify(oldDecision.parties)}`)
+    console.log(`NEW: ${JSON.stringify(newDecision.parties)}`)
     diff.minor.push('parties')
   }
   if (newDecision.idGroupement !== oldDecision.idGroupement) {

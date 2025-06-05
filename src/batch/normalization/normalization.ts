@@ -20,6 +20,8 @@ import { PostponeException } from './infrastructure/nlp.exception'
 import { incrementErrorCount, resetErrorCount } from './errorCounter/errorCounter'
 import { LabelStatus, PublishStatus, UnIdentifiedDecisionTcom } from 'dbsder-api-types'
 
+import { strict as assert } from 'assert'
+
 const dbSderApiGateway = new DbSderApiGateway()
 const bucketNameIntegre = process.env.S3_BUCKET_NAME_RAW
 
@@ -332,13 +334,13 @@ function computeDiff(
     diff.minor.push('codeMatiereCivil')
   }
   if (oldDecision.parties.length !== newDecision.parties.length) {
-    console.log(`OLD: ${JSON.stringify(oldDecision.parties)}`)
-    console.log(`NEW: ${JSON.stringify(newDecision.parties)}`)
     diff.minor.push('parties')
-  } else if (JSON.stringify(oldDecision.parties) !== JSON.stringify(newDecision.parties)) {
-    console.log(`OLD: ${JSON.stringify(oldDecision.parties)}`)
-    console.log(`NEW: ${JSON.stringify(newDecision.parties)}`)
-    diff.minor.push('parties')
+  } else {
+    try {
+      assert.deepStrictEqual(oldDecision.parties, newDecision.parties)
+    } catch (_) {
+      diff.minor.push('parties')
+    }
   }
   if (newDecision.idGroupement !== oldDecision.idGroupement) {
     diff.minor.push('idGroupement')
@@ -354,8 +356,12 @@ function computeDiff(
   }
   if (oldDecision.composition.length !== newDecision.composition.length) {
     diff.minor.push('composition')
-  } else if (JSON.stringify(oldDecision.composition) !== JSON.stringify(newDecision.composition)) {
-    diff.minor.push('composition')
+  } else {
+    try {
+      assert.deepStrictEqual(oldDecision.composition, newDecision.composition)
+    } catch (_) {
+      diff.minor.push('composition')
+    }
   }
   diff.major.sort()
   diff.minor.sort()

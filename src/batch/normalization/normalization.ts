@@ -18,10 +18,15 @@ import {
 } from './services/PDFToText'
 import { PostponeException } from './infrastructure/nlp.exception'
 import { incrementErrorCount, resetErrorCount } from './errorCounter/errorCounter'
-import { LabelStatus, PublishStatus } from 'dbsder-api-types'
+import { LabelStatus, PublishStatus, UnIdentifiedDecisionTcom } from 'dbsder-api-types'
 
 const dbSderApiGateway = new DbSderApiGateway()
 const bucketNameIntegre = process.env.S3_BUCKET_NAME_RAW
+
+interface Diff {
+  major: Array<string>
+  minor: Array<string>
+}
 
 export async function normalizationJob(): Promise<ConvertedDecisionWithMetadonneesDto[]> {
   const listConvertedDecision: ConvertedDecisionWithMetadonneesDto[] = []
@@ -108,7 +113,10 @@ export async function normalizationJob(): Promise<ConvertedDecisionWithMetadonne
 
         // Step 4: Generating unique id for decision
         const _id = decision.metadonnees.idDecision
-        currentNormalizationFormatLogs.data = { decisionId: _id }
+        currentNormalizationFormatLogs.data = {
+          decisionId: _id,
+          decisionFilename: decisionFilename
+        }
 
         logger.info({ ...currentNormalizationFormatLogs, msg: 'Generated unique id for decision' })
 
@@ -135,42 +143,61 @@ export async function normalizationJob(): Promise<ConvertedDecisionWithMetadonne
         }
         decisionToSave.occultation = computeOccultation(decision.metadonnees)
 
-        // Step 7.a: check diff (major/minor)
-        let hasMinorChange = false
+        // Step 7: check diff (major/minor) and upsert/patch accordingly
         const previousVersion = await dbSderApiGateway.getDecisionBySourceId(
           decisionToSave.sourceId
         )
-        if (
-          previousVersion !== null &&
-          decisionToSave.originalText === previousVersion.originalText &&
-          JSON.stringify(decisionToSave.occultation) === JSON.stringify(previousVersion.occultation)
-        ) {
-          hasMinorChange = true
-        }
-
-        if (hasMinorChange === true) {
-          // Step 7.b: Patch decision in database
-          if (previousVersion.labelStatus === LabelStatus.EXPORTED) {
-            decisionToSave.labelStatus = LabelStatus.DONE
+        if (previousVersion !== null) {
+          const diff = computeDiff(previousVersion, decisionToSave)
+          if (diff.major.length > 0) {
+            // Update decision with major changes:
+            await dbSderApiGateway.saveDecision(decisionToSave)
+            logger.info({
+              ...currentNormalizationFormatLogs,
+              msg: `Decision updated in database with major changes: ${JSON.stringify(diff.major)}`
+            })
+          } else if (diff.minor.length > 0) {
+            // Patch decision with minor changes:
+            if (
+              decisionToSave.labelStatus === LabelStatus.IGNORED_DATE_DECISION_INCOHERENTE ||
+              decisionToSave.labelStatus === LabelStatus.IGNORED_DATE_AVANT_MISE_EN_SERVICE
+            ) {
+              decisionToSave.publishStatus = PublishStatus.BLOCKED
+              // Bad new date? Throw a warning... @TODO ODDJDashboard
+              logger.warn({
+                ...currentNormalizationFormatLogs,
+                msg: `Decision has a bad updated date: ${decisionToSave.dateDecision}`
+              })
+            } else {
+              if (previousVersion.labelStatus === LabelStatus.EXPORTED) {
+                decisionToSave.labelStatus = LabelStatus.DONE
+              } else {
+                decisionToSave.labelStatus = previousVersion.labelStatus
+              }
+              if (
+                previousVersion.publishStatus === PublishStatus.SUCCESS ||
+                previousVersion.publishStatus === PublishStatus.UNPUBLISHED ||
+                previousVersion.publishStatus === PublishStatus.FAILURE_PREPARING ||
+                previousVersion.publishStatus === PublishStatus.FAILURE_INDEXING
+              ) {
+                decisionToSave.publishStatus = PublishStatus.TOBEPUBLISHED
+              } else {
+                decisionToSave.publishStatus = previousVersion.publishStatus
+              }
+            }
+            await dbSderApiGateway.patchDecision(previousVersion._id, decisionToSave)
+            logger.info({
+              ...currentNormalizationFormatLogs,
+              msg: `Decision patched in database with minor changes: ${JSON.stringify(diff.minor)}`
+            })
           } else {
-            decisionToSave.labelStatus = previousVersion.labelStatus
+            // No change? Throw a warning and do nothing... @TODO ODDJDashboard
+            logger.warn({ ...currentNormalizationFormatLogs, msg: 'Decision has no change' })
           }
-          if (
-            previousVersion.publishStatus === PublishStatus.SUCCESS ||
-            previousVersion.publishStatus === PublishStatus.UNPUBLISHED ||
-            previousVersion.publishStatus === PublishStatus.FAILURE_PREPARING ||
-            previousVersion.publishStatus === PublishStatus.FAILURE_INDEXING
-          ) {
-            decisionToSave.publishStatus = PublishStatus.TOBEPUBLISHED
-          } else {
-            decisionToSave.publishStatus = previousVersion.publishStatus
-          }
-          await dbSderApiGateway.patchDecision(previousVersion._id, decisionToSave)
-          logger.info({ ...currentNormalizationFormatLogs, msg: 'Decision patched in database' })
         } else {
-          // Step 7.c: Upsert decision in database
+          // Insert new decision:
           await dbSderApiGateway.saveDecision(decisionToSave)
-          logger.info({ ...currentNormalizationFormatLogs, msg: 'Decision saved in database' })
+          logger.info({ ...currentNormalizationFormatLogs, msg: `Decision saved in database` })
         }
 
         // Step 8: Save decision in normalized bucket
@@ -233,4 +260,100 @@ export async function normalizationJob(): Promise<ConvertedDecisionWithMetadonne
   }
 
   return listConvertedDecision
+}
+
+function computeDiff(
+  oldDecision: UnIdentifiedDecisionTcom,
+  newDecision: UnIdentifiedDecisionTcom
+): Diff {
+  const diff: Diff = {
+    major: [],
+    minor: []
+  }
+
+  // Major changes...
+  // Note: we skip zoning diff, because the zoning should only change if the originalText changes (which is a major change anyway). If the zoning changes with the same given originalText, then the change comes from us, not from the sender
+  if (newDecision.public !== oldDecision.public) {
+    diff.major.push('public')
+  }
+  if (newDecision.debatPublic !== oldDecision.debatPublic) {
+    diff.major.push('debatPublic')
+  }
+  if (newDecision.originalText !== oldDecision.originalText) {
+    diff.major.push('originalText')
+  }
+  if (oldDecision.occultation.additionalTerms !== newDecision.occultation.additionalTerms) {
+    diff.major.push('occultation.additionalTerms')
+  }
+  if (
+    oldDecision.occultation.motivationOccultation !== newDecision.occultation.motivationOccultation
+  ) {
+    diff.major.push('occultation.motivationOccultation')
+  }
+  if (
+    oldDecision.occultation.categoriesToOmit.length !==
+    newDecision.occultation.categoriesToOmit.length
+  ) {
+    diff.major.push('occultation.categoriesToOmit')
+  } else {
+    oldDecision.occultation.categoriesToOmit.sort()
+    newDecision.occultation.categoriesToOmit.sort()
+    if (
+      JSON.stringify(oldDecision.occultation.categoriesToOmit) !==
+      JSON.stringify(newDecision.occultation.categoriesToOmit)
+    ) {
+      diff.major.push('occultation.categoriesToOmit')
+    }
+  }
+
+  // Minor changes...
+  if (newDecision.chamberId !== oldDecision.chamberId) {
+    diff.minor.push('chamberId')
+  }
+  if (newDecision.chamberName !== oldDecision.chamberName) {
+    diff.minor.push('chamberName')
+  }
+  if (newDecision.dateDecision !== oldDecision.dateDecision) {
+    diff.minor.push('dateDecision')
+  }
+  if (newDecision.jurisdictionCode !== oldDecision.jurisdictionCode) {
+    diff.minor.push('jurisdictionCode')
+  }
+  if (newDecision.jurisdictionName !== oldDecision.jurisdictionName) {
+    diff.minor.push('jurisdictionName')
+  }
+  if (newDecision.registerNumber !== oldDecision.registerNumber) {
+    diff.minor.push('registerNumber')
+  }
+  if (newDecision.solution !== oldDecision.solution) {
+    diff.minor.push('solution')
+  }
+  if (newDecision.codeMatiereCivil !== oldDecision.codeMatiereCivil) {
+    diff.minor.push('codeMatiereCivil')
+  }
+  if (oldDecision.parties.length !== newDecision.parties.length) {
+    diff.minor.push('parties')
+  } else if (JSON.stringify(oldDecision.parties) !== JSON.stringify(newDecision.parties)) {
+    diff.minor.push('parties')
+  }
+  if (newDecision.idGroupement !== oldDecision.idGroupement) {
+    diff.minor.push('idGroupement')
+  }
+  if (newDecision.codeProcedure !== oldDecision.codeProcedure) {
+    diff.minor.push('codeProcedure')
+  }
+  if (newDecision.libelleMatiere !== oldDecision.libelleMatiere) {
+    diff.minor.push('libelleMatiere')
+  }
+  if (newDecision.selection !== oldDecision.selection) {
+    diff.minor.push('selection')
+  }
+  if (oldDecision.composition.length !== newDecision.composition.length) {
+    diff.minor.push('composition')
+  } else if (JSON.stringify(oldDecision.composition) !== JSON.stringify(newDecision.composition)) {
+    diff.minor.push('composition')
+  }
+  diff.major.sort()
+  diff.minor.sort()
+  return diff
 }

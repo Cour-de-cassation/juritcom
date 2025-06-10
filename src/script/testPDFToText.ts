@@ -30,19 +30,27 @@ async function main(id: string) {
     const delta = (t1.getTime() - t0.getTime()) / 1000
     const perPage = (delta / response.data.pdfPageCount).toFixed(2)
 
-    const input = response.data.markdownText
-    const htmlText = new Marked({ gfm: true, breaks: true }).parse(input, { async: false })
-
-    console.log('---HTML BEGIN---')
+    let htmlText = ''
+    if (response.data.markdownText) {
+      console.log('---MARKDOWN BEGIN---')
+      console.log(JSON.stringify(response.data.markdownText))
+      console.log('---MARKDOWN END---')
+      htmlText = new Marked({ gfm: true, breaks: true }).parse(response.data.markdownText, {
+        async: false
+      })
+      console.log('---HTML (FROM MARKDOWN) BEGIN---')
+    } else if (response.data.HTMLText) {
+      htmlText = response.data.HTMLText
+      console.log('---HTML (DIRECT) BEGIN---')
+    } else {
+      console.log('---HTML (NONE RECEIVED) BEGIN---')
+    }
     console.log(JSON.stringify(htmlText))
     console.log('---HTML END---')
 
     // Remove any HTML stuff:
     // 1.a HTML elements:
     let plainText = decode(htmlText)
-    console.log('---PLAINTEXT 0 BEGIN---')
-    console.log(JSON.stringify(plainText))
-    console.log('---PLAINTEXT 0 END---')
     // 1.b Remove every <html> tag:
     plainText = plainText.replace(/<html>/gim, '\n')
     plainText = plainText.replace(/<\/html>/gim, '\n')
@@ -77,9 +85,6 @@ async function main(id: string) {
     plainText = plainText.replace(/<\/li>/gim, '</li>\n')
     // 4. remove extra \n
     plainText = plainText.replace(/\n+/gm, '\n')
-    console.log('---PLAINTEXT 1 BEGIN---')
-    console.log(JSON.stringify(plainText))
-    console.log('---PLAINTEXT 1 END---')
     // 5. convert:
     plainText = convert(plainText, {
       wordwrap: false,
@@ -137,24 +142,15 @@ async function main(id: string) {
         }
       ]
     })
-    console.log('---PLAINTEXT 2 BEGIN---')
-    console.log(JSON.stringify(plainText))
-    console.log('---PLAINTEXT 2 END---')
     // 6. remove every tag that could remain:
     plainText = plainText.replace(/<\/?[^>]+(>|$)/gm, '')
     // 7. remove extra \n again (after tag collapsing)
     plainText = plainText.replace(/\n\n/gm, '\n')
     plainText = plainText.trim()
 
-    console.log('---TXT BEGIN---')
+    console.log('---PLAINTEXT BEGIN---')
     console.log(JSON.stringify(plainText))
-    console.log('---TXT END---')
-
-    // console.log(response.status)
-    // console.log(response.statusText)
-    // console.log(`PDF type: ${response.data.pdfType}`)
-    // console.log(`PDF page count: ${response.data.pdfPageCount}`)
-    // console.log(`Total duration: ${delta.toFixed(2)} s`)
+    console.log('---PLAINTEXT END---')
     console.log(`Duration per page: ${perPage} page/s`)
   } catch (error: any) {
     if (error instanceof AxiosError) {

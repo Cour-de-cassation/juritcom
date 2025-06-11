@@ -14,7 +14,8 @@ import {
   fetchNLPDataFromPDF,
   markdownToPlainText,
   NLPPDFToTextDTO,
-  isEmptyText
+  isEmptyText,
+  hasNoBreak
 } from './services/PDFToText'
 import { PostponeException } from './infrastructure/nlp.exception'
 import { incrementErrorCount, resetErrorCount } from './errorCounter/errorCounter'
@@ -95,7 +96,7 @@ export async function normalizationJob(): Promise<ConvertedDecisionWithMetadonne
         } else {
           // Step 2b, use texteDecisionIntegre property:
 
-          if (isEmptyText(decision.texteDecisionIntegre)) {
+          if (!decision.texteDecisionIntegre || isEmptyText(decision.texteDecisionIntegre) || hasNoBreak(decision.texteDecisionIntegre)) {
             throw new Error('Collected texteDecisionIntegre property is empty')
           }
 

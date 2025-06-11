@@ -51,6 +51,7 @@ async function main(id: string) {
     // Remove any HTML stuff:
     // 1.a HTML elements:
     let plainText = decode(htmlText)
+    /*
     // 1.b Remove every <html> tag:
     plainText = plainText.replace(/<html>/gim, '\n')
     plainText = plainText.replace(/<\/html>/gim, '\n')
@@ -85,6 +86,7 @@ async function main(id: string) {
     plainText = plainText.replace(/<\/li>/gim, '</li>\n')
     // 4. remove extra \n
     plainText = plainText.replace(/\n+/gm, '\n')
+    */
     // 5. convert:
     plainText = convert(plainText, {
       wordwrap: false,
@@ -143,7 +145,7 @@ async function main(id: string) {
       ]
     })
     // 6. remove every tag that could remain:
-    plainText = plainText.replace(/<\/?[^>]+(>|$)/gm, '')
+    // plainText = plainText.replace(/<\/?[^>]+(>|$)/gm, '')
     // 7. remove extra \n again (after tag collapsing)
     plainText = plainText.replace(/\n\n/gm, '\n')
     plainText = plainText.trim()

@@ -16,6 +16,7 @@ async function main(id: string) {
   const formdata: FormData = new FormData()
   formdata.append('pdf_file', pdf, `${id}.pdf`)
   try {
+    console.log(`Processing ${id}.pdf...`)
     const t0 = new Date()
     const response: AxiosResponse = await axios.post(
       'http://nlp-api-service.nlp.svc.cluster.local:8081/pdf-to-text',
@@ -29,11 +30,13 @@ async function main(id: string) {
     const t1 = new Date()
     const delta = (t1.getTime() - t0.getTime()) / 1000
     const perPage = (delta / response.data.pdfPageCount).toFixed(2)
+    console.log(`Done in: ${delta.toFixed(2)} s`)
+    console.log(`Duration per page: ${perPage} page/s`)
 
     let htmlText = ''
     if (response.data.markdownText) {
       console.log('---MARKDOWN BEGIN---')
-      console.log(JSON.stringify(response.data.markdownText))
+      console.log(response.data.markdownText)
       console.log('---MARKDOWN END---')
       htmlText = new Marked({ gfm: true, breaks: true }).parse(response.data.markdownText, {
         async: false
@@ -45,7 +48,7 @@ async function main(id: string) {
     } else {
       console.log('---HTML (NONE RECEIVED) BEGIN---')
     }
-    console.log(JSON.stringify(htmlText))
+    console.log(htmlText)
     console.log('---HTML END---')
 
     // Remove any HTML stuff:
@@ -153,9 +156,8 @@ async function main(id: string) {
     plainText = plainText.trim()
 
     console.log('---PLAINTEXT BEGIN---')
-    console.log(JSON.stringify(plainText))
+    console.log(plainText)
     console.log('---PLAINTEXT END---')
-    console.log(`Duration per page: ${perPage} page/s`)
   } catch (error: any) {
     if (error instanceof AxiosError) {
       console.error(error.code)

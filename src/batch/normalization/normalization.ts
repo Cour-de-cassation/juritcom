@@ -14,7 +14,8 @@ import {
   fetchNLPDataFromPDF,
   markdownToPlainText,
   NLPPDFToTextDTO,
-  isEmptyText
+  isEmptyText,
+  hasNoBreak
 } from './services/PDFToText'
 import { PostponeException } from './infrastructure/nlp.exception'
 import { incrementErrorCount, resetErrorCount } from './errorCounter/errorCounter'
@@ -95,7 +96,11 @@ export async function normalizationJob(): Promise<ConvertedDecisionWithMetadonne
         } else {
           // Step 2b, use texteDecisionIntegre property:
 
-          if (isEmptyText(decision.texteDecisionIntegre)) {
+          if (
+            !decision.texteDecisionIntegre ||
+            isEmptyText(decision.texteDecisionIntegre) ||
+            hasNoBreak(decision.texteDecisionIntegre)
+          ) {
             throw new Error('Collected texteDecisionIntegre property is empty')
           }
 
@@ -160,6 +165,12 @@ export async function normalizationJob(): Promise<ConvertedDecisionWithMetadonne
             })
           } else if (diff.minor.length > 0) {
             // Patch decision with minor changes:
+            delete decisionToSave.sourceId
+            delete decisionToSave.sourceName
+            delete decisionToSave.public
+            delete decisionToSave.debatPublic
+            delete decisionToSave.occultation
+            delete decisionToSave.originalText
             if (
               decisionToSave.labelStatus === LabelStatus.IGNORED_DATE_DECISION_INCOHERENTE ||
               decisionToSave.labelStatus === LabelStatus.IGNORED_DATE_AVANT_MISE_EN_SERVICE

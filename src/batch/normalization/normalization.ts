@@ -165,6 +165,8 @@ export async function normalizationJob(): Promise<ConvertedDecisionWithMetadonne
             })
           } else if (diff.minor.length > 0) {
             // Patch decision with minor changes:
+            delete decisionToSave.sourceId
+            delete decisionToSave.sourceName
             delete decisionToSave.public
             delete decisionToSave.debatPublic
             delete decisionToSave.occultation

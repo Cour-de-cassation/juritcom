@@ -149,6 +149,7 @@ async function main(id: string) {
     // 7. remove extra \n again (after tag collapsing)
     plainText = plainText.replace(/\n+\n/gm, '\n\n')
     plainText = plainText.replace(/\n\s+\*\s+\n\s+/gm, '\n* ')
+    plainText = plainText.replace(/\n\s+(\d+)\.\s+\n\s+/gm, '\n$1. ')
     plainText = plainText.trim()
 
     console.log('---PLAINTEXT BEGIN---')

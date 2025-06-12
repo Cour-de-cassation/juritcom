@@ -147,7 +147,7 @@ async function main(id: string) {
     // 6. remove every tag that could remain:
     // plainText = plainText.replace(/<\/?[^>]+(>|$)/gm, '')
     // 7. remove extra \n again (after tag collapsing)
-    plainText = plainText.replace(/\n\n/gm, '\n')
+    plainText = plainText.replace(/\n+\n/gm, '\n\n')
     plainText = plainText.replace(/\n\s+\*\s+\n\s+/gm, '\n* ')
     plainText = plainText.trim()
 

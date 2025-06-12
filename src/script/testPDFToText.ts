@@ -36,7 +36,7 @@ async function main(id: string) {
     let htmlText = ''
     if (response.data.markdownText) {
       console.log('---MARKDOWN BEGIN---')
-      console.log(response.data.markdownText)
+      console.log(JSON.stringify(response.data.markdownText))
       console.log('---MARKDOWN END---')
       htmlText = new Marked({ gfm: true, breaks: true }).parse(response.data.markdownText, {
         async: false
@@ -48,7 +48,7 @@ async function main(id: string) {
     } else {
       console.log('---HTML (NONE RECEIVED) BEGIN---')
     }
-    console.log(htmlText)
+    console.log(JSON.stringify(htmlText))
     console.log('---HTML END---')
 
     // Remove any HTML stuff:
@@ -156,7 +156,7 @@ async function main(id: string) {
     plainText = plainText.trim()
 
     console.log('---PLAINTEXT BEGIN---')
-    console.log(plainText)
+    console.log(JSON.stringify(plainText))
     console.log('---PLAINTEXT END---')
   } catch (error: any) {
     if (error instanceof AxiosError) {

@@ -77,15 +77,11 @@ export class DbSderApiGateway {
     const urlToCall = process.env.DBSDER_API_URL + `/decisions/${id}`
 
     const result = await axios
-      .patch(
-        urlToCall,
-        decisionToSave,
-        {
-          headers: {
-            'x-api-key': process.env.DBSDER_OTHER_API_KEY
-          }
+      .patch(urlToCall, decisionToSave, {
+        headers: {
+          'x-api-key': process.env.DBSDER_OTHER_API_KEY
         }
-      )
+      })
       .catch((error) => {
         const formatLogs: LogsFormat = {
           ...normalizationFormatLogs,

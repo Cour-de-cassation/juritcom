@@ -79,7 +79,7 @@ export class DbSderApiGateway {
     const result = await axios
       .patch(
         urlToCall,
-        { decision: decisionToSave },
+        decisionToSave,
         {
           headers: {
             'x-api-key': process.env.DBSDER_OTHER_API_KEY

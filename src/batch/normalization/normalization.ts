@@ -246,20 +246,37 @@ export async function normalizationJob(): Promise<ConvertedDecisionWithMetadonne
           decisionNormalisee: cleanedDecision
         })
       } catch (error) {
-        logger.error({
-          ...normalizationFormatLogs,
-          msg: error.message,
-          data: error
-        })
-        logger.error({
-          ...normalizationFormatLogs,
-          msg: 'Failed to normalize the decision ' + decisionFilename + '.'
-        })
-        // To avoid too many request errors (as in Label):
-        if (error instanceof PostponeException) {
-          await new Promise((_) => setTimeout(_, 20 * 1000))
+        if (error.message && /nosuchkey/i.test(error.message)) {
+          logger.error({
+            ...normalizationFormatLogs,
+            msg: 'Decision has no PDF. Deleting decision in raw bucket',
+            data: error
+          })
+          const reqParamsDelete = {
+            Bucket: bucketNameIntegre,
+            Key: decisionFilename
+          }
+          await s3Repository.deleteDecision(reqParamsDelete)
+          logger.error({
+            ...normalizationFormatLogs,
+            msg: 'Failed to normalize the decision ' + decisionFilename + '.'
+          })
         } else {
-          await new Promise((_) => setTimeout(_, 10 * 1000))
+          logger.error({
+            ...normalizationFormatLogs,
+            msg: error.message,
+            data: error
+          })
+          logger.error({
+            ...normalizationFormatLogs,
+            msg: 'Failed to normalize the decision ' + decisionFilename + '.'
+          })
+          // To avoid too many request errors (as in Label):
+          if (error instanceof PostponeException) {
+            await new Promise((_) => setTimeout(_, 20 * 1000))
+          } else {
+            await new Promise((_) => setTimeout(_, 10 * 1000))
+          }
         }
         continue
       }

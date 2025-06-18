@@ -280,7 +280,7 @@ async function getDeletionRequest(key: string): Promise<any> {
 }
 
 async function getDecisionBySourceId(sourceId: number) {
-  const urlToCall = process.env.DBSDER_API_URL + '/v1/decisions'
+  const urlToCall = process.env.DBSDER_API_URL + '/decisions'
 
   const result = await axios
     .get(urlToCall, {
@@ -329,7 +329,7 @@ async function getDecisionBySourceId(sourceId: number) {
       throw new ServiceUnavailableException('DbSder API is unavailable')
     })
 
-  if (result.data && Array.isArray(result.data) && result.data.length > 0) {
+  if (result && Array.isArray(result.data) && result.data.length > 0) {
     try {
       return await getDecisionById(result.data[0]._id)
     } catch (e) {

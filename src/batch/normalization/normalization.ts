@@ -156,14 +156,14 @@ export async function normalizationJob(): Promise<ConvertedDecisionWithMetadonne
         )
         if (previousVersion !== null) {
           const diff = computeDiff(previousVersion, decisionToSave)
-          if (diff.major.length > 0) {
+          if (diff.major && diff.major.length > 0) {
             // Update decision with major changes:
             await dbSderApiGateway.saveDecision(decisionToSave)
             logger.info({
               ...currentNormalizationFormatLogs,
               msg: `Decision updated in database with major changes: ${JSON.stringify(diff.major)}`
             })
-          } else if (diff.minor.length > 0) {
+          } else if (diff.minor && diff.minor.length > 0) {
             // Patch decision with minor changes:
             delete decisionToSave.__v
             delete decisionToSave.sourceId
@@ -305,18 +305,25 @@ function computeDiff(
     diff.major.push('occultation.motivationOccultation')
   }
   if (
-    oldDecision.occultation.categoriesToOmit.length !==
-    newDecision.occultation.categoriesToOmit.length
+    (!oldDecision.occultation.categoriesToOmit && newDecision.occultation.categoriesToOmit) ||
+    (oldDecision.occultation.categoriesToOmit && !newDecision.occultation.categoriesToOmit)
   ) {
     diff.major.push('occultation.categoriesToOmit')
-  } else {
-    oldDecision.occultation.categoriesToOmit.sort()
-    newDecision.occultation.categoriesToOmit.sort()
+  } else if (oldDecision.occultation.categoriesToOmit && newDecision.occultation.categoriesToOmit) {
     if (
-      JSON.stringify(oldDecision.occultation.categoriesToOmit) !==
-      JSON.stringify(newDecision.occultation.categoriesToOmit)
+      oldDecision.occultation.categoriesToOmit.length !==
+      newDecision.occultation.categoriesToOmit.length
     ) {
       diff.major.push('occultation.categoriesToOmit')
+    } else {
+      oldDecision.occultation.categoriesToOmit.sort()
+      newDecision.occultation.categoriesToOmit.sort()
+      if (
+        JSON.stringify(oldDecision.occultation.categoriesToOmit) !==
+        JSON.stringify(newDecision.occultation.categoriesToOmit)
+      ) {
+        diff.major.push('occultation.categoriesToOmit')
+      }
     }
   }
 
@@ -345,13 +352,20 @@ function computeDiff(
   if (newDecision.codeMatiereCivil !== oldDecision.codeMatiereCivil) {
     diff.minor.push('codeMatiereCivil')
   }
-  if (oldDecision.parties.length !== newDecision.parties.length) {
+  if (
+    (!oldDecision.parties && newDecision.parties) ||
+    (oldDecision.parties && !newDecision.parties)
+  ) {
     diff.minor.push('parties')
-  } else {
-    try {
-      assert.deepStrictEqual(oldDecision.parties, newDecision.parties)
-    } catch (_) {
+  } else if (oldDecision.parties && newDecision.parties) {
+    if (oldDecision.parties.length !== newDecision.parties.length) {
       diff.minor.push('parties')
+    } else {
+      try {
+        assert.deepStrictEqual(oldDecision.parties, newDecision.parties)
+      } catch (_) {
+        diff.minor.push('parties')
+      }
     }
   }
   if (newDecision.idGroupement !== oldDecision.idGroupement) {
@@ -366,13 +380,20 @@ function computeDiff(
   if (newDecision.selection !== oldDecision.selection) {
     diff.minor.push('selection')
   }
-  if (oldDecision.composition.length !== newDecision.composition.length) {
+  if (
+    (!oldDecision.composition && newDecision.composition) ||
+    (oldDecision.composition && !newDecision.composition)
+  ) {
     diff.minor.push('composition')
-  } else {
-    try {
-      assert.deepStrictEqual(oldDecision.composition, newDecision.composition)
-    } catch (_) {
+  } else if (oldDecision.composition && newDecision.composition) {
+    if (oldDecision.composition.length !== newDecision.composition.length) {
       diff.minor.push('composition')
+    } else {
+      try {
+        assert.deepStrictEqual(oldDecision.composition, newDecision.composition)
+      } catch (_) {
+        diff.minor.push('composition')
+      }
     }
   }
   diff.major.sort()

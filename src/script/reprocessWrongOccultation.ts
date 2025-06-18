@@ -156,7 +156,7 @@ async function getDecisionById(id: string): Promise<DecisionTcom> {
 }
 
 async function saveDecision(decisionToSave: UnIdentifiedDecisionTcom) {
-  const urlToCall = process.env.DBSDER_API_URL + '/v1/decisions'
+  const urlToCall = process.env.DBSDER_API_URL + '/decisions'
 
   const result = await axios
     .put(

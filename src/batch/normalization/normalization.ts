@@ -289,9 +289,17 @@ function computeDiff(
   // Note: we skip zoning diff, because the zoning should only change if the originalText changes (which is a major change anyway). If the zoning changes with the same given originalText, then the change comes from us, not from the sender
   if (newDecision.public !== oldDecision.public) {
     diff.major.push('public')
+    logger.info({
+      ...normalizationFormatLogs,
+      msg: `major change to public: '${oldDecision.public}' -> '${newDecision.public}'`
+    })
   }
   if (newDecision.debatPublic !== oldDecision.debatPublic) {
     diff.major.push('debatPublic')
+    logger.info({
+      ...normalizationFormatLogs,
+      msg: `major change to debatPublic: '${oldDecision.debatPublic}' -> '${newDecision.debatPublic}'`
+    })
   }
   if (newDecision.originalText !== oldDecision.originalText) {
     diff.major.push('originalText')
@@ -330,27 +338,59 @@ function computeDiff(
   // Minor changes...
   if (newDecision.chamberId !== oldDecision.chamberId) {
     diff.minor.push('chamberId')
+    logger.info({
+      ...normalizationFormatLogs,
+      msg: `minor change to chamberId: '${oldDecision.chamberId}' -> '${newDecision.chamberId}'`
+    })
   }
   if (newDecision.chamberName !== oldDecision.chamberName) {
     diff.minor.push('chamberName')
+    logger.info({
+      ...normalizationFormatLogs,
+      msg: `minor change to chamberName: '${oldDecision.chamberName}' -> '${newDecision.chamberName}'`
+    })
   }
   if (newDecision.dateDecision !== oldDecision.dateDecision) {
     diff.minor.push('dateDecision')
+    logger.info({
+      ...normalizationFormatLogs,
+      msg: `minor change to dateDecision: '${oldDecision.dateDecision}' -> '${newDecision.dateDecision}'`
+    })
   }
   if (newDecision.jurisdictionCode !== oldDecision.jurisdictionCode) {
     diff.minor.push('jurisdictionCode')
+    logger.info({
+      ...normalizationFormatLogs,
+      msg: `minor change to jurisdictionCode: '${oldDecision.jurisdictionCode}' -> '${newDecision.jurisdictionCode}'`
+    })
   }
   if (newDecision.jurisdictionName !== oldDecision.jurisdictionName) {
     diff.minor.push('jurisdictionName')
+    logger.info({
+      ...normalizationFormatLogs,
+      msg: `minor change to jurisdictionName: '${oldDecision.jurisdictionName}' -> '${newDecision.jurisdictionName}'`
+    })
   }
   if (newDecision.registerNumber !== oldDecision.registerNumber) {
     diff.minor.push('registerNumber')
+    logger.info({
+      ...normalizationFormatLogs,
+      msg: `minor change to registerNumber: '${oldDecision.registerNumber}' -> '${newDecision.registerNumber}'`
+    })
   }
   if (newDecision.solution !== oldDecision.solution) {
     diff.minor.push('solution')
+    logger.info({
+      ...normalizationFormatLogs,
+      msg: `minor change to solution: '${oldDecision.solution}' -> '${newDecision.solution}'`
+    })
   }
   if (newDecision.codeMatiereCivil !== oldDecision.codeMatiereCivil) {
     diff.minor.push('codeMatiereCivil')
+    logger.info({
+      ...normalizationFormatLogs,
+      msg: `minor change to codeMatiereCivil: '${oldDecision.codeMatiereCivil}' -> '${newDecision.codeMatiereCivil}'`
+    })
   }
   if (
     (!oldDecision.parties && newDecision.parties) ||
@@ -370,15 +410,31 @@ function computeDiff(
   }
   if (newDecision.idGroupement !== oldDecision.idGroupement) {
     diff.minor.push('idGroupement')
+    logger.info({
+      ...normalizationFormatLogs,
+      msg: `minor change to idGroupement: '${oldDecision.idGroupement}' -> '${newDecision.idGroupement}'`
+    })
   }
   if (newDecision.codeProcedure !== oldDecision.codeProcedure) {
     diff.minor.push('codeProcedure')
+    logger.info({
+      ...normalizationFormatLogs,
+      msg: `minor change to codeProcedure: '${oldDecision.codeProcedure}' -> '${newDecision.codeProcedure}'`
+    })
   }
   if (newDecision.libelleMatiere !== oldDecision.libelleMatiere) {
     diff.minor.push('libelleMatiere')
+    logger.info({
+      ...normalizationFormatLogs,
+      msg: `minor change to libelleMatiere: '${oldDecision.libelleMatiere}' -> '${newDecision.libelleMatiere}'`
+    })
   }
   if (newDecision.selection !== oldDecision.selection) {
     diff.minor.push('selection')
+    logger.info({
+      ...normalizationFormatLogs,
+      msg: `minor change to selection: '${oldDecision.selection}' -> '${newDecision.selection}'`
+    })
   }
   if (
     (!oldDecision.composition && newDecision.composition) ||

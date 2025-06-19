@@ -9,16 +9,9 @@ import {
   ListObjectsCommand,
   ListObjectsCommandOutput
 } from '@aws-sdk/client-s3'
+import { DbSderApiGateway } from 'src/batch/normalization/repositories/gateways/dbsderApi.gateway'
 
-import {
-  BadRequestException,
-  ConflictException,
-  HttpStatus,
-  ServiceUnavailableException,
-  UnauthorizedException
-} from '@nestjs/common'
-
-import axios from 'axios'
+const { getDecisionBySourceId } = new DbSderApiGateway()
 
 async function main(datetime: string) {
   if (!datetime) {
@@ -144,110 +137,6 @@ async function getDeletionRequest(key: string): Promise<any> {
   const deletionFromS3 = await s3Client.send(new GetObjectCommand(reqParams))
   const stringifiedDeletion = await deletionFromS3.Body?.transformToString()
   return JSON.parse(stringifiedDeletion)
-}
-
-async function getDecisionBySourceId(sourceId: number) {
-  const urlToCall = process.env.DBSDER_API_URL + '/decisions'
-
-  const result = await axios
-    .get(urlToCall, {
-      params: { sourceName: 'juritcom', sourceId: sourceId },
-      headers: {
-        'x-api-key': process.env.DBSDER_OTHER_API_KEY
-      }
-    })
-    .catch((error) => {
-      if (error.response) {
-        if (error.response.data.statusCode === HttpStatus.BAD_REQUEST) {
-          console.error({
-            msg: error.response.data.message,
-            data: error.response.data,
-            statusCode: HttpStatus.BAD_REQUEST
-          })
-          throw new BadRequestException(
-            'DbSderAPI Bad request error : ' + error.response.data.message
-          )
-        } else if (error.response.data.statusCode === HttpStatus.UNAUTHORIZED) {
-          console.error({
-            msg: error.response.data.message,
-            data: error.response.data,
-            statusCode: HttpStatus.UNAUTHORIZED
-          })
-          throw new UnauthorizedException('You are not authorized to call this route')
-        } else if (error.response.data.statusCode === HttpStatus.CONFLICT) {
-          console.error({
-            msg: error.response.data.message,
-            data: error.response.data,
-            statusCode: HttpStatus.CONFLICT
-          })
-          throw new ConflictException('DbSderAPI error: ' + error.response.data.message)
-        } else {
-          console.error({
-            msg: error.response.data.message,
-            data: error.response.data,
-            statusCode: HttpStatus.SERVICE_UNAVAILABLE
-          })
-        }
-      }
-      throw new ServiceUnavailableException('DbSder API is unavailable')
-    })
-
-  if (result && Array.isArray(result.data) && result.data.length > 0) {
-    try {
-      return await getDecisionById(result.data[0]._id)
-    } catch (e) {
-      console.error(e)
-    }
-  }
-  return null
-}
-
-async function getDecisionById(id: string) {
-  const urlToCall = process.env.DBSDER_API_URL + `/decisions/${id}`
-
-  const result = await axios
-    .get(urlToCall, {
-      headers: {
-        'x-api-key': process.env.DBSDER_OTHER_API_KEY
-      }
-    })
-    .catch((error) => {
-      if (error.response) {
-        if (error.response.data.statusCode === HttpStatus.BAD_REQUEST) {
-          console.error({
-            msg: error.response.data.message,
-            data: error.response.data,
-            statusCode: HttpStatus.BAD_REQUEST
-          })
-          throw new BadRequestException(
-            'DbSderAPI Bad request error : ' + error.response.data.message
-          )
-        } else if (error.response.data.statusCode === HttpStatus.UNAUTHORIZED) {
-          console.error({
-            msg: error.response.data.message,
-            data: error.response.data,
-            statusCode: HttpStatus.UNAUTHORIZED
-          })
-          throw new UnauthorizedException('You are not authorized to call this route')
-        } else if (error.response.data.statusCode === HttpStatus.CONFLICT) {
-          console.error({
-            msg: error.response.data.message,
-            data: error.response.data,
-            statusCode: HttpStatus.CONFLICT
-          })
-          throw new ConflictException('DbSderAPI error: ' + error.response.data.message)
-        } else {
-          console.error({
-            msg: error.response.data.message,
-            data: error.response.data,
-            statusCode: HttpStatus.SERVICE_UNAVAILABLE
-          })
-        }
-      }
-      throw new ServiceUnavailableException('DbSder API is unavailable')
-    })
-
-  return result.data
 }
 
 main(process.argv[2])

@@ -6,9 +6,9 @@ import {
   UnauthorizedException
 } from '@nestjs/common'
 import axios from 'axios'
-import { logger, normalizationFormatLogs } from '../../index'
 import { UnIdentifiedDecisionTcom } from 'dbsder-api-types'
 import { LogsFormat } from '../../../../shared/infrastructure/utils/logsFormat.utils'
+import { logger, normalizationFormatLogs } from '../../logger'
 
 export class DbSderApiGateway {
   async saveDecision(decisionToSave: UnIdentifiedDecisionTcom) {
@@ -193,7 +193,7 @@ export class DbSderApiGateway {
     return result.data
   }
 
-  async listDecisions(source: string, status: string, startDate: string, endDate: string) {
+  async listDecisions(source: string, status: string, startDate?: string, endDate?: string) {
     const urlToCall = process.env.DBSDER_API_URL + '/decisions'
 
     const result = await axios

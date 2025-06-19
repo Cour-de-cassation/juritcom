@@ -10,7 +10,7 @@ import {
 import { DbSderApiGateway } from 'src/batch/normalization/repositories/gateways/dbsderApi.gateway'
 
 let batchSize: number
-const { listDecisions, getDecisionById} = new DbSderApiGateway()
+const { listDecisions, getDecisionById } = new DbSderApiGateway()
 
 async function main(count: string) {
   batchSize = parseInt(count, 10)

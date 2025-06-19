@@ -1,8 +1,8 @@
 // Warn: logger was in index but index is used
 
-import { PinoLogger } from "nestjs-pino";
-import { LogsFormat } from "src/shared/infrastructure/utils/logsFormat.utils";
-import { normalizationPinoConfig } from "src/shared/infrastructure/utils/pinoConfig.utils";
+import { PinoLogger } from 'nestjs-pino'
+import { LogsFormat } from 'src/shared/infrastructure/utils/logsFormat.utils'
+import { normalizationPinoConfig } from 'src/shared/infrastructure/utils/pinoConfig.utils'
 
 export const logger = new PinoLogger(normalizationPinoConfig)
 

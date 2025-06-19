@@ -13,7 +13,7 @@ import {
 import { DecisionTcom, Category, LabelStatus, UnIdentifiedDecisionTcom } from 'dbsder-api-types'
 import { DbSderApiGateway } from 'src/batch/normalization/repositories/gateways/dbsderApi.gateway'
 
-const {listDecisions, getDecisionById, saveDecision} = new DbSderApiGateway()
+const { listDecisions, getDecisionById, saveDecision } = new DbSderApiGateway()
 
 async function main(jurisdiction: string) {
   if (!jurisdiction) {

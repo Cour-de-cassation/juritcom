@@ -197,6 +197,7 @@ export class DbSderApiGateway {
   }
 
   async listDecisions(status: string, startDate?: string, endDate?: string) {
+    console.log(this)
     let result = await this.getListDecisions(status, startDate, endDate)
     let index = 0
 

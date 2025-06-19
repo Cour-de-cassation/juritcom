@@ -13,7 +13,7 @@ import {
 import { DecisionTcom, Category, LabelStatus, UnIdentifiedDecisionTcom } from 'dbsder-api-types'
 import { DbSderApiGateway } from '../batch/normalization/repositories/gateways/dbsderApi.gateway'
 
-const { listDecisions, saveDecision } = new DbSderApiGateway()
+const dbSderApiGateway = new DbSderApiGateway()
 
 async function main(jurisdiction: string) {
   if (!jurisdiction) {
@@ -23,7 +23,7 @@ async function main(jurisdiction: string) {
     throw new Error('Usage : <script> jurisdiction')
   }
 
-  const decisions = await listDecisions('ignored_controleRequis')
+  const decisions = await dbSderApiGateway.listDecisions('ignored_controleRequis')
   let decision = await decisions.next()
   let doneCount = 0
 
@@ -82,7 +82,7 @@ async function reprocessDecision(decision: Omit<DecisionTcom, '_id'> & { _id: st
       console.log(
         `OLD: ${oldOccultation} --> NEW: ${JSON.stringify(decision.occultation.categoriesToOmit)}`
       )
-      await saveDecision(decision)
+      await dbSderApiGateway.saveDecision(decision)
       return true
     } else {
       throw new Error('Decision incomplete or ID mismatch')

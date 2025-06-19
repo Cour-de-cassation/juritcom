@@ -10,7 +10,7 @@ import {
 import { DbSderApiGateway } from '../batch/normalization/repositories/gateways/dbsderApi.gateway'
 
 let batchSize: number
-const { listDecisions } = new DbSderApiGateway()
+const dbSderApiGateway = new DbSderApiGateway()
 
 async function main(count: string) {
   batchSize = parseInt(count, 10)
@@ -19,7 +19,7 @@ async function main(count: string) {
     batchSize = 100
   }
 
-  const decisions = await listDecisions('ignored_controleRequis')
+  const decisions = await dbSderApiGateway.listDecisions('ignored_controleRequis')
   let decision = await decisions.next()
   let doneCount = 0
 

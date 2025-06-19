@@ -7,10 +7,10 @@ import {
   DeleteObjectCommand,
   PutObjectCommand
 } from '@aws-sdk/client-s3'
-import { DbSderApiGateway } from 'src/batch/normalization/repositories/gateways/dbsderApi.gateway'
+import { DbSderApiGateway } from '../batch/normalization/repositories/gateways/dbsderApi.gateway'
 
 let batchSize: number
-const { listDecisions, getDecisionById } = new DbSderApiGateway()
+const { listDecisions } = new DbSderApiGateway()
 
 async function main(count: string) {
   batchSize = parseInt(count, 10)
@@ -19,24 +19,24 @@ async function main(count: string) {
     batchSize = 100
   }
 
+  const decisions = await listDecisions('ignored_controleRequis')
+  let decision = await decisions.next()
   let doneCount = 0
-  const decisions = await listDecisions('juritcom', 'ignored_controleRequis')
-  for (let i = 0; i < decisions.length; i++) {
+
+  while(decision) {
     try {
-      const decision = await getDecisionById(decisions[i]._id)
       const done = await reprocessNormalizedDecisionByFilename(decision.filenameSource)
       if (done) {
-        console.log(`Reprocess ${decisions[i]._id}`)
+        console.log(`Reprocess ${decision._id}`)
         doneCount++
       } else {
-        console.log(`Skip ${decisions[i]._id}`)
+        console.log(`Skip ${decision._id}`)
       }
     } catch (_ignore) {
-      console.log(`Skip ${decisions[i]._id}`)
+      console.log(`Skip ${decision._id}`)
     }
-    if (doneCount === batchSize) {
-      break
-    }
+
+    decision = await decisions.next()
   }
 
   console.log(`Reprocessed ${doneCount} decisions`)

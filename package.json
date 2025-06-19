@@ -115,9 +115,6 @@
     "testEnvironment": "node",
     "setupFiles": [
       "<rootDir>/.jest/setupEnvVars.ts"
-    ],
-    "moduleNameMapper": {
-      "^src/(.*)$": "<rootDir>/$1"
-    }
+    ]
   }
 }

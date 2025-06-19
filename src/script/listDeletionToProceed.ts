@@ -9,7 +9,7 @@ import {
   ListObjectsCommand,
   ListObjectsCommandOutput
 } from '@aws-sdk/client-s3'
-import { DbSderApiGateway } from 'src/batch/normalization/repositories/gateways/dbsderApi.gateway'
+import { DbSderApiGateway } from '../batch/normalization/repositories/gateways/dbsderApi.gateway'
 
 const { getDecisionBySourceId } = new DbSderApiGateway()
 

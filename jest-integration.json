@@ -6,8 +6,5 @@
   "transform": {
     "^.+\\.(t|j)s$": "ts-jest"
   },
-  "setupFiles": ["<rootDir>/src/.jest/setupEnvVars.ts"],
-  "moduleNameMapper": {
-    "^src/(.*)$": "<rootDir>/src/$1"
-  }
+  "setupFiles": ["<rootDir>/src/.jest/setupEnvVars.ts"]
 }

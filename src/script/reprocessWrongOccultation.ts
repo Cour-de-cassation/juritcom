@@ -11,9 +11,9 @@ import {
 } from '../shared/infrastructure/dto/metadonnee.dto'
 
 import { DecisionTcom, Category, LabelStatus, UnIdentifiedDecisionTcom } from 'dbsder-api-types'
-import { DbSderApiGateway } from 'src/batch/normalization/repositories/gateways/dbsderApi.gateway'
+import { DbSderApiGateway } from '../batch/normalization/repositories/gateways/dbsderApi.gateway'
 
-const { listDecisions, getDecisionById, saveDecision } = new DbSderApiGateway()
+const { listDecisions, saveDecision } = new DbSderApiGateway()
 
 async function main(jurisdiction: string) {
   if (!jurisdiction) {
@@ -23,30 +23,33 @@ async function main(jurisdiction: string) {
     throw new Error('Usage : <script> jurisdiction')
   }
 
+  const decisions = await listDecisions('ignored_controleRequis')
+  let decision = await decisions.next()
   let doneCount = 0
-  const decisions = await listDecisions('juritcom', jurisdiction)
-  for (let i = 0; i < decisions.length; i++) {
+
+  while(decision) {
     try {
-      const decision: DecisionTcom = await getDecisionById(decisions[i]._id)
       if (
         /ignored/i.test(decision.labelStatus) === false &&
         /blocked/i.test(decision.labelStatus) === false
       ) {
         const done = await reprocessDecision(decision)
         if (done) {
-          console.log(`Reprocess ${decisions[i]._id}`)
+          console.log(`Reprocess ${decision._id}`)
           doneCount++
         }
       }
     } catch (e) {
-      console.log(`Skip ${decisions[i]._id}: error`, e)
+      console.log(`Skip ${decision._id}: error`, e)
     }
+
+    decision = await decisions.next()
   }
 
   console.log(`Reprocessed ${doneCount} decisions`)
 }
 
-async function reprocessDecision(decision: DecisionTcom): Promise<boolean> {
+async function reprocessDecision(decision: Omit<DecisionTcom, '_id'> & { _id: string }): Promise<boolean> {
   const s3Client = new S3Client({
     endpoint: process.env.S3_URL,
     forcePathStyle: true,

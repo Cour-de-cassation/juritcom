@@ -1,9 +1,8 @@
 import { UnIdentifiedDecisionTcom, LabelStatus } from 'dbsder-api-types'
-import { logger } from '../index'
 import { LogsFormat } from '../../../shared/infrastructure/utils/logsFormat.utils'
-import { normalizationFormatLogs } from '../index'
 // import { authorizedJurisdictions } from '../infrastructure/authorizedJurisdictionsList'
 import { ZoningApiService } from './zoningApi.service'
+import { logger, normalizationFormatLogs } from '../logger'
 
 const dateMiseEnService = getMiseEnServiceDate()
 // const authorizedJurisdictionsSet = new Set(authorizedJurisdictions)

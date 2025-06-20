@@ -2,7 +2,7 @@ import { DecisionRepository } from '../domain/decisions/repositories/decision.re
 import { MetadonneeDto } from '../../shared/infrastructure/dto/metadonnee.dto'
 import { bucketFileDto } from '../../shared/infrastructure/dto/receive.dto'
 import { FileService } from '../../shared/infrastructure/files/file.service'
-import { CollectDto } from 'src/shared/infrastructure/dto/collect.dto'
+import { CollectDto } from '../../shared/infrastructure/dto/collect.dto'
 
 export class SaveDecisionUsecase {
   private readonly fileService: FileService = new FileService()

@@ -202,13 +202,11 @@ export class DbSderApiGateway {
   }
 
   async listDecisions(status: string, startDate?: string, endDate?: string) {
-    console.log(this)
     let result = await this.getListDecisions(status, startDate, endDate)
     let index = 0
 
     return {
       next: async () => {
-        index++
         const decision = result.decisions[index]
         if (!!decision) return decision
 
@@ -218,6 +216,7 @@ export class DbSderApiGateway {
           return result.decisions[index]
         }
 
+        index++
         return undefined
       }
     }

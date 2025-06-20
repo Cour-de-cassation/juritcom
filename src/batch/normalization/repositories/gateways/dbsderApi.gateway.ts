@@ -131,11 +131,16 @@ export class DbSderApiGateway {
     return result.data
   }
 
-  private async getListDecisions(status: string, startDate?: string, endDate?: string, nextCursor?: string) {
+  private async getListDecisions(
+    status: string,
+    startDate?: string,
+    endDate?: string,
+    nextCursor?: string
+  ) {
     type Response = {
-      decisions: (Omit<DecisionTcom, '_id'> & { _id: string })[],
-      length: number,
-      nextCursor?: string,
+      decisions: (Omit<DecisionTcom, '_id'> & { _id: string })[]
+      length: number
+      nextCursor?: string
     }
 
     const urlToCall = process.env.DBSDER_API_URL + '/decisions'
@@ -214,15 +219,15 @@ export class DbSderApiGateway {
         }
 
         return undefined
-      },
+      }
     }
   }
 
   async getDecisionBySourceId(sourceId: number) {
     type Response = {
-      decisions: (Omit<DecisionTcom, '_id'> & { _id: string })[],
-      length: number,
-      nextPage?: string,
+      decisions: (Omit<DecisionTcom, '_id'> & { _id: string })[]
+      length: number
+      nextPage?: string
       previousPage?: string
     }
 

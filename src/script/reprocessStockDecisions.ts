@@ -23,7 +23,7 @@ async function main(count: string) {
   let decision = await decisions.next()
   let doneCount = 0
 
-  while(decision) {
+  while (decision) {
     try {
       const done = await reprocessNormalizedDecisionByFilename(decision.filenameSource)
       if (done) {

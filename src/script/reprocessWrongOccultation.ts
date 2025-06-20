@@ -27,7 +27,7 @@ async function main(jurisdiction: string) {
   let decision = await decisions.next()
   let doneCount = 0
 
-  while(decision) {
+  while (decision) {
     try {
       if (
         /ignored/i.test(decision.labelStatus) === false &&
@@ -49,7 +49,9 @@ async function main(jurisdiction: string) {
   console.log(`Reprocessed ${doneCount} decisions`)
 }
 
-async function reprocessDecision(decision: Omit<DecisionTcom, '_id'> & { _id: string }): Promise<boolean> {
+async function reprocessDecision(
+  decision: Omit<DecisionTcom, '_id'> & { _id: string }
+): Promise<boolean> {
   const s3Client = new S3Client({
     endpoint: process.env.S3_URL,
     forcePathStyle: true,

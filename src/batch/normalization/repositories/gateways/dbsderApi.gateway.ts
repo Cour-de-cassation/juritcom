@@ -139,7 +139,7 @@ export class DbSderApiGateway {
   ) {
     type Response = {
       decisions: (Omit<DecisionTcom, '_id'> & { _id: string })[]
-      length: number
+      totalDecisions: number
       nextCursor?: string
     }
 
@@ -202,21 +202,21 @@ export class DbSderApiGateway {
   }
 
   async listDecisions(status: string, startDate?: string, endDate?: string) {
-    let result = await this.getListDecisions(status, startDate, endDate)
+    let response = await this.getListDecisions(status, startDate, endDate)
     let index = 0
 
     return {
       next: async () => {
-        const decision = result.decisions[index]
+        const decision = response.decisions[index]
+        index++
         if (!!decision) return decision
 
-        if (!!result.nextCursor) {
-          result = await this.getListDecisions(status, startDate, endDate, result.nextCursor)
-          index = 0
-          return result.decisions[index]
+        if (!!response.nextCursor) {
+          response = await this.getListDecisions(status, startDate, endDate, response.nextCursor)
+          index = 1
+          return response.decisions[0]
         }
 
-        index++
         return undefined
       }
     }
@@ -225,7 +225,7 @@ export class DbSderApiGateway {
   async getDecisionBySourceId(sourceId: number) {
     type Response = {
       decisions: (Omit<DecisionTcom, '_id'> & { _id: string })[]
-      length: number
+      totalDecisions: number
       nextPage?: string
       previousPage?: string
     }
@@ -285,7 +285,7 @@ export class DbSderApiGateway {
         throw new ServiceUnavailableException('DbSder API is unavailable')
       })
 
-    if (result && Array.isArray(result.data.decisions) && result.data.length > 0) {
+    if (result && Array.isArray(result.data.decisions) && result.data.decisions.length > 0) {
       return result.data.decisions[0]
     } else {
       return null

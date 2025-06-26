@@ -156,14 +156,14 @@ export async function normalizationJob(): Promise<ConvertedDecisionWithMetadonne
         )
         if (previousVersion !== null) {
           const diff = computeDiff(previousVersion, decisionToSave)
-          if (diff.major.length > 0) {
+          if (diff.major && diff.major.length > 0) {
             // Update decision with major changes:
             await dbSderApiGateway.saveDecision(decisionToSave)
             logger.info({
               ...currentNormalizationFormatLogs,
               msg: `Decision updated in database with major changes: ${JSON.stringify(diff.major)}`
             })
-          } else if (diff.minor.length > 0) {
+          } else if (diff.minor && diff.minor.length > 0) {
             // Patch decision with minor changes:
             delete decisionToSave.__v
             delete decisionToSave.sourceId
@@ -246,20 +246,37 @@ export async function normalizationJob(): Promise<ConvertedDecisionWithMetadonne
           decisionNormalisee: cleanedDecision
         })
       } catch (error) {
-        logger.error({
-          ...normalizationFormatLogs,
-          msg: error.message,
-          data: error
-        })
-        logger.error({
-          ...normalizationFormatLogs,
-          msg: 'Failed to normalize the decision ' + decisionFilename + '.'
-        })
-        // To avoid too many request errors (as in Label):
-        if (error instanceof PostponeException) {
-          await new Promise((_) => setTimeout(_, 20 * 1000))
+        if (error.message && /nosuchkey/i.test(error.message)) {
+          logger.error({
+            ...normalizationFormatLogs,
+            msg: 'Decision has no PDF. Deleting decision in raw bucket',
+            data: error
+          })
+          const reqParamsDelete = {
+            Bucket: bucketNameIntegre,
+            Key: decisionFilename
+          }
+          await s3Repository.deleteDecision(reqParamsDelete)
+          logger.error({
+            ...normalizationFormatLogs,
+            msg: 'Failed to normalize the decision ' + decisionFilename + '.'
+          })
         } else {
-          await new Promise((_) => setTimeout(_, 10 * 1000))
+          logger.error({
+            ...normalizationFormatLogs,
+            msg: error.message,
+            data: error
+          })
+          logger.error({
+            ...normalizationFormatLogs,
+            msg: 'Failed to normalize the decision ' + decisionFilename + '.'
+          })
+          // To avoid too many request errors (as in Label):
+          if (error instanceof PostponeException) {
+            await new Promise((_) => setTimeout(_, 20 * 1000))
+          } else {
+            await new Promise((_) => setTimeout(_, 10 * 1000))
+          }
         }
         continue
       }
@@ -289,9 +306,17 @@ function computeDiff(
   // Note: we skip zoning diff, because the zoning should only change if the originalText changes (which is a major change anyway). If the zoning changes with the same given originalText, then the change comes from us, not from the sender
   if (newDecision.public !== oldDecision.public) {
     diff.major.push('public')
+    logger.info({
+      ...normalizationFormatLogs,
+      msg: `major change to public: '${oldDecision.public}' -> '${newDecision.public}'`
+    })
   }
   if (newDecision.debatPublic !== oldDecision.debatPublic) {
     diff.major.push('debatPublic')
+    logger.info({
+      ...normalizationFormatLogs,
+      msg: `major change to debatPublic: '${oldDecision.debatPublic}' -> '${newDecision.debatPublic}'`
+    })
   }
   if (newDecision.originalText !== oldDecision.originalText) {
     diff.major.push('originalText')
@@ -305,74 +330,143 @@ function computeDiff(
     diff.major.push('occultation.motivationOccultation')
   }
   if (
-    oldDecision.occultation.categoriesToOmit.length !==
-    newDecision.occultation.categoriesToOmit.length
+    (!oldDecision.occultation.categoriesToOmit && newDecision.occultation.categoriesToOmit) ||
+    (oldDecision.occultation.categoriesToOmit && !newDecision.occultation.categoriesToOmit)
   ) {
     diff.major.push('occultation.categoriesToOmit')
-  } else {
-    oldDecision.occultation.categoriesToOmit.sort()
-    newDecision.occultation.categoriesToOmit.sort()
+  } else if (oldDecision.occultation.categoriesToOmit && newDecision.occultation.categoriesToOmit) {
     if (
-      JSON.stringify(oldDecision.occultation.categoriesToOmit) !==
-      JSON.stringify(newDecision.occultation.categoriesToOmit)
+      oldDecision.occultation.categoriesToOmit.length !==
+      newDecision.occultation.categoriesToOmit.length
     ) {
       diff.major.push('occultation.categoriesToOmit')
+    } else {
+      oldDecision.occultation.categoriesToOmit.sort()
+      newDecision.occultation.categoriesToOmit.sort()
+      if (
+        JSON.stringify(oldDecision.occultation.categoriesToOmit) !==
+        JSON.stringify(newDecision.occultation.categoriesToOmit)
+      ) {
+        diff.major.push('occultation.categoriesToOmit')
+      }
     }
   }
 
   // Minor changes...
   if (newDecision.chamberId !== oldDecision.chamberId) {
     diff.minor.push('chamberId')
+    logger.info({
+      ...normalizationFormatLogs,
+      msg: `minor change to chamberId: '${oldDecision.chamberId}' -> '${newDecision.chamberId}'`
+    })
   }
   if (newDecision.chamberName !== oldDecision.chamberName) {
     diff.minor.push('chamberName')
+    logger.info({
+      ...normalizationFormatLogs,
+      msg: `minor change to chamberName: '${oldDecision.chamberName}' -> '${newDecision.chamberName}'`
+    })
   }
   if (newDecision.dateDecision !== oldDecision.dateDecision) {
     diff.minor.push('dateDecision')
+    logger.info({
+      ...normalizationFormatLogs,
+      msg: `minor change to dateDecision: '${oldDecision.dateDecision}' -> '${newDecision.dateDecision}'`
+    })
   }
   if (newDecision.jurisdictionCode !== oldDecision.jurisdictionCode) {
     diff.minor.push('jurisdictionCode')
+    logger.info({
+      ...normalizationFormatLogs,
+      msg: `minor change to jurisdictionCode: '${oldDecision.jurisdictionCode}' -> '${newDecision.jurisdictionCode}'`
+    })
   }
   if (newDecision.jurisdictionName !== oldDecision.jurisdictionName) {
     diff.minor.push('jurisdictionName')
+    logger.info({
+      ...normalizationFormatLogs,
+      msg: `minor change to jurisdictionName: '${oldDecision.jurisdictionName}' -> '${newDecision.jurisdictionName}'`
+    })
   }
   if (newDecision.registerNumber !== oldDecision.registerNumber) {
     diff.minor.push('registerNumber')
+    logger.info({
+      ...normalizationFormatLogs,
+      msg: `minor change to registerNumber: '${oldDecision.registerNumber}' -> '${newDecision.registerNumber}'`
+    })
   }
   if (newDecision.solution !== oldDecision.solution) {
     diff.minor.push('solution')
+    logger.info({
+      ...normalizationFormatLogs,
+      msg: `minor change to solution: '${oldDecision.solution}' -> '${newDecision.solution}'`
+    })
   }
   if (newDecision.codeMatiereCivil !== oldDecision.codeMatiereCivil) {
     diff.minor.push('codeMatiereCivil')
+    logger.info({
+      ...normalizationFormatLogs,
+      msg: `minor change to codeMatiereCivil: '${oldDecision.codeMatiereCivil}' -> '${newDecision.codeMatiereCivil}'`
+    })
   }
-  if (oldDecision.parties.length !== newDecision.parties.length) {
+  if (
+    (!oldDecision.parties && newDecision.parties) ||
+    (oldDecision.parties && !newDecision.parties)
+  ) {
     diff.minor.push('parties')
-  } else {
-    try {
-      assert.deepStrictEqual(oldDecision.parties, newDecision.parties)
-    } catch (_) {
+  } else if (oldDecision.parties && newDecision.parties) {
+    if (oldDecision.parties.length !== newDecision.parties.length) {
       diff.minor.push('parties')
+    } else {
+      try {
+        assert.deepStrictEqual(oldDecision.parties, newDecision.parties)
+      } catch (_) {
+        diff.minor.push('parties')
+      }
     }
   }
   if (newDecision.idGroupement !== oldDecision.idGroupement) {
     diff.minor.push('idGroupement')
+    logger.info({
+      ...normalizationFormatLogs,
+      msg: `minor change to idGroupement: '${oldDecision.idGroupement}' -> '${newDecision.idGroupement}'`
+    })
   }
   if (newDecision.codeProcedure !== oldDecision.codeProcedure) {
     diff.minor.push('codeProcedure')
+    logger.info({
+      ...normalizationFormatLogs,
+      msg: `minor change to codeProcedure: '${oldDecision.codeProcedure}' -> '${newDecision.codeProcedure}'`
+    })
   }
   if (newDecision.libelleMatiere !== oldDecision.libelleMatiere) {
     diff.minor.push('libelleMatiere')
+    logger.info({
+      ...normalizationFormatLogs,
+      msg: `minor change to libelleMatiere: '${oldDecision.libelleMatiere}' -> '${newDecision.libelleMatiere}'`
+    })
   }
   if (newDecision.selection !== oldDecision.selection) {
     diff.minor.push('selection')
+    logger.info({
+      ...normalizationFormatLogs,
+      msg: `minor change to selection: '${oldDecision.selection}' -> '${newDecision.selection}'`
+    })
   }
-  if (oldDecision.composition.length !== newDecision.composition.length) {
+  if (
+    (!oldDecision.composition && newDecision.composition) ||
+    (oldDecision.composition && !newDecision.composition)
+  ) {
     diff.minor.push('composition')
-  } else {
-    try {
-      assert.deepStrictEqual(oldDecision.composition, newDecision.composition)
-    } catch (_) {
+  } else if (oldDecision.composition && newDecision.composition) {
+    if (oldDecision.composition.length !== newDecision.composition.length) {
       diff.minor.push('composition')
+    } else {
+      try {
+        assert.deepStrictEqual(oldDecision.composition, newDecision.composition)
+      } catch (_) {
+        diff.minor.push('composition')
+      }
     }
   }
   diff.major.sort()

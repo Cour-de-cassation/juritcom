@@ -1,6 +1,6 @@
 import { DecisionS3Repository } from '../../../shared/infrastructure/repositories/decisionS3.repository'
 import { InfrastructureException } from '../../../shared/infrastructure/exceptions/infrastructure.exception'
-import { logger, normalizationFormatLogs } from '..'
+import { logger, normalizationFormatLogs } from '../logger'
 import { LogsFormat } from '../../../shared/infrastructure/utils/logsFormat.utils'
 import { HttpStatus } from '@nestjs/common'
 

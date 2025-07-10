@@ -19,8 +19,10 @@ import {
 } from '@nestjs/common'
 
 import axios from 'axios'
+import { DbSderApiGateway } from '../normalization/repositories/gateways/dbsderApi.gateway'
 
 const logger: Logger = new Logger('deletionBatch')
+const { getDecisionBySourceId } = new DbSderApiGateway()
 
 export async function processDeletion() {
   let doneCount = 0
@@ -277,122 +279,6 @@ async function getDeletionRequest(key: string): Promise<any> {
   const deletionFromS3 = await s3Client.send(new GetObjectCommand(reqParams))
   const stringifiedDeletion = await deletionFromS3.Body?.transformToString()
   return JSON.parse(stringifiedDeletion)
-}
-
-async function getDecisionBySourceId(sourceId: number) {
-  const urlToCall = process.env.DBSDER_API_URL + '/decisions'
-
-  const result = await axios
-    .get(urlToCall, {
-      params: { sourceName: 'juritcom', sourceId: sourceId },
-      headers: {
-        'x-api-key': process.env.DBSDER_OTHER_API_KEY
-      }
-    })
-    .catch((error) => {
-      if (error.response) {
-        if (error.response.data.statusCode === HttpStatus.BAD_REQUEST) {
-          logger.error({
-            operationName: 'processTCOMDeletion.getDecisionBySourceId',
-            msg: error.response.data.message,
-            data: error.response.data,
-            statusCode: HttpStatus.BAD_REQUEST
-          })
-          throw new BadRequestException(
-            'DbSderAPI Bad request error : ' + error.response.data.message
-          )
-        } else if (error.response.data.statusCode === HttpStatus.UNAUTHORIZED) {
-          logger.error({
-            operationName: 'processTCOMDeletion.getDecisionBySourceId',
-            msg: error.response.data.message,
-            data: error.response.data,
-            statusCode: HttpStatus.UNAUTHORIZED
-          })
-          throw new UnauthorizedException('You are not authorized to call this route')
-        } else if (error.response.data.statusCode === HttpStatus.CONFLICT) {
-          logger.error({
-            operationName: 'processTCOMDeletion.getDecisionBySourceId',
-            msg: error.response.data.message,
-            data: error.response.data,
-            statusCode: HttpStatus.CONFLICT
-          })
-          throw new ConflictException('DbSderAPI error: ' + error.response.data.message)
-        } else {
-          logger.error({
-            operationName: 'processTCOMDeletion.getDecisionBySourceId',
-            msg: error.response.data.message,
-            data: error.response.data,
-            statusCode: HttpStatus.SERVICE_UNAVAILABLE
-          })
-        }
-      }
-      throw new ServiceUnavailableException('DbSder API is unavailable')
-    })
-
-  if (result && Array.isArray(result.data) && result.data.length > 0) {
-    try {
-      return await getDecisionById(result.data[0]._id)
-    } catch (e) {
-      logger.error({
-        operationName: 'processTCOMDeletion.getDecisionBySourceId',
-        msg: e.message,
-        data: e
-      })
-    }
-  }
-  return null
-}
-
-async function getDecisionById(id: string) {
-  const urlToCall = process.env.DBSDER_API_URL + `/decisions/${id}`
-
-  const result = await axios
-    .get(urlToCall, {
-      headers: {
-        'x-api-key': process.env.DBSDER_OTHER_API_KEY
-      }
-    })
-    .catch((error) => {
-      if (error.response) {
-        if (error.response.data.statusCode === HttpStatus.BAD_REQUEST) {
-          logger.error({
-            operationName: 'processTCOMDeletion.getDecisionById',
-            msg: error.response.data.message,
-            data: error.response.data,
-            statusCode: HttpStatus.BAD_REQUEST
-          })
-          throw new BadRequestException(
-            'DbSderAPI Bad request error : ' + error.response.data.message
-          )
-        } else if (error.response.data.statusCode === HttpStatus.UNAUTHORIZED) {
-          logger.error({
-            operationName: 'processTCOMDeletion.getDecisionById',
-            msg: error.response.data.message,
-            data: error.response.data,
-            statusCode: HttpStatus.UNAUTHORIZED
-          })
-          throw new UnauthorizedException('You are not authorized to call this route')
-        } else if (error.response.data.statusCode === HttpStatus.CONFLICT) {
-          logger.error({
-            operationName: 'processTCOMDeletion.getDecisionById',
-            msg: error.response.data.message,
-            data: error.response.data,
-            statusCode: HttpStatus.CONFLICT
-          })
-          throw new ConflictException('DbSderAPI error: ' + error.response.data.message)
-        } else {
-          logger.error({
-            operationName: 'processTCOMDeletion.getDecisionById',
-            msg: error.response.data.message,
-            data: error.response.data,
-            statusCode: HttpStatus.SERVICE_UNAVAILABLE
-          })
-        }
-      }
-      throw new ServiceUnavailableException('DbSder API is unavailable')
-    })
-
-  return result.data
 }
 
 async function deleteDecisionById(id: string) {

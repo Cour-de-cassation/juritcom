@@ -11,16 +11,9 @@ import {
 } from '../shared/infrastructure/dto/metadonnee.dto'
 
 import { DecisionTcom, Category, LabelStatus, UnIdentifiedDecisionTcom } from 'dbsder-api-types'
+import { DbSderApiGateway } from '../batch/normalization/repositories/gateways/dbsderApi.gateway'
 
-import {
-  BadRequestException,
-  ConflictException,
-  HttpStatus,
-  ServiceUnavailableException,
-  UnauthorizedException
-} from '@nestjs/common'
-
-import axios from 'axios'
+const dbSderApiGateway = new DbSderApiGateway()
 
 async function main(jurisdiction: string) {
   if (!jurisdiction) {
@@ -30,185 +23,35 @@ async function main(jurisdiction: string) {
     throw new Error('Usage : <script> jurisdiction')
   }
 
+  const decisions = await dbSderApiGateway.listDecisions('ignored_controleRequis')
+  let decision = await decisions.next()
   let doneCount = 0
-  const decisions = await listDecisions('juritcom', jurisdiction)
-  for (let i = 0; i < decisions.length; i++) {
+
+  while (decision) {
     try {
-      const decision: DecisionTcom = await getDecisionById(decisions[i]._id)
       if (
         /ignored/i.test(decision.labelStatus) === false &&
         /blocked/i.test(decision.labelStatus) === false
       ) {
         const done = await reprocessDecision(decision)
         if (done) {
-          console.log(`Reprocess ${decisions[i]._id}`)
+          console.log(`Reprocess ${decision._id}`)
           doneCount++
         }
       }
     } catch (e) {
-      console.log(`Skip ${decisions[i]._id}: error`, e)
+      console.log(`Skip ${decision._id}: error`, e)
     }
+
+    decision = await decisions.next()
   }
 
   console.log(`Reprocessed ${doneCount} decisions`)
 }
 
-async function listDecisions(source: string, jurisdiction: string) {
-  const urlToCall = process.env.DBSDER_API_URL + '/decisions'
-  const params: any = {
-    sourceName: source
-  }
-  if (jurisdiction !== 'all' && jurisdiction !== '*') {
-    params.jurisdiction = jurisdiction
-  }
-  const result = await axios
-    .get(urlToCall, {
-      params: params,
-      headers: {
-        'x-api-key': process.env.DBSDER_OTHER_API_KEY
-      }
-    })
-    .catch((error) => {
-      if (error.response) {
-        if (error.response.data.statusCode === HttpStatus.BAD_REQUEST) {
-          console.error({
-            msg: error.response.data.message,
-            data: error.response.data,
-            statusCode: HttpStatus.BAD_REQUEST
-          })
-          throw new BadRequestException(
-            'DbSderAPI Bad request error : ' + error.response.data.message
-          )
-        } else if (error.response.data.statusCode === HttpStatus.UNAUTHORIZED) {
-          console.error({
-            msg: error.response.data.message,
-            data: error.response.data,
-            statusCode: HttpStatus.UNAUTHORIZED
-          })
-          throw new UnauthorizedException('You are not authorized to call this route')
-        } else if (error.response.data.statusCode === HttpStatus.CONFLICT) {
-          console.error({
-            msg: error.response.data.message,
-            data: error.response.data,
-            statusCode: HttpStatus.CONFLICT
-          })
-          throw new ConflictException('DbSderAPI error: ' + error.response.data.message)
-        } else {
-          console.error({
-            msg: error.response.data.message,
-            data: error.response.data,
-            statusCode: HttpStatus.SERVICE_UNAVAILABLE
-          })
-        }
-      }
-      throw new ServiceUnavailableException('DbSder API is unavailable')
-    })
-
-  return result.data
-}
-
-async function getDecisionById(id: string): Promise<DecisionTcom> {
-  const urlToCall = process.env.DBSDER_API_URL + `/decisions/${id}`
-
-  const result = await axios
-    .get(urlToCall, {
-      headers: {
-        'x-api-key': process.env.DBSDER_OTHER_API_KEY
-      }
-    })
-    .catch((error) => {
-      if (error.response) {
-        if (error.response.data.statusCode === HttpStatus.BAD_REQUEST) {
-          console.error({
-            msg: error.response.data.message,
-            data: error.response.data,
-            statusCode: HttpStatus.BAD_REQUEST
-          })
-          throw new BadRequestException(
-            'DbSderAPI Bad request error : ' + error.response.data.message
-          )
-        } else if (error.response.data.statusCode === HttpStatus.UNAUTHORIZED) {
-          console.error({
-            msg: error.response.data.message,
-            data: error.response.data,
-            statusCode: HttpStatus.UNAUTHORIZED
-          })
-          throw new UnauthorizedException('You are not authorized to call this route')
-        } else if (error.response.data.statusCode === HttpStatus.CONFLICT) {
-          console.error({
-            msg: error.response.data.message,
-            data: error.response.data,
-            statusCode: HttpStatus.CONFLICT
-          })
-          throw new ConflictException('DbSderAPI error: ' + error.response.data.message)
-        } else {
-          console.error({
-            msg: error.response.data.message,
-            data: error.response.data,
-            statusCode: HttpStatus.SERVICE_UNAVAILABLE
-          })
-        }
-      }
-      throw new ServiceUnavailableException('DbSder API is unavailable')
-    })
-
-  return result.data
-}
-
-async function saveDecision(decisionToSave: UnIdentifiedDecisionTcom) {
-  const urlToCall = process.env.DBSDER_API_URL + '/decisions'
-
-  const result = await axios
-    .put(
-      urlToCall,
-      { decision: decisionToSave },
-      {
-        headers: {
-          'x-api-key': process.env.DBSDER_API_KEY
-        }
-      }
-    )
-    .catch((error) => {
-      if (error.response) {
-        if (error.response.data.statusCode === HttpStatus.BAD_REQUEST) {
-          console.error({
-            msg: error.response.data.message,
-            data: error.response.data,
-            statusCode: HttpStatus.BAD_REQUEST
-          })
-          throw new BadRequestException(
-            'DbSderAPI Bad request error : ' + error.response.data.message
-          )
-        } else if (error.response.data.statusCode === HttpStatus.UNAUTHORIZED) {
-          console.error({
-            msg: error.response.data.message,
-            data: error.response.data,
-            statusCode: HttpStatus.UNAUTHORIZED
-          })
-
-          throw new UnauthorizedException('You are not authorized to call this route')
-        } else if (error.response.data.statusCode === HttpStatus.CONFLICT) {
-          console.error({
-            msg: error.response.data.message,
-            data: error.response.data,
-            statusCode: HttpStatus.CONFLICT
-          })
-          throw new ConflictException('DbSderAPI error: ' + error.response.data.message)
-        } else {
-          console.error({
-            msg: error.response.data.message,
-            data: error.response.data,
-            statusCode: HttpStatus.SERVICE_UNAVAILABLE
-          })
-        }
-      }
-      throw new ServiceUnavailableException('DbSder API is unavailable')
-    })
-
-  return result.data
-}
-
-async function reprocessDecision(decision: DecisionTcom): Promise<boolean> {
+async function reprocessDecision(
+  decision: Omit<DecisionTcom, '_id'> & { _id: string }
+): Promise<boolean> {
   const s3Client = new S3Client({
     endpoint: process.env.S3_URL,
     forcePathStyle: true,
@@ -241,7 +84,7 @@ async function reprocessDecision(decision: DecisionTcom): Promise<boolean> {
       console.log(
         `OLD: ${oldOccultation} --> NEW: ${JSON.stringify(decision.occultation.categoriesToOmit)}`
       )
-      await saveDecision(decision)
+      await dbSderApiGateway.saveDecision(decision)
       return true
     } else {
       throw new Error('Decision incomplete or ID mismatch')

@@ -1,5 +1,5 @@
 import { UnIdentifiedDecisionTcom, Category } from 'dbsder-api-types'
-import { logger, normalizationFormatLogs } from '../index'
+import { logger, normalizationFormatLogs } from '../logger'
 import { LogsFormat } from '../../../shared/infrastructure/utils/logsFormat.utils'
 import {
   OccultationComplementaireDto,

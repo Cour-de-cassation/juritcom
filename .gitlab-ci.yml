@@ -65,7 +65,7 @@ build_and_push_batch:
     - docker
 
 deploy_dev:
-  variable:
+  variables:
     ENV: dev
   extends: .deploy_template
   rules:

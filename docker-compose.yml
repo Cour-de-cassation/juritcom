@@ -3,18 +3,22 @@ name: opendata
 services:
   juritcom-api:
     build:
-      target: api
+      target: api-local
     env_file:
       - .env
     ports:
       - ${PORT}:${PORT}
+    volumes:
+      - .:/home/node
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
   juritcom-batch: 
     build:
-      target: batch
+      target: batch-local
     env_file:
       - .env
+    volumes:
+      - .:/home/node
     extra_hosts:
       - "host.docker.internal:host-gateway"

@@ -8,9 +8,13 @@ services:
       - .env
     ports:
       - ${PORT}:${PORT}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   juritcom-batch: 
     build:
       target: batch
     env_file:
       - .env
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

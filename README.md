@@ -34,11 +34,9 @@ Collecte TCOM pour Judilibre
 -
 ### Pré-requis
 
-- Installer [nvm](https://github.com/nvm-sh/nvm) afin d'avoir la version utilisée pour cette application et lancer la commande :
+L'application nécessite node ainsi qu'un bucket S3, une connexion à une API de pseudonymisation ([nlp-api](https://github.com/Cour-de-cassation/nlp-api)) et une connexion à une API de sauvegarde ([dbsder-api](https://github.com/Cour-de-cassation/dbsder-api)), n'hésitez pas à jeter un coup d'oeil à [juridependencies](https://github.com/Cour-de-cassation/juridependencies).
 
-```bash
-nvm install
-```
+La version de Node utilisée par ce projet est indiquée dans le fichier [.nvmrc](.nvmrc).
 
 ### Installation
 
@@ -50,7 +48,7 @@ npm install
 ## Configuration
 ### Configurer les variables d'environnement:
 
-    Dupliquer le fichier `docker.env.example` et le rennomer `docker.env` ou `.env` selon le besoin, adapter les variables d'environnement si besoin
+  Dupliquer le fichier `.env.example` et le rennomer `.env` selon le besoin, adapter les variables d'environnement si besoin
 
 
 ## Scripts
@@ -65,14 +63,10 @@ npm install
 | `start:dev`        | Démarre l'application en mode développement avec rechargement à chaud.                         |
 | `start:debug`      | Démarre l'application en mode debug avec rechargement à chaud.                                 |
 | `start:prod`       | Démarre l'application en mode production.                                                      |
-| `docker:build`     | Construit l'image Docker avec `docker-compose.local.yml`.                                       |
-| `docker:start`     | Démarre les conteneurs Docker en arrière-plan avec `docker-compose.local.yml`.                  |
-| `docker:stop`      | Arrête les conteneurs Docker.                                                                  |
-| `docker:kill`      | Supprime les conteneurs Docker, les orphelins, les volumes et les images.                      |
+| `start:docker`     | Démarre les conteneurs Docker en arrière-plan avec `docker-compose.local.yml`.                  |
+| `stop:docker`      | Arrête les conteneurs Docker.                                                                  |
 | `batch:start`      | Exécute un script de normalisation batch en utilisant `ts-node`.                                |
 | `batch:start:prod` | Exécute le script batch de normalisation en production.                                         |
-| `docker:start:s3`  | Démarre le conteneur S3 et crée des buckets via Docker.                                         |
-| `docker:stop:s3`   | Arrête le conteneur S3.                                                                        |
 | `lint`             | Vérifie le code TypeScript avec ESLint.                                                        |
 | `test`             | Exécute les tests unitaires et d'intégration.                                                  |
 | `test:batch`       | Exécute uniquement les tests pour le batch.                                                    |
@@ -88,33 +82,22 @@ npm install
 
 Démarrer l'application nécessite au préalable d'initaliser les fichiers de variables d'environnement.
 
-- Pour lancer l'ensemble de JuriTCOM avec Docker :
+- Pour lancer JuriTCOM avec Docker (voir [juridependencies](https://github.com/Cour-de-cassation/juridependencies) pour un container S3 adapté et [dbsder-api](https://github.com/Cour-de-cassation/dbsder-api) pour la brique de sauvegarde) :
 
   ```bash
-  npm run docker:build
-  npm run docker:start
+  npm run start:docker
   ```
 
 - Pour lancer l'API en phase de développement et afin de disposer d'une mise à jour à chaud du serveur à chaque changement:
 
   ```bash
-  npm run docker:build
-  npm run docker:start:s3
-  npm run start:dev
+  npm run start:watch
   ```
 
 - Autres commandes utiles :
     - Stopper tous les container :
       ```bash
       npm run docker:stop
-      ```
-    - Stopper le container du S3 :
-      ```bash
-      npm run docker:stop:s3
-      ```
-    - Arrêter et nettoyer l'environnement docker de l'application :
-      ```bash
-      npm run docker:kill
       ```
     - Lancer le lint et le formatage du code :
       ```bash

@@ -8,9 +8,12 @@ import { Marked } from 'marked'
 import { PostponeException } from '../infrastructure/nlp.exception'
 import { decode } from 'html-entities'
 import { convert } from 'html-to-text'
+import { JSDOM } from 'jsdom';
+
 
 export interface NLPPDFToTextDTO {
   markdownText?: string
+  HTMLText?: string
   images?: object
   versions?: object
 }
@@ -95,6 +98,30 @@ export async function fetchNLPDataFromPDF(pdfFile: Buffer, pdfFilename: string):
       throw new InfrastructureException(error.message)
     }
   }
+}
+
+export function HTMLToPlainText(input: string): string {
+  let plainText = input
+
+  if (!plainText || isEmptyText(plainText) || hasNoBreak(plainText)) {
+    const error = new InfrastructureException(
+      'Le texte retourné est vide ou potentiellement incomplet'
+    )
+    const formatLogs: LogsFormat = {
+      ...normalizationFormatLogs,
+      operationName: 'HTMLToPlainText',
+      msg: error.message,
+      data: {
+        input: input,
+        output: plainText
+      }
+    }
+    logger.error({
+      ...formatLogs
+    })
+    throw error
+  }
+  return plainText
 }
 
 export function markdownToPlainText(input: string): string {

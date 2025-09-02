@@ -10,6 +10,7 @@ import { DbSderApiGateway } from './repositories/gateways/dbsderApi.gateway'
 import {
   fetchPDFFromS3,
   fetchNLPDataFromPDF,
+  HTMLToPlainText,
   markdownToPlainText,
   NLPPDFToTextDTO,
   isEmptyText,
@@ -61,8 +62,13 @@ export async function normalizationJob(): Promise<ConvertedDecisionWithMetadonne
             // 1. Get data from NLP API:
             const NLPData: NLPPDFToTextDTO = await fetchNLPDataFromPDF(pdfFile, pdfFilename)
 
-            // 2. Get plain text from markdown:
-            decision.texteDecisionIntegre = markdownToPlainText(NLPData.markdownText)
+            if (NLPData.HTMLText) {
+              // 2.1. Get plain text from HTML:
+              decision.texteDecisionIntegre = HTMLToPlainText(NLPData.HTMLText)
+            } else if (NLPData.markdownText) {
+              // 2.2. Get plain text from markdown:
+              decision.texteDecisionIntegre = markdownToPlainText(NLPData.markdownText)
+            }
 
             // 3. Store NLP data in -pdf-success bucket:
             await s3Repository.archiveSuccessPDF(NLPData, pdfFilename)

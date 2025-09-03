@@ -1,5 +1,5 @@
 # --- Builder --- #
-FROM node:20-alpine AS builder
+FROM node:24-alpine AS builder
 
 ENV NODE_ENV=build
 
@@ -27,7 +27,7 @@ RUN npm prune --production
 RUN ls -al /home/node/dist
 
 # --- Base final image with only shared dist content --- #
-FROM node:20-alpine AS shared
+FROM node:24-alpine AS shared
 
 ENV NODE_ENV=production
 
@@ -65,7 +65,7 @@ USER node
 CMD ["npm", "run", "batch:start:watch"]
 
 # --- Base image with api content --- #
-FROM node:20-alpine AS api-local
+FROM node:24-alpine AS api-local
 
 USER node
 WORKDIR /home/node

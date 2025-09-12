@@ -386,6 +386,13 @@ function computeDiff(
       msg: `minor change to jurisdictionCode: '${oldDecision.jurisdictionCode}' -> '${newDecision.jurisdictionCode}'`
     })
   }
+  if (newDecision.jurisdictionId !== oldDecision.jurisdictionId) {
+    diff.minor.push('jurisdictionId')
+    logger.info({
+      ...normalizationFormatLogs,
+      msg: `minor change to jurisdictionId: '${oldDecision.jurisdictionId}' -> '${newDecision.jurisdictionId}'`
+    })
+  }
   if (newDecision.jurisdictionName !== oldDecision.jurisdictionName) {
     diff.minor.push('jurisdictionName')
     logger.info({

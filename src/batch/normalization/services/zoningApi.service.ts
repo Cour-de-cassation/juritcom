@@ -71,7 +71,6 @@ export class ZoningApiService {
               `Le texte de la décision ${decision.sourceName}:${decision.sourceId} est mal encodé pour l'API de zonage : ${error.response.statusText}`
             )
           } else {
-            console.log(error)
             this.logger.error({
               ...formatLogs,
               msg: error.response.statusText,

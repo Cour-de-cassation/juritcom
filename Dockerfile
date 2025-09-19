@@ -23,9 +23,6 @@ FROM builder AS prod
 # Remove dev dependencies
 RUN npm prune --production
 
-# Check the contents of the dist directory in the prod stage
-RUN ls -al /home/node/dist
-
 # --- Base final image with only shared dist content --- #
 FROM node:24-alpine AS shared
 
@@ -43,9 +40,8 @@ FROM shared AS batch
 
 USER node
 COPY --from=prod --chown=node:node /home/node/dist/batch ./dist/batch
-COPY --chown=node:node batch_docker_entrypoint.sh batch_docker_entrypoint.sh
 
-ENTRYPOINT ["/bin/sh", "batch_docker_entrypoint.sh"]
+CMD ["node", "dist/batch/main"]
 
 # --- Base final image with api dist content --- #
 FROM shared AS api

@@ -65,7 +65,9 @@ async function main(datetime: string) {
   }
   console.log(`To unpublish from Judilibre (${unpublishFromJudilibreIds.length}):`)
   console.log(
-    `kubectl exec -it -n judilibre-sder \`kubectl -n judilibre-sder get pods | grep judilibre-sder-deployment-\` -- sh -c "node ./src/scripts/deleteFromJudilibre.js ${unpublishFromJudilibreIds.join(',')}"`
+    `kubectl exec -it -n judilibre-sder \`kubectl -n judilibre-sder get pods | grep judilibre-sder-deployment-\` -- sh -c "node ./src/scripts/deleteFromJudilibre.js ${unpublishFromJudilibreIds.join(
+      ','
+    )}"`
   )
   console.log(`To remove from Label (${removeFromLabelIds.length}):`)
   console.log(removeFromLabelIds.join(';'))

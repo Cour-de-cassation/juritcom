@@ -41,7 +41,7 @@ FROM shared AS batch
 USER node
 COPY --from=prod --chown=node:node /home/node/dist/batch ./dist/batch
 
-CMD ["node", "dist/batch/main"]
+CMD ["node", "dist/batch/normalization/index.js"]
 
 # --- Base final image with api dist content --- #
 FROM shared AS api

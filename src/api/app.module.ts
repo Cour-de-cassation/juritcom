@@ -10,7 +10,6 @@ import { DecisionController } from './infrastructure/controllers/decision/decisi
 import { envValidationConfig } from '../shared/infrastructure/dto/env.validation'
 import { AuthModule } from '../shared/infrastructure/security/auth/auth.module'
 import { FileModule } from '../shared/infrastructure/files/file.module'
-import { BatchModule } from '../batch/batch.module'
 
 @Module({
   imports: [
@@ -21,8 +20,7 @@ import { BatchModule } from '../batch/batch.module'
     }),
     configureLoggerModule(),
     AuthModule,
-    FileModule,
-    BatchModule
+    FileModule
   ],
   controllers: [RedirectController, HealthController, DecisionController],
   providers: [BucketHealthIndicator]

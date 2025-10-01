@@ -1,6 +1,5 @@
 import {
   S3Client,
-  GetObjectCommand,
   PutObjectCommand,
   ListObjectsV2CommandInput,
   _Object,
@@ -11,7 +10,6 @@ import { Logger } from '@nestjs/common'
 import { PinoLogger } from 'nestjs-pino'
 import { BucketError } from '../../domain/errors/bucket.error'
 import { DecisionRepository } from '../../../api/domain/decisions/repositories/decision.repository'
-import { CollectDto } from '../dto/collect.dto'
 
 export class DecisionS3Repository implements DecisionRepository {
   private s3Client: S3Client
@@ -94,16 +92,6 @@ export class DecisionS3Repository implements DecisionRepository {
     await this.deleteDecision(reqParamsDelete)
   }
 
-  async saveDecisionNormalisee(requestToS3Dto: string, filename: string) {
-    const reqParams = {
-      Body: requestToS3Dto,
-      Bucket: process.env.S3_BUCKET_NAME_NORMALIZED,
-      Key: filename
-    }
-
-    await this.saveDecision(reqParams)
-  }
-
   async uploadFichierDecisionIntegre(
     file: Express.Multer.File,
     originalPdfFileName: string,
@@ -125,78 +113,6 @@ export class DecisionS3Repository implements DecisionRepository {
       await this.s3Client.send(new PutObjectCommand(params))
     } catch (error) {
       this.logger.error({ operationName: 'putDecision', msg: error.message, data: error })
-      throw new BucketError(error)
-    }
-  }
-
-  async getDecisionByFilename(filename: string): Promise<CollectDto & { _id: string }> {
-    const reqParams = {
-      Bucket: process.env.S3_BUCKET_NAME_RAW,
-      Key: filename
-    }
-
-    try {
-      const decisionFromS3 = await this.s3Client.send(new GetObjectCommand(reqParams))
-      const stringifiedDecision = await decisionFromS3.Body?.transformToString()
-      return JSON.parse(stringifiedDecision)
-    } catch (error) {
-      this.logger.error({ operationName: 'getDecisionByFilename', msg: error.message, data: error })
-      throw new BucketError(error)
-    }
-  }
-
-  async getPDFByFilename(filename: string): Promise<Buffer> {
-    const reqParams = {
-      Bucket: process.env.S3_BUCKET_NAME_PDF,
-      Key: filename
-    }
-
-    try {
-      const fileFromS3 = await this.s3Client.send(new GetObjectCommand(reqParams))
-      return Buffer.from(await fileFromS3.Body?.transformToByteArray())
-    } catch (error) {
-      this.logger.error({ operationName: 'getPDFByFilename', msg: error.message, data: error })
-      throw new BucketError(error)
-    }
-  }
-
-  async archiveFailedPDF(file: Buffer, key: string): Promise<void> {
-    const params = {
-      Bucket: process.env.S3_BUCKET_NAME_PDF2TEXT_FAILED,
-      Key: `${key}`,
-      Body: file,
-      ContentType: 'application/pdf',
-      ACL: 'public-read',
-      Metadata: {
-        date: new Date().toISOString(),
-        originalPdfFileName: `${key}`
-      }
-    } as unknown as any
-
-    try {
-      await this.s3Client.send(new PutObjectCommand(params))
-    } catch (error) {
-      this.logger.error({ operationName: 'archiveFailedPDF', msg: error.message, data: error })
-      throw new BucketError(error)
-    }
-  }
-
-  async archiveSuccessPDF(data: object, key: string): Promise<void> {
-    const params = {
-      Bucket: process.env.S3_BUCKET_NAME_PDF2TEXT_SUCCESS,
-      Key: `${key}`,
-      Body: JSON.stringify(data),
-      ACL: 'public-read',
-      Metadata: {
-        date: new Date().toISOString(),
-        originalPdfFileName: `${key}`
-      }
-    } as unknown as any
-
-    try {
-      await this.s3Client.send(new PutObjectCommand(params))
-    } catch (error) {
-      this.logger.error({ operationName: 'archiveSuccessPDF', msg: error.message, data: error })
       throw new BucketError(error)
     }
   }

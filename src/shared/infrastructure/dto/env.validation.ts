@@ -17,7 +17,6 @@ export const envValidationConfig = {
     S3_BUCKET_NAME_DELETION: Joi.string().required(),
     S3_BUCKET_NAME_DELETION_PROCESSED: Joi.string().required(),
     S3_BUCKET_NAME_NORMALIZED: Joi.string().required(),
-    NLP_PSEUDONYMISATION_API_URL: Joi.string().required(),
     DBSDER_API_URL: Joi.string().required(),
     DBSDER_API_KEY: Joi.string()
       .required()
@@ -36,7 +35,6 @@ export const envValidationConfig = {
       .guid({
         version: ['uuidv4'],
         separator: true
-      }),
-    ZONING_API_URL: Joi.string().required()
+      })
   })
 }

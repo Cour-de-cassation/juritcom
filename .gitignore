@@ -164,3 +164,5 @@ dist
 !secrets/dev/generate-keys.sh
 /test
 .vscode/
+
+AV_PDF_PATH/

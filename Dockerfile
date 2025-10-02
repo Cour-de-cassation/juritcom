@@ -35,14 +35,6 @@ COPY --from=prod --chown=node:node /home/node/package*.json ./
 COPY --from=prod --chown=node:node /home/node/node_modules/ ./node_modules/
 COPY --from=prod --chown=node:node /home/node/dist/shared ./dist/shared
 
-# --- Base final image with batch dist content --- #
-FROM shared AS batch 
-
-USER node
-COPY --from=prod --chown=node:node /home/node/dist/batch ./dist/batch
-
-CMD ["node", "dist/batch/normalization/index.js"]
-
 # --- Base final image with api dist content --- #
 FROM shared AS api
 
@@ -52,13 +44,6 @@ WORKDIR /home/node
 COPY --from=prod --chown=node:node /home/node/dist ./dist
 
 CMD ["node", "dist/api/main"]
-
-# --- Base image with batch content --- #
-FROM shared AS batch-local
-
-USER node
-
-CMD ["npm", "run", "batch:start:watch"]
 
 # --- Base image with api content --- #
 FROM node:24-alpine AS api-local

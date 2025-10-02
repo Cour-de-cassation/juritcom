@@ -34,7 +34,7 @@ export class BatchService implements OnModuleInit {
     this.logger.log({ operationName: 'archiveFilesToS3', msg: `Starting scan` })
 
     try {
-      const fileNames = fs.readdirSync(this.folderPath)
+      const fileNames = fs.readdirSync(this.folderPath).filter((_) => _.endsWith('.pdf'))
       fileNames.forEach((filename) => {
         const filePath = path.join(this.folderPath, filename)
         const stats = fs.statSync(filePath)

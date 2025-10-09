@@ -46,6 +46,7 @@ import { SaveDecisionUsecase } from '../../../usecase/saveDecision.usecase'
 import { DeleteDecisionUsecase } from '../../../usecase/deleteDecision.usecase'
 import { DecisionS3Repository } from '../../../../shared/infrastructure/repositories/decisionS3.repository'
 import { JwtAuthGuard } from '../../../../shared/infrastructure/security/auth/auth.guard'
+import { DecisionMongoRepository } from 'src/shared/infrastructure/repositories/decisionMongo.repository'
 
 const FILE_MAX_SIZE = {
   size: 31457280,
@@ -108,7 +109,7 @@ export class DecisionController {
     @Req() request: Request
   ): Promise<DeleteDecisionResponse> {
     const routePath = request.method + ' ' + request.path
-    const decisionUseCase = new DeleteDecisionUsecase(new DecisionS3Repository(this.logger))
+    const decisionUseCase = new DeleteDecisionUsecase(new DecisionS3Repository(this.logger), new DecisionMongoRepository())
     const formatLogs: LogsFormat = {
       operationName: 'deleteDecision',
       httpMethod: request.method,

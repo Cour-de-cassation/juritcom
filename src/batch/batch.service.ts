@@ -2,11 +2,12 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common'
 import { SchedulerRegistry } from '@nestjs/schedule'
 import * as fs from 'fs'
 import * as path from 'path'
-import { DecisionRepository } from '../api/domain/decisions/repositories/decision.repository'
+import { DecisionRepository, RawFilesRepository } from '../api/domain/decisions/repositories/decision.repository'
 import { DecisionS3Repository } from '../shared/infrastructure/repositories/decisionS3.repository'
 import { CronJob } from 'cron'
 
 import { processDeletion } from './deletion/deletion'
+import { DecisionMongoRepository } from 'src/shared/infrastructure/repositories/decisionMongo.repository'
 
 @Injectable()
 export class BatchService implements OnModuleInit {
@@ -14,8 +15,9 @@ export class BatchService implements OnModuleInit {
   private readonly separator = process.env.S3_PDF_FILE_NAME_SEPARATOR
   private readonly logger: Logger = new Logger(BatchService.name)
   private readonly decisionsRepository: DecisionRepository = new DecisionS3Repository(this.logger)
+  private readonly rawRepository: RawFilesRepository = new DecisionMongoRepository()
 
-  constructor(private schedulerRegistry: SchedulerRegistry) {}
+  constructor(private schedulerRegistry: SchedulerRegistry) { }
 
   onModuleInit() {
     this.addCronJob(
@@ -35,7 +37,7 @@ export class BatchService implements OnModuleInit {
 
     try {
       const fileNames = fs.readdirSync(this.folderPath).filter((_) => _.endsWith('.pdf'))
-      fileNames.forEach((filename) => {
+      const filesArchived = await Promise.allSettled(fileNames.map(async (filename) => {
         const filePath = path.join(this.folderPath, filename)
         const stats = fs.statSync(filePath)
 
@@ -49,11 +51,19 @@ export class BatchService implements OnModuleInit {
             originalPdfFileName,
             pdfS3Key
           )
-        }
-      })
 
-      fileNames.forEach((filename) => {
-        const filePath = path.join(this.folderPath, filename)
+          const { metadonnees } = await this.decisionsRepository.getDecisionByFilename(`${idMatch[0]}.json`)
+          this.rawRepository.createFileInformation({
+            path: pdfS3Key,
+            events: [{ type: "created", date: new Date() }],
+            metadonnees
+          })
+        }
+        return filename
+      }))
+
+      filesArchived.filter(_ => _.status === 'fulfilled').forEach((_) => {
+        const filePath = path.join(this.folderPath, _.value)
         fs.unlinkSync(filePath) // file deletion
       })
     } catch (error) {

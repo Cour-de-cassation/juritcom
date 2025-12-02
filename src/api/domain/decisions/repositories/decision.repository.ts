@@ -1,13 +1,7 @@
-import { ObjectId } from "bson"
-import { CollectDto } from "src/shared/infrastructure/dto/collect.dto"
-import { MetadonneeDto } from "src/shared/infrastructure/dto/metadonnee.dto"
+import { ObjectId } from 'bson'
+import { CollectDto } from 'src/shared/infrastructure/dto/collect.dto'
+import { MetadonneeDto } from 'src/shared/infrastructure/dto/metadonnee.dto'
 export interface DecisionRepository {
-  saveDataDecisionIntegre(
-    jsonToString: string,
-    originalPdfFileName: string,
-    jsonS3Key: string
-  ): Promise<void>
-
   deleteDataDecisionIntegre(jsonS3Key: string): Promise<void>
 
   uploadFichierDecisionIntegre(
@@ -39,13 +33,13 @@ type Deleted = {
 export type Event = Created | Normalized | Blocked | Deleted
 
 export type RawTcom = {
-  path: string,
-  events: [Created, ...Event[]], 
-  metadonnees: MetadonneeDto
+  path: string
+  events: [Created, ...Event[]]
+  metadatas: MetadonneeDto
 }
 
 export interface RawFilesRepository {
   findFileInformation(key: Partial<RawTcom>): Promise<RawTcom & { _id: ObjectId }>
   createFileInformation(file: RawTcom): Promise<unknown>
-  updateFileInformation(id: ObjectId, update: Partial<RawTcom>): Promise<{ _id: ObjectId }> 
+  updateFileInformation(id: ObjectId, update: Partial<RawTcom>): Promise<{ _id: ObjectId }>
 }

@@ -109,7 +109,10 @@ export class DecisionController {
     @Req() request: Request
   ): Promise<DeleteDecisionResponse> {
     const routePath = request.method + ' ' + request.path
-    const decisionUseCase = new DeleteDecisionUsecase(new DecisionS3Repository(this.logger), new DecisionMongoRepository())
+    const decisionUseCase = new DeleteDecisionUsecase(
+      new DecisionS3Repository(this.logger),
+      new DecisionMongoRepository()
+    )
     const formatLogs: LogsFormat = {
       operationName: 'deleteDecision',
       httpMethod: request.method,
@@ -218,7 +221,7 @@ export class DecisionController {
     const decisionUseCase = new SaveDecisionUsecase(new DecisionS3Repository(this.logger))
 
     const bucketFileDto = await decisionUseCase
-      .putDecision(fichierDecisionIntegre, texteDecisionIntegre, metadonneeDto)
+      .putDecision(fichierDecisionIntegre, metadonneeDto)
       .catch((error) => {
         if (error instanceof BucketError) {
           this.logger.error({

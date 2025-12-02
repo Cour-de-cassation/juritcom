@@ -1,7 +1,13 @@
-import { DecisionRepository, RawFilesRepository } from '../domain/decisions/repositories/decision.repository'
+import {
+  DecisionRepository,
+  RawFilesRepository
+} from '../domain/decisions/repositories/decision.repository'
 
 export class DeleteDecisionUsecase {
-  constructor(private decisionsRepository: DecisionRepository, private rawRepository: RawFilesRepository) {}
+  constructor(
+    private decisionsRepository: DecisionRepository,
+    private rawRepository: RawFilesRepository
+  ) {}
 
   async deleteDecision(decisionId: string): Promise<string> {
     const jsonFileName = `${decisionId}.json`
@@ -11,10 +17,11 @@ export class DeleteDecisionUsecase {
     try {
       const rawFile = await this.rawRepository.findFileInformation({ path: jsonFileName })
       await this.rawRepository.updateFileInformation(rawFile._id, {
-         events: [...rawFile.events, { type: "deleted", date: new Date() }] 
+        events: [...rawFile.events, { type: 'deleted', date: new Date() }]
       })
-    } catch(err) {
+    } catch (err) {
       // needs to be think by a collect refacto
+      throw new Error(err)
     }
 
     return jsonFileName

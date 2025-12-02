@@ -26,7 +26,21 @@ export class FileService {
         path: fullPath
       }
     } catch (_error) {
-      const error = new InternalServerErrorException('Error saving file')
+      const error = new InternalServerErrorException('Error saving pdf file')
+      this.logger.error({
+        operationName: FileService.name,
+        msg: error.message
+      })
+      throw error
+    }
+  }
+
+  saveJson(json: object, fileName: string) {
+    try {
+      const fullPath = `${this.uploadPath}/${fileName}`
+      fs.writeFileSync(fullPath, JSON.stringify(json))
+    } catch (_error) {
+      const error = new InternalServerErrorException('Error saving json file')
       this.logger.error({
         operationName: FileService.name,
         msg: error.message

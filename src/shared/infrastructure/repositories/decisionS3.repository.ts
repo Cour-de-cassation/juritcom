@@ -42,26 +42,6 @@ export class DecisionS3Repository implements DecisionRepository {
     }
   }
 
-  async saveDataDecisionIntegre(
-    requestToS3Dto: string,
-    originalPdfFileName: string,
-    jsonS3Key: string
-  ): Promise<void> {
-    const now = new Date()
-    now.setMilliseconds(0)
-    const reqParams = {
-      Body: requestToS3Dto,
-      Bucket: process.env.S3_BUCKET_NAME_RAW,
-      Key: `${jsonS3Key}`,
-      Metadata: {
-        date: now.toISOString(),
-        originalPdfFileName: originalPdfFileName
-      }
-    }
-
-    await this.saveDecision(reqParams)
-  }
-
   async deleteDecision(reqParams): Promise<void> {
     try {
       await this.s3Client.send(new DeleteObjectCommand(reqParams))

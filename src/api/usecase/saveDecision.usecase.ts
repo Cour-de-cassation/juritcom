@@ -2,7 +2,6 @@ import { DecisionRepository } from '../domain/decisions/repositories/decision.re
 import { MetadonneeDto } from '../../shared/infrastructure/dto/metadonnee.dto'
 import { bucketFileDto } from '../../shared/infrastructure/dto/receive.dto'
 import { FileService } from '../../shared/infrastructure/files/file.service'
-import { CollectDto } from '../../shared/infrastructure/dto/collect.dto'
 
 export class SaveDecisionUsecase {
   private readonly fileService: FileService = new FileService()
@@ -11,28 +10,14 @@ export class SaveDecisionUsecase {
 
   async putDecision(
     fichierDecisionIntegre: Express.Multer.File,
-    texteDecisionIntegre: string,
     metadonnees: MetadonneeDto
   ): Promise<bucketFileDto> {
     const uuid = metadonnees.idDecision
     const originalFileName = fichierDecisionIntegre.originalname
-    const jsonFileName = `${uuid}.json`
+    const jsonFileName = `${uuid}${process.env.S3_PDF_FILE_NAME_SEPARATOR}${originalFileName}.json`
     const pdfFileName = `${uuid}${process.env.S3_PDF_FILE_NAME_SEPARATOR}${originalFileName}`
 
-    const now = new Date()
-    now.setMilliseconds(0)
-
-    const requestDto: CollectDto = {
-      texteDecisionIntegre,
-      metadonnees,
-      date: now
-    }
-
-    await this.decisionsRepository.saveDataDecisionIntegre(
-      JSON.stringify(requestDto),
-      originalFileName,
-      jsonFileName
-    )
+    this.fileService.saveJson(metadonnees, jsonFileName)
 
     this.fileService.saveFile(fichierDecisionIntegre, pdfFileName)
 

@@ -4,7 +4,8 @@ import {
   ListObjectsV2CommandInput,
   _Object,
   ListObjectsV2Command,
-  DeleteObjectCommand
+  DeleteObjectCommand,
+  GetObjectCommand
 } from '@aws-sdk/client-s3'
 import { Logger } from '@nestjs/common'
 import { PinoLogger } from 'nestjs-pino'
@@ -39,26 +40,6 @@ export class DecisionS3Repository implements DecisionRepository {
       this.logger.error({ operationName: 'saveDecision', msg: error.message, data: error })
       throw new BucketError(error)
     }
-  }
-
-  async saveDataDecisionIntegre(
-    requestToS3Dto: string,
-    originalPdfFileName: string,
-    jsonS3Key: string
-  ): Promise<void> {
-    const now = new Date()
-    now.setMilliseconds(0)
-    const reqParams = {
-      Body: requestToS3Dto,
-      Bucket: process.env.S3_BUCKET_NAME_RAW,
-      Key: `${jsonS3Key}`,
-      Metadata: {
-        date: now.toISOString(),
-        originalPdfFileName: originalPdfFileName
-      }
-    }
-
-    await this.saveDecision(reqParams)
   }
 
   async deleteDecision(reqParams): Promise<void> {
@@ -134,6 +115,22 @@ export class DecisionS3Repository implements DecisionRepository {
       return decisionListFromS3.Contents ? decisionListFromS3.Contents : []
     } catch (error) {
       this.logger.error({ operationName: 'getDecisionList', msg: error.message, data: error })
+      throw new BucketError(error)
+    }
+  }
+
+  async getDecisionByFilename<T>(filename: string): Promise<{ _id: string } & T> {
+    const reqParams = {
+      Bucket: process.env.S3_BUCKET_NAME_RAW,
+      Key: filename
+    }
+
+    try {
+      const decisionFromS3 = await this.s3Client.send(new GetObjectCommand(reqParams))
+      const stringifiedDecision = await decisionFromS3.Body?.transformToString()
+      return JSON.parse(stringifiedDecision) // Warning: any is not a T
+    } catch (error) {
+      this.logger.error({ operationName: 'getDecisionByFilename', msg: error.message, data: error })
       throw new BucketError(error)
     }
   }

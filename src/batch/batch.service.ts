@@ -2,11 +2,15 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common'
 import { SchedulerRegistry } from '@nestjs/schedule'
 import * as fs from 'fs'
 import * as path from 'path'
-import { DecisionRepository } from '../api/domain/decisions/repositories/decision.repository'
+import {
+  DecisionRepository,
+  RawFilesRepository
+} from '../api/domain/decisions/repositories/decision.repository'
 import { DecisionS3Repository } from '../shared/infrastructure/repositories/decisionS3.repository'
 import { CronJob } from 'cron'
 
 import { processDeletion } from './deletion/deletion'
+import { DecisionMongoRepository } from 'src/shared/infrastructure/repositories/decisionMongo.repository'
 
 @Injectable()
 export class BatchService implements OnModuleInit {
@@ -14,6 +18,7 @@ export class BatchService implements OnModuleInit {
   private readonly separator = process.env.S3_PDF_FILE_NAME_SEPARATOR
   private readonly logger: Logger = new Logger(BatchService.name)
   private readonly decisionsRepository: DecisionRepository = new DecisionS3Repository(this.logger)
+  private readonly rawRepository: RawFilesRepository = new DecisionMongoRepository()
 
   constructor(private schedulerRegistry: SchedulerRegistry) {}
 
@@ -35,27 +40,43 @@ export class BatchService implements OnModuleInit {
 
     try {
       const fileNames = fs.readdirSync(this.folderPath).filter((_) => _.endsWith('.pdf'))
-      fileNames.forEach((filename) => {
-        const filePath = path.join(this.folderPath, filename)
-        const stats = fs.statSync(filePath)
+      const filesArchived = await Promise.allSettled(
+        fileNames.map(async (filename) => {
+          const filePath = path.join(this.folderPath, filename)
+          const stats = fs.statSync(filePath)
 
-        if (stats.isFile()) {
-          const idMatch = filename.split(this.separator)
-          const pdfS3Key = `${idMatch[0]}.pdf`
-          const originalPdfFileName = idMatch.length === 2 ? `${idMatch[1]}` : filename
+          if (stats.isFile()) {
+            const idMatch = filename.split(this.separator)
+            const pdfS3Key = `${idMatch[0]}.pdf`
+            const originalPdfFileName = idMatch.length === 2 ? `${idMatch[1]}` : filename
 
-          this.decisionsRepository.uploadFichierDecisionIntegre(
-            fs.readFileSync(filePath),
-            originalPdfFileName,
-            pdfS3Key
-          )
-        }
-      })
+            this.decisionsRepository.uploadFichierDecisionIntegre(
+              fs.readFileSync(filePath),
+              originalPdfFileName,
+              pdfS3Key
+            )
 
-      fileNames.forEach((filename) => {
-        const filePath = path.join(this.folderPath, filename)
-        fs.unlinkSync(filePath) // file deletion
-      })
+            const jsonPath = `${filePath}.json`
+
+            const metadonnees = JSON.parse(fs.readFileSync(jsonPath, 'utf8'))
+
+            this.rawRepository.createFileInformation({
+              path: pdfS3Key,
+              events: [{ type: 'created', date: new Date() }],
+              metadatas: metadonnees
+            })
+          }
+          return filename
+        })
+      )
+
+      filesArchived
+        .filter((_) => _.status === 'fulfilled')
+        .forEach((_) => {
+          const filePath = path.join(this.folderPath, _.value)
+          fs.unlinkSync(filePath) // file deletion
+          fs.unlinkSync(`${filePath}.json`)
+        })
     } catch (error) {
       this.logger.error({ operationName: 'archiveFilesToS3', msg: error.message, data: error })
     }

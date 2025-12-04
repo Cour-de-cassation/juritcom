@@ -51,7 +51,7 @@ async function listCollected(): Promise<Array<any>> {
   let marker = null
   while (done === false) {
     const reqParams = {
-      Bucket: process.env.S3_BUCKET_NAME_RAW,
+      Bucket: process.env.S3_BUCKET_NAME_NORMALIZED, // S3_BUCKET_NAME_RAW,
       Marker: undefined
     }
     if (marker !== null) {
@@ -62,6 +62,7 @@ async function listCollected(): Promise<Array<any>> {
       const listObjects: ListObjectsCommandOutput = await s3Client.send(
         new ListObjectsCommand(reqParams)
       )
+      console.log(listObjects)
       if (listObjects && listObjects.Contents && listObjects.Contents.length) {
         console.log(listObjects)
         for (let i = 0; i < listObjects.Contents.length; i++) {

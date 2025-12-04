@@ -11,8 +11,8 @@ import {
 } from '@aws-sdk/client-s3'
 import { DbSderApiGateway } from '../batch/normalization/repositories/gateways/dbsderApi.gateway'
 
-import fs from 'fs'
-import path from 'path'
+import * as fs from 'fs'
+import * as path from 'path'
 
 const { getDecisionBySourceId } = new DbSderApiGateway()
 

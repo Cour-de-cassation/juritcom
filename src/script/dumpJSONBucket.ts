@@ -41,12 +41,6 @@ async function listCollected(): Promise<Array<any>> {
       secretAccessKey: process.env.S3_SECRET_KEY
     }
   })
-  console.log({
-    endpoint: process.env.S3_URL,
-    region: process.env.S3_REGION,
-    accessKeyId: process.env.S3_ACCESS_KEY,
-    secretAccessKey: process.env.S3_SECRET_KEY
-  })
   let done = false
   let marker = null
   while (done === false) {
@@ -57,14 +51,12 @@ async function listCollected(): Promise<Array<any>> {
     if (marker !== null) {
       reqParams.Marker = marker
     }
-    console.log(reqParams)
     try {
       const listObjects: ListObjectsCommandOutput = await s3Client.send(
         new ListObjectsCommand(reqParams)
       )
       console.log(listObjects)
       if (listObjects && listObjects.Contents && listObjects.Contents.length) {
-        console.log(listObjects)
         for (let i = 0; i < listObjects.Contents.length; i++) {
           const item = listObjects.Contents[i]
           const itemObject = await getItem(item.Key)
@@ -110,7 +102,7 @@ async function getItem(key: string): Promise<any> {
     }
   })
   const reqParams = {
-    Bucket: process.env.S3_BUCKET_NAME_RAW,
+    Bucket: process.env.S3_BUCKET_NAME_NORMALIZED, // S3_BUCKET_NAME_RAW,
     Key: key
   }
   const itemFromS3 = await s3Client.send(new GetObjectCommand(reqParams))

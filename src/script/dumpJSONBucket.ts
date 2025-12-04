@@ -64,6 +64,7 @@ async function listCollected(): Promise<Array<any>> {
       )
       console.log(listObjects)
       if (listObjects && listObjects.Contents && listObjects.Contents.length) {
+        console.log(listObjects)
         for (let i = 0; i < listObjects.Contents.length; i++) {
           const item = listObjects.Contents[i]
           const itemObject = await getItem(item.Key)

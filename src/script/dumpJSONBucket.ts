@@ -55,6 +55,7 @@ async function listCollected(): Promise<Array<any>> {
       const listObjects: ListObjectsCommandOutput = await s3Client.send(
         new ListObjectsCommand(reqParams)
       )
+      console.log(listObjects)
       if (listObjects && listObjects.Contents && listObjects.Contents.length) {
         for (let i = 0; i < listObjects.Contents.length; i++) {
           const item = listObjects.Contents[i]

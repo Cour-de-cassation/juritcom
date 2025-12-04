@@ -11,23 +11,26 @@ import {
 } from '@aws-sdk/client-s3'
 import { DbSderApiGateway } from '../batch/normalization/repositories/gateways/dbsderApi.gateway'
 
+import fs from 'fs'
+import path from 'path'
+
 const { getDecisionBySourceId } = new DbSderApiGateway()
 
 async function main() {
-  // const dump = []
+  const dump = []
   const collected = await listCollected()
   for (let i = 0; i < collected.length; i++) {
+    collected[i].inDecision = false
     try {
-      console.log(collected[i])
       const decision = await getDecisionBySourceId(collected[i].sourceId)
-      console.log(`Decision exists: ${decision ? 'true' : 'false'}`)
-    } catch (e) {
-      console.error(
-        `Error while processing TCOM deletion request ${collected[i].s3Key}.deletion (sourceId: ${collected[i].sourceId})`,
-        e
-      )
-    }
+      collected[i].inDecision = decision ? true : false
+    } catch (_) {}
+    dump.push(collected[i])
   }
+  fs.writeFileSync(
+    path.join(__dirname, 'dumpJSONBucket.output.json'),
+    JSON.stringify(dump, null, 2)
+  )
 }
 
 async function listCollected(): Promise<Array<any>> {
@@ -55,7 +58,6 @@ async function listCollected(): Promise<Array<any>> {
       const listObjects: ListObjectsCommandOutput = await s3Client.send(
         new ListObjectsCommand(reqParams)
       )
-      console.log(listObjects)
       if (listObjects && listObjects.Contents && listObjects.Contents.length) {
         for (let i = 0; i < listObjects.Contents.length; i++) {
           const item = listObjects.Contents[i]
@@ -76,9 +78,7 @@ async function listCollected(): Promise<Array<any>> {
       } else {
         done = true
       }
-    } catch (error) {
-      console.log({ operationName: 'listCollected', msg: error.message, data: error })
-    }
+    } catch (_) {}
   }
   return list
 }

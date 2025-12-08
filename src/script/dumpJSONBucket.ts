@@ -68,7 +68,9 @@ async function listCollected(): Promise<Array<any>> {
             dateDecision: parseDate(itemObject.metadonnees.dateDecision).toISOString(),
             idDecisionTCOM: itemObject.metadonnees.idDecision,
             jurisdictionId: itemObject.metadonnees.idJuridiction,
-            registerNumber: itemObject.metadonnees.numeroDossier
+            registerNumber: itemObject.metadonnees.numeroDossier,
+            metadonnees: itemObject.metadonnees,
+            date: itemObject.date
           })
           marker = item.Key
         }

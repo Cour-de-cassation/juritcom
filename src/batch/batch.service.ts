@@ -23,11 +23,13 @@ export class BatchService implements OnModuleInit {
       process.env.S3_ARCHIVE_SCHEDULE,
       this.archiveFilesToS3.bind(this)
     )
+    /*
     this.addCronJob(
       `process_deletion_requests`,
       process.env.S3_ARCHIVE_SCHEDULE,
       this.processDeletionRequests.bind(this)
     )
+    */
   }
 
   async archiveFilesToS3() {

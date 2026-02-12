@@ -137,4 +137,4 @@ Pour effectuer des tests Postman sur l'environnement de développement :
 
 Un Swagger est disponible à l'url `/doc` ou via `/doc-json`
 
-L'API utilise le protocole OAuth 2 avec un flow client credentials, et l'utilisation d'un jeton JWT valide est requise pour accéder aux différents endpoints.
+L'API s'appuie sur des jetons JWT valides pour accéder aux différents endpoints.

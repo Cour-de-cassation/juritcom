@@ -1,189 +1,20 @@
 import { NestFactory } from '@nestjs/core'
 import * as basicAuth from 'express-basic-auth'
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger'
-import { Logger } from 'nestjs-pino'
+import { Logger as PinoLogger } from 'nestjs-pino'
+import { Logger } from '@nestjs/common'
 import { AppModule } from './app.module'
 import { RequestLoggerInterceptor } from './infrastructure/interceptors/request-logger.interceptor'
 import { NestApplicationOptions } from '@nestjs/common/interfaces/nest-application-options.interface'
-
-function createModel(db) {
-  async function getClient(clientId, clientSecret) {
-    return db.findClient(clientId, clientSecret)
-  }
-
-  async function validateScope(user, client, scope) {
-    if (!user || user.id !== 'system') {
-      return false
-    }
-
-    if (!client || !db.findClientById(client.id)) {
-      return false
-    }
-
-    if (typeof scope === 'string') {
-      return enabledScopes.includes(scope) ? [scope] : false
-    } else {
-      return scope.every((s) => enabledScopes.includes(s)) ? scope : false
-    }
-  }
-
-  async function getUserFromClient(_client) {
-    const client = db.findClient(_client.id, _client.secret)
-    return client && getUserDoc()
-  }
-
-  async function saveToken(token, client, user) {
-    const meta = {
-      clientId: client.id,
-      userId: user.id,
-      scope: token.scope,
-      accessTokenExpiresAt: token.accessTokenExpiresAt,
-      refreshTokenExpiresAt: token.refreshTokenExpiresAt
-    }
-
-    token.client = client
-    token.user = user
-
-    if (token.accessToken) {
-      db.saveAccessToken(token.accessToken, meta)
-    }
-
-    if (token.refreshToken) {
-      db.saveRefreshToken(token.refreshToken, meta)
-    }
-
-    return token
-  }
-
-  async function getAccessToken(accessToken) {
-    const meta = db.findAccessToken(accessToken)
-
-    if (!meta) {
-      return false
-    }
-
-    return {
-      accessToken,
-      accessTokenExpiresAt: meta.accessTokenExpiresAt,
-      user: getUserDoc(),
-      client: db.findClientById(meta.clientId),
-      scope: meta.scope
-    }
-  }
-
-  async function getRefreshToken(refreshToken) {
-    const meta = db.findRefreshToken(refreshToken)
-
-    if (!meta) {
-      return false
-    }
-
-    return {
-      refreshToken,
-      refreshTokenExpiresAt: meta.refreshTokenExpiresAt,
-      user: getUserDoc(),
-      client: db.findClientById(meta.clientId),
-      scope: meta.scope
-    }
-  }
-
-  async function revokeToken(token) {
-    db.deleteRefreshToken(token.refreshToken)
-
-    return true
-  }
-
-  async function verifyScope(token, scope) {
-    if (typeof scope === 'string') {
-      return enabledScopes.includes(scope)
-    } else {
-      return scope.every((s) => enabledScopes.includes(s))
-    }
-  }
-
-  return {
-    getClient,
-    saveToken,
-    getAccessToken,
-    getRefreshToken,
-    revokeToken,
-    validateScope,
-    verifyScope,
-    getUserFromClient
-  }
-}
-
-class DB {
-  clients: any[]
-  accessTokens: Map<any, any>
-  refreshTokens: Map<any, any>
-
-  constructor() {
-    this.clients = []
-    this.accessTokens = new Map()
-    this.refreshTokens = new Map()
-  }
-
-  saveClient(client) {
-    this.clients.push(client)
-
-    return client
-  }
-
-  findClient(clientId, clientSecret) {
-    return this.clients.find((client) => {
-      if (clientSecret) {
-        return client.id === clientId && client.secret === clientSecret
-      } else {
-        return client.id === clientId
-      }
-    })
-  }
-
-  findClientById(id) {
-    return this.clients.find((client) => client.id === id)
-  }
-
-  saveAccessToken(accessToken, meta) {
-    this.accessTokens.set(accessToken, meta)
-  }
-
-  findAccessToken(accessToken) {
-    return this.accessTokens.get(accessToken)
-  }
-
-  deleteAccessToken(accessToken) {
-    this.accessTokens.delete(accessToken)
-  }
-
-  saveRefreshToken(refreshToken, meta) {
-    this.refreshTokens.set(refreshToken, meta)
-  }
-
-  findRefreshToken(refreshToken) {
-    return this.refreshTokens.get(refreshToken)
-  }
-
-  deleteRefreshToken(refreshToken) {
-    this.refreshTokens.delete(refreshToken)
-  }
-}
-
-const enabledScopes = ['collect']
-const getUserDoc = () => ({ id: 'system' })
 import * as bodyParser from 'body-parser'
-import * as OAuthServer from '@node-oauth/express-oauth-server'
-const db = new DB()
-const model = createModel(db)
-const oauth = new OAuthServer({
-  model: model
-})
+import * as jwtUtils from '../shared/infrastructure/security/jwt/jwt.utils'
+import { safeCompare } from '../shared/infrastructure/security/auth/auth.guard'
 
-db.saveClient({
-  id: process.env.OAUTH_CLIENT_ID,
-  secret: process.env.OAUTH_CLIENT_SECRET,
-  grants: ['client_credentials']
-})
+const JWT_CLIENT_ID = process.env.OAUTH_CLIENT_ID
+const JWT_CLIENT_SECRET = process.env.OAUTH_CLIENT_SECRET
+
+// @legacy: Scope must be present in the response
+const ENABLED_SCOPES = ['collect']
 
 async function bootstrap() {
   const appOptions = {
@@ -198,9 +29,9 @@ async function bootstrap() {
   app.setGlobalPrefix('v1')
 
   // Add logger
-  app.useLogger(app.get(Logger))
-
+  app.useLogger(app.get(PinoLogger))
   app.useGlobalInterceptors(new RequestLoggerInterceptor())
+  const logger = new Logger('main')
 
   // Add login/password to access to API Documentation
   const basicAuthOptions: basicAuth.IUsersOptions = {
@@ -222,26 +53,73 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config)
   SwaggerModule.setup('doc', app, document)
 
-  // ------------------------
-  // private area begins here
-  // ------------------------
-  app.use('/token', oauth.token())
-
   const httpAdapter = app.getHttpAdapter()
-  // @ts-expect-error necessary for testing purpose, will be removed later
-  httpAdapter.get('/test-auth', oauth.authenticate(), function (req, res, _next) {
-    res.send({ test: true })
+  httpAdapter.post('/token', (req, res) => {
+    try {
+      const { client_id: clientId, client_secret: clientSecret, grant_type: grantType } = req.body
+
+      if (!isValidClient(clientId, clientSecret)) {
+        return res.status(401).json({
+          error: 'invalid_client',
+          error_description: 'Invalid client credentials'
+        })
+      }
+
+      if (grantType !== 'client_credentials') {
+        return res.status(400).json({
+          error: 'unsupported_grant_type',
+          error_description: 'Only client_credentials grant type is supported'
+        })
+      }
+
+      const accessToken = jwtUtils.generateToken(clientId)
+      if (!accessToken) {
+        return res.status(500).json({
+          error: 'server_error',
+          error_description: 'Failed to generate token'
+        })
+      }
+
+      return res.status(200).json({
+        access_token: accessToken,
+        token_type: 'Bearer',
+        expires_in: jwtUtils.JWT_EXPIRATION_SECONDS,
+        scope: ENABLED_SCOPES
+      })
+    } catch (error) {
+      logger.error(`Token generation error: ${error.message}`)
+
+      return res.status(500).json({
+        error: 'server_error',
+        error_description: 'Internal server error'
+      })
+    }
+  })
+
+  httpAdapter.get('/test-auth', (req, res) => {
+    const token = jwtUtils.extractBearerToken(req.headers.authorization)
+    if (!token) {
+      return res.status(401).json({ error: 'Missing or invalid Authorization header' })
+    }
+
+    const decoded = jwtUtils.verifyToken(token)
+    if (!decoded) {
+      return res.status(401).json({ error: 'Invalid or expired token' })
+    }
+
+    return res.status(200).json({ test: true, decoded })
   })
 
   await app.listen(process.env.PORT)
 }
 
+function isValidClient(clientId: string, clientSecret: string): boolean {
+  return (
+    clientId &&
+    clientSecret &&
+    safeCompare(clientId, JWT_CLIENT_ID) &&
+    safeCompare(clientSecret, JWT_CLIENT_SECRET)
+  )
+}
+
 bootstrap()
-
-export function getOAuth(): any {
-  return oauth
-}
-
-export function getModel(): any {
-  return model
-}

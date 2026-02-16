@@ -2,6 +2,9 @@ import * as jwt from 'jsonwebtoken'
 import { Logger } from '@nestjs/common'
 
 const JWT_ISSUER = process.env.JWT_ISSUER
+const JWT_ACCEPTED_ISSUERS = process.env.JWT_ACCEPTED_ISSUERS
+  ? process.env.JWT_ACCEPTED_ISSUERS.split(',').map((s) => s.trim())
+  : [JWT_ISSUER]
 const JWT_ALGORITHM = process.env.JWT_ALGORITHM
 const JWT_SECRET = process.env.JWT_SECRET
 const JWT_EXPIRATION_SECONDS = parseInt(process.env.JWT_EXPIRATION_SECONDS, 10) || 900
@@ -32,7 +35,7 @@ function verifyToken(token: string): jwt.JwtPayload | null {
   try {
     const options = {
       algorithms: [JWT_ALGORITHM as jwt.Algorithm],
-      issuer: JWT_ISSUER
+      issuer: JWT_ACCEPTED_ISSUERS as [string, ...string[]]
     }
 
     return jwt.verify(token, JWT_SECRET, options) as jwt.JwtPayload

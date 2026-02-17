@@ -6,7 +6,7 @@ import {
   Logger,
   HttpStatus
 } from '@nestjs/common'
-import { verifyToken } from '../jwt/jwt.utils'
+import * as jwtUtils from '../jwt/jwt.utils'
 import { timingSafeEqual } from 'crypto'
 import { LogsFormat } from '../../../../shared/infrastructure/utils/logsFormat.utils'
 
@@ -94,9 +94,8 @@ export class JwtAuthGuard implements CanActivate {
   }
 
   validateJwt(request): boolean {
-    const authHeader = request.headers.authorization
-
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    const token = jwtUtils.extractBearerToken(request.headers.authorization)
+    if (!token) {
       logger.error({
         ...formatLogs,
         msg: 'Missing or invalid Authorization header'
@@ -105,9 +104,7 @@ export class JwtAuthGuard implements CanActivate {
       return false
     }
 
-    const token = authHeader.substring(7)
-    const decoded = verifyToken(token)
-
+    const decoded = jwtUtils.verifyToken(token)
     if (!decoded) {
       logger.error({
         ...formatLogs,

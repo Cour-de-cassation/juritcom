@@ -21,4 +21,8 @@
         OAUTH_PROVIDER_URL: "{{ oauth_provider_url }}"
         OAUTH_CLIENT_ID: "{{ oauth_client_id }}"
         OAUTH_TOKEN_URL: "{{ oauth_token_url }}"
+        JWT_ISSUER: "{{ jwt_issuer }}"
+        JWT_ACCEPTED_ISSUERS: "{{ jwt_accepted_issuers }}"
+        JWT_ALGORITHM: "{{ jwt_algorithm }}"
+        JWT_EXPIRATION_SECONDS: "{{ jwt_expiration_seconds }}"
 ...

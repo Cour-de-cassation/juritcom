@@ -68,4 +68,3 @@ export function extractBearerToken(authHeader: string): string | null {
 
   return authHeader.substring(7)
 }
-

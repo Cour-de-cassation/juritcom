@@ -7,6 +7,7 @@ import { DecisionS3Repository } from '../shared/infrastructure/repositories/deci
 import { CronJob } from 'cron'
 
 import { processDeletion } from './deletion/deletion'
+import { TechLog } from 'src/shared/infrastructure/utils/logsFormat.utils'
 
 @Injectable()
 export class BatchService implements OnModuleInit {
@@ -33,7 +34,12 @@ export class BatchService implements OnModuleInit {
   }
 
   async archiveFilesToS3() {
-    this.logger.log({ operationName: 'archiveFilesToS3', msg: `Starting scan` })
+    const formatLog: TechLog = {
+      operations: ['other', 'archiveFilesToS3'],
+      path: 'src/batch/batch.service.ts',
+      message: `Starting scan`
+    }
+    this.logger.log({ ...formatLog })
 
     try {
       const fileNames = fs.readdirSync(this.folderPath).filter((_) => _.endsWith('.pdf'))
@@ -59,26 +65,42 @@ export class BatchService implements OnModuleInit {
         fs.unlinkSync(filePath) // file deletion
       })
     } catch (error) {
-      this.logger.error({ operationName: 'archiveFilesToS3', msg: error.message, data: error })
+      this.logger.error({
+        ...formatLog,
+        message: JSON.stringify({
+          msg: error.message,
+          data: error
+        })
+      })
     }
 
-    this.logger.log({ operationName: 'archiveFilesToS3', msg: `End of scan` })
+    this.logger.log({
+      ...formatLog,
+      message: `End of scan`
+    })
   }
 
   async processDeletionRequests() {
-    this.logger.log({ operationName: 'processDeletionRequests', msg: `Starting process` })
+    const formatLog: TechLog = {
+      operations: ['other', 'processDeletionRequests'],
+      path: 'src/batch/batch.service.ts',
+      message: `Starting process`
+    }
+    this.logger.log({ ...formatLog })
 
     try {
       await processDeletion()
     } catch (error) {
       this.logger.error({
-        operationName: 'processDeletionRequests',
-        msg: error.message,
-        data: error
+        ...formatLog,
+        message: JSON.stringify({
+          msg: error.message,
+          data: error
+        })
       })
     }
 
-    this.logger.log({ operationName: 'processDeletionRequests', msg: `End of process` })
+    this.logger.log({ ...formatLog, message: `End of process` })
   }
 
   /**
@@ -96,8 +118,10 @@ export class BatchService implements OnModuleInit {
     this.schedulerRegistry.addCronJob(name, job)
     job.start()
 
-    this.logger.log(
-      `The cron job ${name} has been added with the following cron expression : ${cronExpression}`
-    )
+    this.logger.log({
+      operations: ['other', 'addCronJob'],
+      path: 'src/batch/batch.service.ts',
+      message: `The cron job ${name} has been added with the following cron expression : ${cronExpression}`
+    })
   }
 }

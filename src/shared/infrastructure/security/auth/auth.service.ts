@@ -1,11 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common'
 import axios from 'axios'
-import { LogsFormat } from '../../../../shared/infrastructure/utils/logsFormat.utils'
+import { TechLog } from '../../../../shared/infrastructure/utils/logsFormat.utils'
 
 const logger = new Logger()
-const formatLogs: LogsFormat = {
-  operationName: 'auth.service',
-  msg: 'Error while calling auth.service'
+const formatLogs: TechLog = {
+  operations: ['other', 'AuthService'],
+  path: 'src/shared/infrastructure/security/auth/auth.service.ts',
+  message: 'Error while calling AuthService.getToken'
 }
 
 @Injectable()
@@ -30,13 +31,13 @@ export class AuthService {
       const tokenResponse = await axios.request(config)
       logger.log({
         ...formatLogs,
-        msg: `Get token for ${process.env.OAUTH_CLIENT_ID} from URL ${process.env.OAUTH_TOKEN_URL}`
+        message: `Get token for ${process.env.OAUTH_CLIENT_ID} from URL ${process.env.OAUTH_TOKEN_URL}`
       })
       return tokenResponse.data.access_token
     } catch (e) {
       logger.error({
         ...formatLogs,
-        msg: e.message
+        message: e.message
       })
     }
   }

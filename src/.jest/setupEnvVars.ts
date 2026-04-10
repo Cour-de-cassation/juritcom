@@ -16,5 +16,10 @@ process.env = {
   DBSDER_API_KEY: '24277eca-290c-40c3-9bf6-a370880d800b',
   DBSDER_OTHER_API_KEY: '24277eca-290c-40c3-9bf6-a370880d800b',
   DBSDER_POWERFUL_API_KEY: '24277eca-290c-40c3-9bf6-a370880d800b',
-  USE_AUTH: 'basic'
+  USE_AUTH: 'basic',
+  JWT_SECRET: 'jest-secret',
+  JWT_ISSUER: 'jest-issuer',
+  JWT_ACCEPTED_ISSUERS: 'jest-issuer,jest-issuer-other',
+  JWT_ALGORITHM: 'HS256',
+  JWT_EXPIRATION_SECONDS: '900'
 }

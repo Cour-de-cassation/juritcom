@@ -20,7 +20,6 @@ import {
 
 import axios from 'axios'
 import { DbSderApiGateway } from '../normalization/repositories/gateways/dbsderApi.gateway'
-import path from 'path'
 import { DecisionLog } from 'src/shared/infrastructure/utils/logsFormat.utils'
 
 const logger: Logger = new Logger('deletionBatch')

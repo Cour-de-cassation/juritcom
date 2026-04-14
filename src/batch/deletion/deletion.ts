@@ -20,6 +20,8 @@ import {
 
 import axios from 'axios'
 import { DbSderApiGateway } from '../normalization/repositories/gateways/dbsderApi.gateway'
+import path from 'path'
+import { DecisionLog } from 'src/shared/infrastructure/utils/logsFormat.utils'
 
 const logger: Logger = new Logger('deletionBatch')
 const { getDecisionBySourceId } = new DbSderApiGateway()
@@ -167,28 +169,32 @@ export async function processDeletion() {
           })
         }
       }
+      const decisionLogFormat: DecisionLog = {
+        operations: ['other', 'processTCOMDeletion.deleteFromDBSDER'],
+        path: 'src/batch/deletion/deletion.ts',
+        decision: {
+          sourceId: deletionRequests[i].sourceId,
+          sourceName: decision ? decision.sourceName : 'juritcom'
+        },
+        message: `Deleting decision with sourceId ${deletionRequests[i].sourceId} from DBSDER`
+      }
       if (deleteFromDBSDER) {
         try {
           logger.log({
-            ...formatLog,
-            operation: ['other', 'processTCOMDeletion'],
+            ...decisionLogFormat,
             message: `TCOM decision ${deletionRequests[i].s3Key} (sourceId: ${deletionRequests[i].sourceId}) will be deleted from DBSDER`
           })
-          await deleteDecisionById(decision._id)
+          await deleteDecisionById(decision._id.toString())
         } catch (e) {
           logger.error({
-            ...formatLog,
-            operation: ['other', 'processTCOMDeletion'],
-            message: JSON.stringify({
-              msg: `Could not delete decision with id ${decision._id} from DBSDER`,
-              data: e
-            })
+            ...decisionLogFormat,
+            stack: e
           })
         }
       }
       if (removeFromLabel) {
         logger.warn({
-          ...formatLog,
+          ...decisionLogFormat,
           operation: ['other', 'processTCOMDeletionNotifyLabel'],
           message: JSON.stringify({
             msg: `TCOM decision ${deletionRequests[i].s3Key} (sourceId: ${deletionRequests[i].sourceId}) should be removed from Label`,
@@ -200,7 +206,7 @@ export async function processDeletion() {
       }
       if (unpublishFromJudilibre) {
         logger.warn({
-          ...formatLog,
+          ...decisionLogFormat,
           operation: ['other', 'processTCOMDeletionNotifyJudilibre'],
           message: JSON.stringify({
             msg: `TCOM decision ${deletionRequests[i].s3Key} (sourceId: ${deletionRequests[i].sourceId}) should be unpublished from Judilibre`,
@@ -211,7 +217,7 @@ export async function processDeletion() {
         })
       }
       logger.log({
-        ...formatLog,
+        ...decisionLogFormat,
         operation: ['other', 'processTCOMDeletion'],
         message: `TCOM deletion request ${deletionRequests[i].s3Key}.deletion (sourceId: ${deletionRequests[i].sourceId}) will be deleted`
       })

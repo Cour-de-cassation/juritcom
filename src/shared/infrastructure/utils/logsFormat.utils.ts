@@ -17,7 +17,7 @@ export type DecisionLog = {
     labelStatus?: string
   }
   path: string
-  operations: readonly ['collect' | 'extraction' | 'normalization', string]
+  operations: readonly ['collect' | 'extraction' | 'normalization' | 'other', string]
   message?: string
 }
 

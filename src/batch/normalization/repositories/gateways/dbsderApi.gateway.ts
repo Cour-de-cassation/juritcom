@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common'
 import axios from 'axios'
 import { DecisionTcom } from 'dbsder-api-types'
-import { LogsFormat } from '../../../../shared/infrastructure/utils/logsFormat.utils'
+import { TechLog } from '../../../../shared/infrastructure/utils/logsFormat.utils'
 
 export class DbSderApiGateway {
   private readonly logger = new Logger()
@@ -31,17 +31,20 @@ export class DbSderApiGateway {
         }
       })
       .catch((error) => {
-        const formatLogs: LogsFormat = {
-          operationName: 'getDecisionBySourceId',
-          msg: 'Error while calling DbSder API'
+        const formatLogs: TechLog = {
+          operations: ['other', 'getDecisionBySourceId'],
+          path: 'src/batch/normalization/repositories/gateways/dbsderApi.gateway.ts',
+          message: 'Error while calling DbSder API'
         }
         if (error.response) {
           if (error.response.data.statusCode === HttpStatus.BAD_REQUEST) {
             this.logger.error({
               ...formatLogs,
-              msg: error.response.data.message,
-              data: error.response.data,
-              statusCode: HttpStatus.BAD_REQUEST
+              message: JSON.stringify({
+                msg: error.response.data.message,
+                data: error.response.data,
+                statusCode: HttpStatus.BAD_REQUEST
+              })
             })
             throw new BadRequestException(
               'DbSderAPI Bad request error : ' + error.response.data.message
@@ -49,26 +52,42 @@ export class DbSderApiGateway {
           } else if (error.response.data.statusCode === HttpStatus.UNAUTHORIZED) {
             this.logger.error({
               ...formatLogs,
-              msg: error.response.data.message,
-              data: error.response.data,
-              statusCode: HttpStatus.UNAUTHORIZED
+              message: JSON.stringify({
+                msg: error.response.data.message,
+                data: error.response.data,
+                statusCode: HttpStatus.UNAUTHORIZED
+              })
+            })
+            throw new UnauthorizedException('You are not authorized to call this route')
+          } else if (error.response.data.statusCode === HttpStatus.CONFLICT) {
+            this.logger.error({
+              ...formatLogs,
+              message: JSON.stringify({
+                msg: error.response.data.message,
+                data: error.response.data,
+                statusCode: HttpStatus.CONFLICT
+              })
             })
 
             throw new UnauthorizedException('You are not authorized to call this route')
           } else if (error.response.data.statusCode === HttpStatus.CONFLICT) {
             this.logger.error({
               ...formatLogs,
-              msg: error.response.data.message,
-              data: error.response.data,
-              statusCode: HttpStatus.CONFLICT
+              message: JSON.stringify({
+                msg: error.response.data.message,
+                data: error.response.data,
+                statusCode: HttpStatus.CONFLICT
+              })
             })
             throw new ConflictException('DbSderAPI error: ' + error.response.data.message)
           } else {
             this.logger.error({
               ...formatLogs,
-              msg: error.response.data.message,
-              data: error.response.data,
-              statusCode: HttpStatus.SERVICE_UNAVAILABLE
+              message: JSON.stringify({
+                msg: error.response.data.message,
+                data: error.response.data,
+                statusCode: HttpStatus.SERVICE_UNAVAILABLE
+              })
             })
           }
         }

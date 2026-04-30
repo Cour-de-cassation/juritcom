@@ -20,10 +20,15 @@ import {
 
 import axios from 'axios'
 import { DbSderApiGateway } from '../normalization/repositories/gateways/dbsderApi.gateway'
+import { DecisionLog } from 'src/shared/infrastructure/utils/logsFormat.utils'
 
 const logger: Logger = new Logger('deletionBatch')
 const { getDecisionBySourceId } = new DbSderApiGateway()
-
+const formatLog = {
+  operations: ['other', 'processDeletionRequests'],
+  path: 'src/batch/batch.service.ts',
+  message: 'Running processDeletion()'
+}
 export async function processDeletion() {
   let doneCount = 0
   const s3Client = new S3Client({
@@ -69,15 +74,17 @@ export async function processDeletion() {
           }
         } else {
           logger.log({
-            operationName: 'processTCOMDeletion',
-            msg: `TCOM deletion request ${deletionRequests[i].s3Key} (sourceId: ${deletionRequests[i].sourceId}) ignored because lastImportDate (${decision.lastImportDate}) >  deletionDate (${deletionRequests[i].deletionDate})`
+            ...formatLog,
+            operation: ['other', 'processTCOMDeletion'],
+            message: `TCOM deletion request ${deletionRequests[i].s3Key}.deletion (sourceId: ${deletionRequests[i].sourceId}) is ignored because the decision was imported after the deletion request`
           })
         }
       }
       if (deleteFromBuckets) {
         logger.log({
-          operationName: 'processTCOMDeletion',
-          msg: `TCOM decision ${deletionRequests[i].s3Key} will be deleted from all buckets`
+          ...formatLog,
+          operation: ['other', 'processTCOMDeletion'],
+          message: `TCOM decision ${deletionRequests[i].s3Key} will be deleted from all buckets`
         })
         const pdfKey = `${deletionRequests[i].s3Key}`.replace(/\.json/, '.pdf')
         try {
@@ -88,9 +95,12 @@ export async function processDeletion() {
           await s3Client.send(new DeleteObjectCommand(deleteRawParams))
         } catch (e) {
           logger.error({
-            operationName: 'processTCOMDeletion',
-            msg: `Could not delete document ${deletionRequests[i].s3Key} from bucket ${process.env.S3_BUCKET_NAME_RAW}`,
-            data: e
+            ...formatLog,
+            operation: ['other', 'processTCOMDeletion'],
+            message: JSON.stringify({
+              msg: `Could not delete document ${deletionRequests[i].s3Key} from bucket ${process.env.S3_BUCKET_NAME_RAW}`,
+              data: e
+            })
           })
         }
         try {
@@ -101,9 +111,12 @@ export async function processDeletion() {
           await s3Client.send(new DeleteObjectCommand(deleteNormalizedParams))
         } catch (e) {
           logger.error({
-            operationName: 'processTCOMDeletion',
-            msg: `Could not delete document ${deletionRequests[i].s3Key} from bucket ${process.env.S3_BUCKET_NAME_NORMALIZED}`,
-            data: e
+            ...formatLog,
+            operation: ['other', 'processTCOMDeletion'],
+            message: JSON.stringify({
+              msg: `Could not delete document ${deletionRequests[i].s3Key} from bucket ${process.env.S3_BUCKET_NAME_NORMALIZED}`,
+              data: e
+            })
           })
         }
         try {
@@ -114,9 +127,12 @@ export async function processDeletion() {
           await s3Client.send(new DeleteObjectCommand(deletePDFParams))
         } catch (e) {
           logger.error({
-            operationName: 'processTCOMDeletion',
-            msg: `Could not delete document ${pdfKey} from bucket ${process.env.S3_BUCKET_NAME_PDF}`,
-            data: e
+            ...formatLog,
+            operation: ['other', 'processTCOMDeletion'],
+            message: JSON.stringify({
+              msg: `Could not delete document ${pdfKey} from bucket ${process.env.S3_BUCKET_NAME_PDF}`,
+              data: e
+            })
           })
         }
         try {
@@ -127,9 +143,12 @@ export async function processDeletion() {
           await s3Client.send(new DeleteObjectCommand(deletePDFSuccessParams))
         } catch (e) {
           logger.error({
-            operationName: 'processTCOMDeletion',
-            msg: `Could not delete document ${pdfKey} from bucket ${process.env.S3_BUCKET_NAME_PDF2TEXT_SUCCESS}`,
-            data: e
+            ...formatLog,
+            operation: ['other', 'processTCOMDeletion'],
+            message: JSON.stringify({
+              msg: `Could not delete document ${pdfKey} from bucket ${process.env.S3_BUCKET_NAME_PDF2TEXT_SUCCESS}`,
+              data: e
+            })
           })
         }
         try {
@@ -140,48 +159,66 @@ export async function processDeletion() {
           await s3Client.send(new DeleteObjectCommand(deletePDFFailedParams))
         } catch (e) {
           logger.error({
-            operationName: 'processTCOMDeletion',
-            msg: `Could not delete document ${pdfKey} from bucket ${process.env.S3_BUCKET_NAME_PDF2TEXT_FAILED}`,
-            data: e
+            ...formatLog,
+            operation: ['other', 'processTCOMDeletion'],
+            message: JSON.stringify({
+              msg: `Could not delete document ${pdfKey} from bucket ${process.env.S3_BUCKET_NAME_PDF2TEXT_FAILED}`,
+              data: e
+            })
           })
         }
+      }
+      const decisionLogFormat: DecisionLog = {
+        operations: ['other', 'processTCOMDeletion.deleteFromDBSDER'],
+        path: 'src/batch/deletion/deletion.ts',
+        decision: {
+          sourceId: deletionRequests[i].sourceId,
+          sourceName: decision ? decision.sourceName : 'juritcom'
+        },
+        message: `Deleting decision with sourceId ${deletionRequests[i].sourceId} from DBSDER`
       }
       if (deleteFromDBSDER) {
         try {
           logger.log({
-            operationName: 'processTCOMDeletion',
-            msg: `TCOM decision ${deletionRequests[i].s3Key} (sourceId: ${deletionRequests[i].sourceId}) will be deleted from DBSDER`
+            ...decisionLogFormat,
+            message: `TCOM decision ${deletionRequests[i].s3Key} (sourceId: ${deletionRequests[i].sourceId}) will be deleted from DBSDER`
           })
-          await deleteDecisionById(decision._id)
+          await deleteDecisionById(decision._id.toString())
         } catch (e) {
           logger.error({
-            operationName: 'processTCOMDeletion',
-            msg: `Could not delete TCOM decision ${deletionRequests[i].s3Key} (${decision._id}) from DBSDER`,
-            data: e
+            ...decisionLogFormat,
+            stack: e
           })
         }
       }
       if (removeFromLabel) {
         logger.warn({
-          operationName: 'processTCOMDeletionNotifyLabel',
-          msg: `TCOM decision ${deletionRequests[i].s3Key} (sourceId: ${deletionRequests[i].sourceId}) should be removed from Label`,
-          data: deletionRequests[i],
-          idJuridiction: decision.jurisdictionId,
-          libelleJuridiction: decision.jurisdictionName
+          ...decisionLogFormat,
+          operation: ['other', 'processTCOMDeletionNotifyLabel'],
+          message: JSON.stringify({
+            msg: `TCOM decision ${deletionRequests[i].s3Key} (sourceId: ${deletionRequests[i].sourceId}) should be removed from Label`,
+            data: deletionRequests[i],
+            idJuridiction: decision.jurisdictionId,
+            libelleJuridiction: decision.jurisdictionName
+          })
         })
       }
       if (unpublishFromJudilibre) {
         logger.warn({
-          operationName: 'processTCOMDeletionNotifyJudilibre',
-          msg: `TCOM decision ${deletionRequests[i].s3Key} (sourceId: ${deletionRequests[i].sourceId}) should be unpublished from Judilibre`,
-          data: deletionRequests[i],
-          idJuridiction: decision.jurisdictionId,
-          libelleJuridiction: decision.jurisdictionName
+          ...decisionLogFormat,
+          operation: ['other', 'processTCOMDeletionNotifyJudilibre'],
+          message: JSON.stringify({
+            msg: `TCOM decision ${deletionRequests[i].s3Key} (sourceId: ${deletionRequests[i].sourceId}) should be unpublished from Judilibre`,
+            data: deletionRequests[i],
+            idJuridiction: decision.jurisdictionId,
+            libelleJuridiction: decision.jurisdictionName
+          })
         })
       }
       logger.log({
-        operationName: 'processTCOMDeletion',
-        msg: `TCOM deletion request ${deletionRequests[i].s3Key}.deletion (sourceId: ${deletionRequests[i].sourceId}) will be deleted`
+        ...decisionLogFormat,
+        operation: ['other', 'processTCOMDeletion'],
+        message: `TCOM deletion request ${deletionRequests[i].s3Key}.deletion (sourceId: ${deletionRequests[i].sourceId}) will be deleted`
       })
       const archiveDeletionRequestParams = {
         Body: JSON.stringify({ date: deletionRequests[i].deletionDate }),
@@ -197,15 +234,19 @@ export async function processDeletion() {
       doneCount++
     } catch (e) {
       logger.warn({
-        operationName: 'processTCOMDeletion',
-        msg: `Error while processing TCOM deletion request ${deletionRequests[i].s3Key}.deletion (sourceId: ${deletionRequests[i].sourceId})`,
-        data: e
+        ...formatLog,
+        operation: ['other', 'processTCOMDeletion'],
+        message: JSON.stringify({
+          msg: `Error while processing TCOM deletion request ${deletionRequests[i].s3Key}.deletion (sourceId: ${deletionRequests[i].sourceId})`,
+          data: e
+        })
       })
     }
   }
   logger.log({
-    operationName: 'processTCOMDeletion',
-    msg: `Processed ${doneCount} TCOM deletion requests`
+    ...formatLog,
+    operation: ['other', 'processTCOMDeletion'],
+    message: `Processed ${doneCount} TCOM deletion requests`
   })
 }
 
@@ -253,9 +294,12 @@ async function listDeletionRequests(): Promise<Array<any>> {
       }
     } catch (error) {
       logger.error({
-        operationName: 'processTCOMDeletion.listDeletionRequests',
-        msg: error.message,
-        data: error
+        ...formatLog,
+        operations: ['other', 'processTCOMDeletion.listDeletionRequests'],
+        message: JSON.stringify({
+          error: error.message,
+          data: error
+        })
       })
     }
   }
@@ -294,36 +338,48 @@ async function deleteDecisionById(id: string) {
       if (error.response) {
         if (error.response.data.statusCode === HttpStatus.BAD_REQUEST) {
           logger.error({
-            operationName: 'processTCOMDeletion.deleteDecisionById',
-            msg: error.response.data.message,
-            data: error.response.data,
-            statusCode: HttpStatus.BAD_REQUEST
+            ...formatLog,
+            operations: ['other', 'processTCOMDeletion.deleteDecisionById'],
+            message: JSON.stringify({
+              msg: error.response.data.message,
+              data: error.response.data,
+              statusCode: HttpStatus.BAD_REQUEST
+            })
           })
           throw new BadRequestException(
             'DbSderAPI Bad request error : ' + error.response.data.message
           )
         } else if (error.response.data.statusCode === HttpStatus.UNAUTHORIZED) {
           logger.error({
-            operationName: 'processTCOMDeletion.deleteDecisionById',
-            msg: error.response.data.message,
-            data: error.response.data,
-            statusCode: HttpStatus.UNAUTHORIZED
+            ...formatLog,
+            operations: ['other', 'processTCOMDeletion.deleteDecisionById'],
+            message: JSON.stringify({
+              msg: error.response.data.message,
+              data: error.response.data,
+              statusCode: HttpStatus.UNAUTHORIZED
+            })
           })
           throw new UnauthorizedException('You are not authorized to call this route')
         } else if (error.response.data.statusCode === HttpStatus.CONFLICT) {
           logger.error({
-            operationName: 'processTCOMDeletion.deleteDecisionById',
-            msg: error.response.data.message,
-            data: error.response.data,
-            statusCode: HttpStatus.CONFLICT
+            ...formatLog,
+            operations: ['other', 'processTCOMDeletion.deleteDecisionById'],
+            message: JSON.stringify({
+              msg: error.response.data.message,
+              data: error.response.data,
+              statusCode: HttpStatus.CONFLICT
+            })
           })
           throw new ConflictException('DbSderAPI error: ' + error.response.data.message)
         } else {
           logger.error({
-            operationName: 'processTCOMDeletion.deleteDecisionById',
-            msg: error.response.data.message,
-            data: error.response.data,
-            statusCode: HttpStatus.SERVICE_UNAVAILABLE
+            ...formatLog,
+            operations: ['other', 'processTCOMDeletion.deleteDecisionById'],
+            message: JSON.stringify({
+              msg: error.response.data.message,
+              data: error.response.data,
+              statusCode: HttpStatus.SERVICE_UNAVAILABLE
+            })
           })
         }
       }

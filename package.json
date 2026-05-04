@@ -51,6 +51,7 @@
     "jwks-rsa": "3.2.0",
     "marked": "15.0.12",
     "minio": "8.0.6",
+    "mongodb": "7.2.0",
     "nestjs-pino": "4.4.0",
     "passport": "0.7.0",
     "passport-jwt": "4.0.1",

@@ -9,7 +9,7 @@ import {
 } from '@aws-sdk/client-s3'
 import { Logger } from '@nestjs/common'
 import { PinoLogger } from 'nestjs-pino'
-import { BucketError } from '../../domain/errors/bucket.error'
+import { BucketError } from '../exceptions/bucket.error'
 import { DecisionRepository } from '../../../api/domain/decisions/repositories/decision.repository'
 
 export class DecisionS3Repository implements DecisionRepository {

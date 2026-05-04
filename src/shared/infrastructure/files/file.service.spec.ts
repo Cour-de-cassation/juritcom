@@ -13,7 +13,6 @@ describe('FileService', () => {
   } as Express.Multer.File
 
   beforeEach(() => {
-    process.env.AV_PDF_PATH = mockUploadPath
     fileService = new FileService()
   })
 

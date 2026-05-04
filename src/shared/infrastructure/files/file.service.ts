@@ -3,7 +3,6 @@ import * as fs from 'fs'
 
 @Injectable()
 export class FileService {
-  private readonly uploadPath = process.env.AV_PDF_PATH
   private readonly logger = new Logger(FileService.name)
 
   constructor() {

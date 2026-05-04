@@ -236,9 +236,9 @@ export class DecisionController {
       throw error
     }
 
-    const decisionUseCase = new SaveDecisionUsecase(new DecisionS3Repository(this.logger))
+    const decisionUseCase = new SaveDecisionUsecase()
 
-    const bucketFileDto = await decisionUseCase
+    const fileName = await decisionUseCase
       .putDecision(fichierDecisionIntegre, metadonneeDto)
       .catch((error) => {
         if (error instanceof BucketError) {
@@ -278,8 +278,8 @@ export class DecisionController {
     })
 
     return {
-      jsonFileName: bucketFileDto.jsonFileName,
-      pdfFileName: bucketFileDto.pdfFileName,
+      jsonFileName: fileName,
+      pdfFileName: fileName,
       body: `la décision a bien été prise en compte`
     }
   }

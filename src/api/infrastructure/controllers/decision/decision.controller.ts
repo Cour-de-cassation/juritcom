@@ -37,7 +37,7 @@ import {
 } from '../../exceptions/badFileFormat.exception'
 import { StringToJsonPipe } from '../../pipes/stringToJson.pipe'
 import { ValidateDtoPipe } from '../../pipes/validateDto.pipe'
-import { LogsFormat } from '../../../../shared/infrastructure/utils/logsFormat.utils'
+import { TechLog } from '../../../../shared/infrastructure/utils/logsFormat.utils'
 import { Request } from 'express'
 import { BucketError } from '../../../../shared/domain/errors/bucket.error'
 import { InfrastructureException } from '../../../../shared/infrastructure/exceptions/infrastructure.exception'
@@ -113,39 +113,50 @@ export class DecisionController {
       new DecisionS3Repository(this.logger),
       new DecisionMongoRepository()
     )
-    const formatLogs: LogsFormat = {
-      operationName: 'deleteDecision',
-      httpMethod: request.method,
-      path: request.path,
-      msg: `Starting ${routePath}...`,
-      correlationId: request.headers['x-correlation-id']
+    const formatLogs: TechLog = {
+      path: 'src/api/infrastructure/controllers/decision/decision.controller.ts',
+      operations: ['other', 'deleteDecision'],
+      message: JSON.stringify({
+        httpMethod: request.method,
+        path: request.path,
+        msg: `Starting ${routePath}...`,
+        correlationId: request.headers['x-correlation-id']
+      })
     }
+
+    this.logger.log({ ...formatLogs })
 
     const decisionStoredKey = await decisionUseCase.deleteDecision(decisionId).catch((error) => {
       if (error instanceof BucketError) {
         this.logger.error({
           ...formatLogs,
-          msg: error.message,
-          statusCode: HttpStatus.SERVICE_UNAVAILABLE
+          message: JSON.stringify({
+            msg: error.message,
+            statusCode: HttpStatus.SERVICE_UNAVAILABLE
+          })
         })
         throw new InfrastructureException(error.message)
       }
       this.logger.error({
         ...formatLogs,
-        msg: error.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+        message: JSON.stringify({
+          msg: error.message,
+          statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+        })
       })
       throw new UnexpectedException(error)
     })
 
     this.logger.log({
       ...formatLogs,
-      msg: routePath + ' returns ' + HttpStatus.NO_CONTENT,
-      data: {
-        decisionId: decisionId,
-        decisionStoredKey: decisionStoredKey
-      },
-      statusCode: HttpStatus.NO_CONTENT
+      message: JSON.stringify({
+        msg: routePath + ' returns ' + HttpStatus.NO_CONTENT,
+        data: {
+          decisionId: decisionId,
+          decisionStoredKey: decisionStoredKey
+        },
+        statusCode: HttpStatus.NO_CONTENT
+      })
     })
 
     return {
@@ -190,20 +201,25 @@ export class DecisionController {
     @Req() request: Request
   ): Promise<DecisionResponse> {
     const routePath = request.method + ' ' + request.path
-    const formatLogs: LogsFormat = {
-      operationName: 'putDecision',
-      httpMethod: request.method,
-      path: request.path,
-      msg: `Starting ${routePath}...`,
-      correlationId: request.headers['x-correlation-id']
+    const formatLogs: TechLog = {
+      operations: ['other', 'putDecision'],
+      path: 'src/api/infrastructure/controllers/decision/decision.controller.ts',
+      message: JSON.stringify({
+        httpMethod: request.method,
+        path: request.path,
+        msg: `Starting ${routePath}...`,
+        correlationId: request.headers['x-correlation-id']
+      })
     }
 
     if (!fichierDecisionIntegre || !isPdfFile(fichierDecisionIntegre.mimetype)) {
       const error = new BadFileFormatException('fichierDecisionIntegre', 'PDF')
       this.logger.error({
         ...formatLogs,
-        msg: error.message,
-        statusCode: HttpStatus.BAD_REQUEST
+        message: JSON.stringify({
+          msg: error.message,
+          statusCode: HttpStatus.BAD_REQUEST
+        })
       })
       throw error
     }
@@ -212,8 +228,10 @@ export class DecisionController {
       const error = new BadFileSizeException(FILE_MAX_SIZE.readSize)
       this.logger.error({
         ...formatLogs,
-        msg: error.message,
-        statusCode: HttpStatus.BAD_REQUEST
+        message: JSON.stringify({
+          msg: error.message,
+          statusCode: HttpStatus.BAD_REQUEST
+        })
       })
       throw error
     }
@@ -226,15 +244,19 @@ export class DecisionController {
         if (error instanceof BucketError) {
           this.logger.error({
             ...formatLogs,
-            msg: error.message,
-            statusCode: HttpStatus.SERVICE_UNAVAILABLE
+            message: JSON.stringify({
+              msg: error.message,
+              statusCode: HttpStatus.SERVICE_UNAVAILABLE
+            })
           })
           throw new InfrastructureException(error.message)
         }
         this.logger.error({
           ...formatLogs,
-          msg: error.message,
-          statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+          message: JSON.stringify({
+            msg: error.message,
+            statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+          })
         })
         throw new UnexpectedException(error)
       })
@@ -246,11 +268,13 @@ export class DecisionController {
 
     this.logger.log({
       ...formatLogs,
-      msg: routePath + ' returns ' + HttpStatus.CREATED,
-      data: {
-        decision: metadonneeDto
-      },
-      statusCode: HttpStatus.CREATED
+      message: JSON.stringify({
+        msg: routePath + ' returns ' + HttpStatus.CREATED,
+        data: {
+          decision: metadonneeDto
+        },
+        statusCode: HttpStatus.CREATED
+      })
     })
 
     return {

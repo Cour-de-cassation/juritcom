@@ -14,9 +14,9 @@ import { DecisionRepository } from '../../../api/domain/decisions/repositories/d
 
 export class DecisionS3Repository implements DecisionRepository {
   private s3Client: S3Client
-  private logger: PinoLogger | Logger
+  private readonly logger = new Logger()
 
-  constructor(logger: PinoLogger | Logger, providedS3Client?: S3Client) {
+  constructor(providedS3Client?: S3Client) {
     if (providedS3Client) {
       this.s3Client = providedS3Client
     } else {
@@ -30,135 +30,28 @@ export class DecisionS3Repository implements DecisionRepository {
         }
       })
     }
-    this.logger = logger
   }
 
-  async saveDecision(reqParams): Promise<void> {
-    try {
-      await this.s3Client.send(new PutObjectCommand(reqParams))
-    } catch (error) {
-      this.logger.error({
-        operations: ['other', 'saveDecision'],
-        path: 'src/shared/infrastructure/repositories/decisionS3.repository.ts',
-        message: JSON.stringify({
-          msg: error.message,
-          data: error
-        })
-      })
-      throw new BucketError(error)
-    }
-  }
-
-  async deleteDecision(reqParams): Promise<void> {
-    try {
-      await this.s3Client.send(new DeleteObjectCommand(reqParams))
-    } catch (error) {
-      this.logger.error({
-        operations: ['other', 'deleteDecision'],
-        path: 'src/shared/infrastructure/repositories/decisionS3.repository.ts',
-        message: JSON.stringify({
-          msg: error.message,
-          data: error
-        })
-      })
-      throw new BucketError(error)
-    }
-  }
-
-  async deleteDataDecisionIntegre(jsonS3Key: string): Promise<void> {
-    const reqParamsMarkForDeletion = {
-      Body: JSON.stringify({
-        date: new Date()
-      }),
-      Bucket: process.env.S3_BUCKET_NAME_DELETION,
-      Key: `${jsonS3Key}.deletion`,
-      Metadata: {
-        date: new Date().toISOString()
-      }
-    }
-
-    await this.saveDecision(reqParamsMarkForDeletion)
-
-    const reqParamsDelete = {
+  async saveDecisionIntegre(decisionIntegre: Express.Multer.File, fileName: string) {
+    const reqParams: PutObjectCommand = new PutObjectCommand({
+      Body: decisionIntegre.buffer,
       Bucket: process.env.S3_BUCKET_NAME_RAW,
-      Key: `${jsonS3Key}`
-    }
+      Key: fileName,
+      ContentType: decisionIntegre.mimetype
+    })
 
-    await this.deleteDecision(reqParamsDelete)
+    await this.saveDecision(reqParams)
   }
 
-  async uploadFichierDecisionIntegre(
-    file: Express.Multer.File,
-    originalPdfFileName: string,
-    pdfS3Key: string
-  ): Promise<void> {
-    const params = {
-      Bucket: process.env.S3_BUCKET_NAME_PDF,
-      Key: `${pdfS3Key}`,
-      Body: file.buffer,
-      ContentType: file.mimetype,
-      ACL: 'public-read',
-      Metadata: {
-        date: new Date().toISOString(),
-        originalPdfFileName: originalPdfFileName
-      }
-    } as unknown as any
-
+  async saveDecision(reqParams: PutObjectCommand): Promise<void> {
     try {
-      await this.s3Client.send(new PutObjectCommand(params))
+      await this.s3Client.send(reqParams)
     } catch (error) {
       this.logger.error({
-        operations: ['other', 'putDecision'],
-        path: 'src/shared/infrastructure/repositories/decisionS3.repository.ts',
-        message: JSON.stringify({
-          msg: error.message,
-          data: error
-        })
+        operations: ['collect', 'decision'],
+        path: './src/shared/infrastructure/repositories/decisionS3.repository.ts',
+        message: JSON.stringify({ msg: error.message, data: error })
       })
-      throw new BucketError(error)
-    }
-  }
-
-  async getDecisionList(
-    maxNumberOfDecisionsToRetrieve?: number,
-    startAfterFileName?: string
-  ): Promise<_Object[]> {
-    const reqParams: ListObjectsV2CommandInput = {
-      Bucket: process.env.S3_BUCKET_NAME_RAW
-    }
-    if (maxNumberOfDecisionsToRetrieve >= 1 && maxNumberOfDecisionsToRetrieve <= 1000) {
-      reqParams.MaxKeys = maxNumberOfDecisionsToRetrieve
-    }
-    if (startAfterFileName) reqParams.StartAfter = startAfterFileName
-
-    try {
-      const decisionListFromS3 = await this.s3Client.send(new ListObjectsV2Command(reqParams))
-      return decisionListFromS3.Contents ? decisionListFromS3.Contents : []
-    } catch (error) {
-      this.logger.error({
-        operations: ['other', 'getDecisionList'],
-        path: 'src/shared/infrastructure/repositories/decisionS3.repository.ts',
-        message: JSON.stringify({
-          msg: error.message,
-          data: error
-        })
-      })
-      throw new BucketError(error)
-    }
-  }
-
-  async getDecisionByFilename<T>(filename: string): Promise<{ _id: string } & T> {
-    const reqParams = {
-      Bucket: process.env.S3_BUCKET_NAME_RAW,
-      Key: filename
-    }
-
-    try {
-      const decisionFromS3 = await this.s3Client.send(new GetObjectCommand(reqParams))
-      const stringifiedDecision = await decisionFromS3.Body?.transformToString()
-      return JSON.parse(stringifiedDecision) // Warning: any is not a T
-    } catch (error) {
-      this.logger.error({ operationName: 'getDecisionByFilename', msg: error.message, data: error })
       throw new BucketError(error)
     }
   }

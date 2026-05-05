@@ -1,11 +1,13 @@
 import { DecisionRepository } from '../domain/decisions/repositories/decision.repository'
 import { MetadonneeDto } from '../../shared/infrastructure/dto/metadonnee.dto'
 import { bucketFileDto } from '../../shared/infrastructure/dto/receive.dto'
-import { FileService } from '../../shared/infrastructure/files/file.service'
 import { v4 as uuidv4 } from 'uuid'
+import { DecisionS3Repository } from 'src/shared/infrastructure/repositories/decisionS3.repository'
+import { DecisionMongoRepository } from 'src/shared/infrastructure/repositories/decisionMongo.repository'
 
 export class SaveDecisionUsecase {
-  private readonly fileService: FileService = new FileService()
+  private readonly decisionS3Repository: DecisionS3Repository = new DecisionS3Repository()
+  private readonly decisionMongoRepository: DecisionMongoRepository = new DecisionMongoRepository()
 
   constructor() {}
 
@@ -14,12 +16,16 @@ export class SaveDecisionUsecase {
     metadonnees: MetadonneeDto
   ): Promise<string> {
     const pdfFileExtension = '.pdf'
-    const uuid = uuidv4() + pdfFileExtension
+    const fileName = uuidv4() + pdfFileExtension
 
-    this.fileService.saveFile(fichierDecisionIntegre, uuid)
+    await this.decisionS3Repository.saveDecisionIntegre(fichierDecisionIntegre, fileName)
 
-    this.fileService.saveJson(metadonnees, uuid)
+    await this.decisionMongoRepository.createFileInformation({
+      path: fileName,
+      events: [{ type: 'created', date: new Date() }],
+      metadatas: metadonnees
+    })
 
-    return uuid
+    return fileName
   }
 }

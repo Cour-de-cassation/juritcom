@@ -110,7 +110,7 @@ export class DecisionController {
   ): Promise<DeleteDecisionResponse> {
     const routePath = request.method + ' ' + request.path
     const decisionUseCase = new DeleteDecisionUsecase(
-      new DecisionS3Repository(this.logger),
+      new DecisionS3Repository(),
       new DecisionMongoRepository()
     )
     const formatLogs: TechLog = {

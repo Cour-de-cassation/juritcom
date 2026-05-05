@@ -12,8 +12,6 @@ export class DeleteDecisionUsecase {
   async deleteDecision(decisionId: string): Promise<string> {
     const jsonFileName = `${decisionId}.json`
 
-    await this.decisionsRepository.deleteDataDecisionIntegre(jsonFileName)
-
     try {
       const rawFile = await this.rawRepository.findFileInformation({ path: jsonFileName })
       await this.rawRepository.updateFileInformation(rawFile._id, {

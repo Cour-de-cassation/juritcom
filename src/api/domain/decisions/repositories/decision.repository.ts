@@ -2,15 +2,7 @@ import { ObjectId } from 'mongodb'
 import { CollectDto } from 'src/shared/infrastructure/dto/collect.dto'
 import { MetadonneeDto } from 'src/shared/infrastructure/dto/metadonnee.dto'
 export interface DecisionRepository {
-  deleteDataDecisionIntegre(jsonS3Key: string): Promise<void>
-
-  uploadFichierDecisionIntegre(
-    fichierDecisionIntegre: Express.Multer.File | Buffer,
-    originalPdfFileName: string,
-    pdfS3Key: string
-  ): Promise<void>
-
-  getDecisionByFilename(filename: string): Promise<CollectDto & { _id: string }>
+  saveDecisionIntegre(decisionIntegre: Express.Multer.File, fileName: string): Promise<void>
 }
 
 type Created = {

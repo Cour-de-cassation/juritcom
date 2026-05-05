@@ -9,7 +9,6 @@ import { BucketHealthIndicator } from './infrastructure/controllers/health/bucke
 import { DecisionController } from './infrastructure/controllers/decision/decision.controller'
 import { envValidationConfig } from '../shared/infrastructure/dto/env.validation'
 import { AuthModule } from '../shared/infrastructure/security/auth/auth.module'
-import { FileModule } from '../shared/infrastructure/files/file.module'
 
 @Module({
   imports: [
@@ -19,8 +18,7 @@ import { FileModule } from '../shared/infrastructure/files/file.module'
       logger: false
     }),
     configureLoggerModule(),
-    AuthModule,
-    FileModule
+    AuthModule
   ],
   controllers: [RedirectController, HealthController, DecisionController],
   providers: [BucketHealthIndicator]

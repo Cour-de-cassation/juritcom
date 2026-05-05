@@ -1,5 +1,4 @@
 import { ObjectId } from 'mongodb'
-import { CollectDto } from 'src/shared/infrastructure/dto/collect.dto'
 import { MetadonneeDto } from 'src/shared/infrastructure/dto/metadonnee.dto'
 export interface DecisionRepository {
   saveDecisionIntegre(decisionIntegre: Express.Multer.File, fileName: string): Promise<void>

@@ -1,14 +1,5 @@
-import {
-  S3Client,
-  PutObjectCommand,
-  ListObjectsV2CommandInput,
-  _Object,
-  ListObjectsV2Command,
-  DeleteObjectCommand,
-  GetObjectCommand
-} from '@aws-sdk/client-s3'
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'
 import { Logger } from '@nestjs/common'
-import { PinoLogger } from 'nestjs-pino'
 import { BucketError } from '../exceptions/bucket.error'
 import { DecisionRepository } from '../../../api/domain/decisions/repositories/decision.repository'
 

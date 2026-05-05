@@ -1,37 +1,30 @@
-import { Injectable, Logger } from '@nestjs/common'
-import { HealthIndicator, HealthIndicatorResult, HealthCheckError } from '@nestjs/terminus'
-import { DecisionS3Repository } from '../../../../shared/infrastructure/repositories/decisionS3.repository'
-import { TechLog } from '../../../../shared/infrastructure/utils/logsFormat.utils'
+import { Injectable } from '@nestjs/common'
+import { HealthIndicatorResult, HealthIndicatorService } from '@nestjs/terminus'
+import { S3Client, ListObjectsV2Command } from '@aws-sdk/client-s3'
 
 @Injectable()
-export class BucketHealthIndicator extends HealthIndicator {
-  private key = 'bucket'
-  private readonly logger = new Logger()
+export class BucketHealthIndicator {
+  private readonly key = 'bucket'
+  private readonly s3Client: S3Client
 
-  constructor() {
-    super()
+  constructor(private readonly healthIndicatorService: HealthIndicatorService) {
+    this.s3Client = new S3Client({
+      endpoint: process.env.S3_URL,
+      forcePathStyle: true,
+      region: process.env.S3_REGION,
+      credentials: {
+        accessKeyId: process.env.S3_ACCESS_KEY,
+        secretAccessKey: process.env.S3_SECRET_KEY
+      }
+    })
   }
 
   async isHealthy(): Promise<HealthIndicatorResult> {
-    const decisionS3Repository = new DecisionS3Repository(this.logger)
-    const formatLogs: TechLog = {
-      operations: ['other', 'BucketHealthIndicator.isHealthy'],
-      path: 'src/api/infrastructure/controllers/health/bucketHealthIndicator.ts',
-      message: 'Error while calling BucketHealthIndicator.isHealthy()'
-    }
     try {
-      await decisionS3Repository.getDecisionList()
-      return this.getStatus(this.key, true)
+      await this.s3Client.send(new ListObjectsV2Command({ Bucket: process.env.S3_BUCKET_NAME_RAW }))
+      return this.healthIndicatorService.check(this.key).up()
     } catch (_) {
-      const error = new HealthCheckError('Bucket call failed', this.getStatus(this.key, false))
-      this.logger.error({
-        ...formatLogs,
-        message: JSON.stringify({
-          msg: error.message,
-          statusCode: 503
-        })
-      })
-      throw error
+      return this.healthIndicatorService.check(this.key).down()
     }
   }
 }

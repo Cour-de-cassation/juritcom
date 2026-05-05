@@ -1,44 +1,29 @@
-import { DecisionRepository } from '../domain/decisions/repositories/decision.repository'
 import { MetadonneeDto } from '../../shared/infrastructure/dto/metadonnee.dto'
-import { bucketFileDto } from '../../shared/infrastructure/dto/receive.dto'
-import { FileService } from '../../shared/infrastructure/files/file.service'
-import { CollectDto } from '../../shared/infrastructure/dto/collect.dto'
+import { v4 as uuidv4 } from 'uuid'
+import { DecisionS3Repository } from 'src/shared/infrastructure/repositories/decisionS3.repository'
+import { DecisionMongoRepository } from 'src/shared/infrastructure/repositories/decisionMongo.repository'
 
 export class SaveDecisionUsecase {
-  private readonly fileService: FileService = new FileService()
+  private readonly decisionS3Repository: DecisionS3Repository = new DecisionS3Repository()
+  private readonly decisionMongoRepository: DecisionMongoRepository = new DecisionMongoRepository()
 
-  constructor(private decisionsRepository: DecisionRepository) {}
+  constructor() {}
 
   async putDecision(
     fichierDecisionIntegre: Express.Multer.File,
-    texteDecisionIntegre: string,
     metadonnees: MetadonneeDto
-  ): Promise<bucketFileDto> {
-    const uuid = metadonnees.idDecision
-    const originalFileName = fichierDecisionIntegre.originalname
-    const jsonFileName = `${uuid}.json`
-    const pdfFileName = `${uuid}${process.env.S3_PDF_FILE_NAME_SEPARATOR}${originalFileName}`
+  ): Promise<string> {
+    const pdfFileExtension = '.pdf'
+    const fileName = uuidv4() + pdfFileExtension
 
-    const now = new Date()
-    now.setMilliseconds(0)
+    await this.decisionS3Repository.saveDecisionIntegre(fichierDecisionIntegre, fileName)
 
-    const requestDto: CollectDto = {
-      texteDecisionIntegre,
-      metadonnees,
-      date: now
-    }
+    await this.decisionMongoRepository.createFileInformation({
+      path: fileName,
+      events: [{ type: 'created', date: new Date() }],
+      metadatas: metadonnees
+    })
 
-    await this.decisionsRepository.saveDataDecisionIntegre(
-      JSON.stringify(requestDto),
-      originalFileName,
-      jsonFileName
-    )
-
-    this.fileService.saveFile(fichierDecisionIntegre, pdfFileName)
-
-    return {
-      jsonFileName,
-      pdfFileName
-    }
+    return fileName
   }
 }

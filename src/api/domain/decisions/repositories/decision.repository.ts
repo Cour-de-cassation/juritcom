@@ -29,8 +29,14 @@ export type RawTcom = {
   metadatas: MetadonneeDto
 }
 
+export type TcomDeletion = {
+  decisionId: string
+  events: [Created, ...(Blocked | Deleted)[]]
+}
+
 export interface RawFilesRepository {
   findFileInformation(key: Partial<RawTcom>): Promise<RawTcom & { _id: ObjectId }>
-  createFileInformation(file: RawTcom): Promise<unknown>
+  createFileInformation(file: RawTcom): Promise<{ _id: ObjectId } & RawTcom>
   updateFileInformation(id: ObjectId, update: Partial<RawTcom>): Promise<{ _id: ObjectId }>
+  createDeleteInformation(file: TcomDeletion): Promise<{ _id: ObjectId } & TcomDeletion>
 }

@@ -6,7 +6,7 @@ process.env = {
   S3_SECRET_KEY: 's3-secret-key',
   S3_REGION: 's3-region',
   S3_BUCKET_NAME_PDF: 'fake-pdf-bucket-name',
-  S3_BUCKET_NAME_DELETION: 'fake-deletion-bucket-nam',
+  DELETION_COLLECTION_NAME: 'fake-deletion-collection-name',
   DBSDER_API_URL: 'http://localhost:3000',
   DBSDER_API_KEY: '24277eca-290c-40c3-9bf6-a370880d800b',
   DBSDER_OTHER_API_KEY: '24277eca-290c-40c3-9bf6-a370880d800b',

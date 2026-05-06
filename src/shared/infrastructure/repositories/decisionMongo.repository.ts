@@ -42,4 +42,14 @@ export class DecisionMongoRepository implements RawFilesRepository {
 
     return { _id: upsertedId }
   }
+
+  async createDeleteInformation<T extends Document>(
+    file: OptionalUnlessRequiredId<T>
+  ): Promise<{ _id: InferIdType<T> } & typeof file> {
+    const db = await this.db
+    const { insertedId } = await db
+      .collection<T>(process.env.DELETION_COLLECTION_NAME)
+      .insertOne(file)
+    return { _id: insertedId, ...file }
+  }
 }

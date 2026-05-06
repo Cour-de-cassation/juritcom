@@ -44,7 +44,6 @@ import { InfrastructureException } from '../../../../shared/infrastructure/excep
 import { UnexpectedException } from '../../../../shared/infrastructure/exceptions/unexpected.exception'
 import { SaveDecisionUsecase } from '../../../usecase/saveDecision.usecase'
 import { DeleteDecisionUsecase } from '../../../usecase/deleteDecision.usecase'
-import { DecisionS3Repository } from '../../../../shared/infrastructure/repositories/decisionS3.repository'
 import { JwtAuthGuard } from '../../../../shared/infrastructure/security/auth/auth.guard'
 import { DecisionMongoRepository } from 'src/shared/infrastructure/repositories/decisionMongo.repository'
 
@@ -109,10 +108,7 @@ export class DecisionController {
     @Req() request: Request
   ): Promise<DeleteDecisionResponse> {
     const routePath = request.method + ' ' + request.path
-    const decisionUseCase = new DeleteDecisionUsecase(
-      new DecisionS3Repository(),
-      new DecisionMongoRepository()
-    )
+    const decisionUseCase = new DeleteDecisionUsecase(new DecisionMongoRepository())
     const formatLogs: TechLog = {
       path: 'src/api/infrastructure/controllers/decision/decision.controller.ts',
       operations: ['other', 'deleteDecision'],

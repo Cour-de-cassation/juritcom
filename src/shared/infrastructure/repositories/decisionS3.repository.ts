@@ -26,7 +26,7 @@ export class DecisionS3Repository implements DecisionRepository {
   async saveDecisionIntegre(decisionIntegre: Express.Multer.File, fileName: string) {
     const reqParams: PutObjectCommand = new PutObjectCommand({
       Body: decisionIntegre.buffer,
-      Bucket: process.env.S3_BUCKET_NAME_RAW,
+      Bucket: process.env.S3_BUCKET_NAME_PDF,
       Key: fileName,
       ContentType: decisionIntegre.mimetype
     })

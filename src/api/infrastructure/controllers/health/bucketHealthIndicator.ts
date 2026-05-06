@@ -21,7 +21,7 @@ export class BucketHealthIndicator {
 
   async isHealthy(): Promise<HealthIndicatorResult> {
     try {
-      await this.s3Client.send(new ListObjectsV2Command({ Bucket: process.env.S3_BUCKET_NAME_RAW }))
+      await this.s3Client.send(new ListObjectsV2Command({ Bucket: process.env.S3_BUCKET_NAME_PDF }))
       return this.healthIndicatorService.check(this.key).up()
     } catch (_) {
       return this.healthIndicatorService.check(this.key).down()

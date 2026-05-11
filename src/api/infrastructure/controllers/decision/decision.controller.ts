@@ -59,14 +59,14 @@ const MULTER_OPTIONS = {
 } as MulterOptions
 
 export interface DecisionResponse {
-  jsonFileName: string | void
+  id: string | void
   pdfFileName: string | void
   body: string
 }
 
 export interface DeleteDecisionResponse {
   decisionId: string | void
-  decisionStoredKey: string | void
+  id: string | void
 }
 
 @ApiBearerAuth()
@@ -122,7 +122,7 @@ export class DecisionController {
 
     this.logger.log({ ...formatLogs })
 
-    const decisionStoredKey = await decisionUseCase.deleteDecision(decisionId).catch((error) => {
+    const { rawfileId } = await decisionUseCase.deleteDecision(decisionId).catch((error) => {
       if (error instanceof BucketError) {
         this.logger.error({
           ...formatLogs,
@@ -149,7 +149,7 @@ export class DecisionController {
         msg: routePath + ' returns ' + HttpStatus.NO_CONTENT,
         data: {
           decisionId: decisionId,
-          decisionStoredKey: decisionStoredKey
+          rawfileId: rawfileId
         },
         statusCode: HttpStatus.NO_CONTENT
       })
@@ -157,7 +157,7 @@ export class DecisionController {
 
     return {
       decisionId: decisionId,
-      decisionStoredKey: decisionStoredKey
+      id: rawfileId
     }
   }
 
@@ -234,7 +234,7 @@ export class DecisionController {
 
     const decisionUseCase = new SaveDecisionUsecase()
 
-    const fileName = await decisionUseCase
+    const { fileName, rawfileId } = await decisionUseCase
       .putDecision(fichierDecisionIntegre, metadonneeDto)
       .catch((error) => {
         if (error instanceof BucketError) {
@@ -274,7 +274,7 @@ export class DecisionController {
     })
 
     return {
-      jsonFileName: fileName,
+      id: rawfileId,
       pdfFileName: fileName,
       body: `la décision a bien été prise en compte`
     }

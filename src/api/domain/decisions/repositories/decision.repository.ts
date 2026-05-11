@@ -35,8 +35,6 @@ export type TcomDeletion = {
 }
 
 export interface RawFilesRepository {
-  findFileInformation(key: Partial<RawTcom>): Promise<RawTcom & { _id: ObjectId }>
   createFileInformation(file: RawTcom): Promise<{ _id: ObjectId } & RawTcom>
-  updateFileInformation(id: ObjectId, update: Partial<RawTcom>): Promise<{ _id: ObjectId }>
   createDeleteInformation(file: TcomDeletion): Promise<{ _id: ObjectId } & TcomDeletion>
 }

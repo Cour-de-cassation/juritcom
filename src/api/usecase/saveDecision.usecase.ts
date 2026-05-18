@@ -13,8 +13,7 @@ export class SaveDecisionUsecase {
     fichierDecisionIntegre: Express.Multer.File,
     metadonnees: MetadonneeDto
   ): Promise<{ fileName: string; rawfileId: string }> {
-    const pdfFileExtension = '.pdf'
-    const fileName = uuidv4() + pdfFileExtension
+    const fileName = uuidv4() + '.pdf'
 
     await this.decisionS3Repository.saveDecisionIntegre(fichierDecisionIntegre, fileName)
 

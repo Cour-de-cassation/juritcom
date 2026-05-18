@@ -418,7 +418,7 @@
 			]
 		},
 		{
-			"name": "Collecte - oAuth",
+			"name": "Collecte - JWT",
 			"item": [
 				{
 					"name": "202 - Envoi d'une décision valide",
@@ -790,7 +790,7 @@
 					"response": []
 				},
 				{
-					"name": "Test oAuth",
+					"name": "Test JWT",
 					"event": [
 						{
 							"listen": "test",
@@ -831,8 +831,8 @@
 				}
 			],
 			"auth": {
-				"type": "oauth2",
-				"oauth2": [
+				"type": "jwt",
+				"jwt": [
 					{
 						"key": "tokenName",
 						"value": "t3",

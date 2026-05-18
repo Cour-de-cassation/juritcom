@@ -111,6 +111,8 @@ export class MockUtils {
     debatPublic: true,
     idDecisionTCOM: '0605_2001F00930_2012-12-05_19',
     selection: false,
-    filenameSource: 'path'
+    filenameSource: 'path',
+    motifsSecretAffaires: false,
+    motifsDebatsChambreConseil: false
   }
 }

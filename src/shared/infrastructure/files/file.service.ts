@@ -9,8 +9,9 @@ export class FileService {
   constructor() {
     if (!fs.existsSync(this.uploadPath)) {
       this.logger.warn({
-        operationName: FileService.name,
-        msg: `AV_PDF_PATH ${this.uploadPath} not found or volume does not exist`
+        operation: ['other', `${FileService.name}`],
+        path: 'src/shared/infrastructure/files/file.service.ts',
+        message: `AV_PDF_PATH ${this.uploadPath} not found or volume does not exist`
       })
     }
   }
@@ -28,8 +29,9 @@ export class FileService {
     } catch (_error) {
       const error = new InternalServerErrorException('Error saving file')
       this.logger.error({
-        operationName: FileService.name,
-        msg: error.message
+        operation: ['other', `${FileService.name}.saveFile`],
+        path: 'src/shared/infrastructure/files/file.service.ts',
+        message: error.message
       })
       throw error
     }

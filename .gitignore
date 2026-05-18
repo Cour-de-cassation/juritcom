@@ -61,11 +61,6 @@ jspm_packages/
 
 # IDE - VSCode
 .vscode/*
-!.vscode/snippets.code-snippets
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
 
 # Snowpack dependency directory (https://snowpack.dev/)
 web_modules/

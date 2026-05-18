@@ -8,12 +8,13 @@ import {
 } from '@nestjs/common'
 import * as jwtUtils from '../jwt/jwt.utils'
 import { timingSafeEqual } from 'crypto'
-import { LogsFormat } from '../../../../shared/infrastructure/utils/logsFormat.utils'
+import { TechLog } from '../../../../shared/infrastructure/utils/logsFormat.utils'
 
 const logger = new Logger()
-const formatLogs: LogsFormat = {
-  operationName: 'auth.guard',
-  msg: 'Error while calling auth.guard'
+const formatLogs: TechLog = {
+  operations: ['other', 'JwtAuthGuard.canActivate'],
+  path: 'src/shared/infrastructure/security/auth/auth.guard.ts',
+  message: 'Error while calling JwtAuthGuard.canActivate()'
 }
 const CREDENTIALS_REGEXP = /^ *(?:[Bb][Aa][Ss][Ii][Cc]) +([A-Za-z0-9._~+/-]+=*) *$/
 const USER_PASS_REGEXP = /^([^:]*):(.*)$/
@@ -71,7 +72,7 @@ export class JwtAuthGuard implements CanActivate {
           value = staticUsersAuthorizer(users, authentication.name, authentication.pass)
           logger.log({
             ...formatLogs,
-            msg: `Validate request using Basic: ${value}`
+            message: `Validate request using Basic: ${value}`
           })
         }
       } catch (_ignore) {
@@ -79,14 +80,20 @@ export class JwtAuthGuard implements CanActivate {
       }
     } else if (process.env.USE_AUTH === 'jwt') {
       value = this.validateJwt(request)
+      logger.log({
+        ...formatLogs,
+        message: `Validate request using JWT: ${value}`
+      })
     }
 
     if (!value) {
       const error = new UnauthorizedException('You are not authorized to access this resource.')
       logger.error({
         ...formatLogs,
-        msg: error.message,
-        statusCode: HttpStatus.UNAUTHORIZED
+        message: JSON.stringify({
+          msg: error.message,
+          statusCode: HttpStatus.UNAUTHORIZED
+        })
       })
       throw error
     }
@@ -98,7 +105,7 @@ export class JwtAuthGuard implements CanActivate {
     if (!token) {
       logger.error({
         ...formatLogs,
-        msg: 'Missing or invalid Authorization header'
+        message: 'Missing or invalid Authorization header'
       })
 
       return false
@@ -108,7 +115,7 @@ export class JwtAuthGuard implements CanActivate {
     if (!decoded) {
       logger.error({
         ...formatLogs,
-        msg: 'Invalid or expired token'
+        message: 'Invalid or expired token'
       })
 
       return false

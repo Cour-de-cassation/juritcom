@@ -36,7 +36,14 @@ export class DecisionS3Repository implements DecisionRepository {
     try {
       await this.s3Client.send(new PutObjectCommand(reqParams))
     } catch (error) {
-      this.logger.error({ operationName: 'saveDecision', msg: error.message, data: error })
+      this.logger.error({
+        operations: ['other', 'saveDecision'],
+        path: 'src/shared/infrastructure/repositories/decisionS3.repository.ts',
+        message: JSON.stringify({
+          msg: error.message,
+          data: error
+        })
+      })
       throw new BucketError(error)
     }
   }
@@ -65,7 +72,14 @@ export class DecisionS3Repository implements DecisionRepository {
     try {
       await this.s3Client.send(new DeleteObjectCommand(reqParams))
     } catch (error) {
-      this.logger.error({ operationName: 'deleteDecision', msg: error.message, data: error })
+      this.logger.error({
+        operations: ['other', 'deleteDecision'],
+        path: 'src/shared/infrastructure/repositories/decisionS3.repository.ts',
+        message: JSON.stringify({
+          msg: error.message,
+          data: error
+        })
+      })
       throw new BucketError(error)
     }
   }
@@ -112,7 +126,14 @@ export class DecisionS3Repository implements DecisionRepository {
     try {
       await this.s3Client.send(new PutObjectCommand(params))
     } catch (error) {
-      this.logger.error({ operationName: 'putDecision', msg: error.message, data: error })
+      this.logger.error({
+        operations: ['other', 'putDecision'],
+        path: 'src/shared/infrastructure/repositories/decisionS3.repository.ts',
+        message: JSON.stringify({
+          msg: error.message,
+          data: error
+        })
+      })
       throw new BucketError(error)
     }
   }
@@ -133,7 +154,14 @@ export class DecisionS3Repository implements DecisionRepository {
       const decisionListFromS3 = await this.s3Client.send(new ListObjectsV2Command(reqParams))
       return decisionListFromS3.Contents ? decisionListFromS3.Contents : []
     } catch (error) {
-      this.logger.error({ operationName: 'getDecisionList', msg: error.message, data: error })
+      this.logger.error({
+        operations: ['other', 'getDecisionList'],
+        path: 'src/shared/infrastructure/repositories/decisionS3.repository.ts',
+        message: JSON.stringify({
+          msg: error.message,
+          data: error
+        })
+      })
       throw new BucketError(error)
     }
   }

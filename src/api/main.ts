@@ -10,8 +10,8 @@ import * as bodyParser from 'body-parser'
 import * as jwtUtils from '../shared/infrastructure/security/jwt/jwt.utils'
 import { safeCompare } from '../shared/infrastructure/security/auth/auth.guard'
 
-const JWT_CLIENT_ID = process.env.OAUTH_CLIENT_ID
-const JWT_CLIENT_SECRET = process.env.OAUTH_CLIENT_SECRET
+const JWT_CLIENT_ID = process.env.JWT_CLIENT_ID
+const JWT_CLIENT_SECRET = process.env.JWT_CLIENT_SECRET
 
 // @legacy: Scope must be present in the response
 const ENABLED_SCOPES = ['collect']

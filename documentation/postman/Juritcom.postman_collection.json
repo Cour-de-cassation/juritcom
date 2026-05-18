@@ -840,22 +840,22 @@
 					},
 					{
 						"key": "scope",
-						"value": "{{OAUTH_SCOPE}}",
+						"value": "{{JWT_SCOPE}}",
 						"type": "string"
 					},
 					{
 						"key": "clientSecret",
-						"value": "{{OAUTH_CLIENT_SECRET}}",
+						"value": "{{JWT_CLIENT_SECRET}}",
 						"type": "string"
 					},
 					{
 						"key": "clientId",
-						"value": "{{OAUTH_CLIENT_ID}}",
+						"value": "{{JWT_CLIENT_ID}}",
 						"type": "string"
 					},
 					{
 						"key": "accessTokenUrl",
-						"value": "{{OAUTH_TOKEN_URL}}",
+						"value": "{{JWT_TOKEN_URL}}",
 						"type": "string"
 					},
 					{

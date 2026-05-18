@@ -77,7 +77,7 @@ export class JwtAuthGuard implements CanActivate {
       } catch (_ignore) {
         value = false
       }
-    } else if (process.env.USE_AUTH === 'oauth') {
+    } else if (process.env.USE_AUTH === 'jwt') {
       value = this.validateJwt(request)
     }
 

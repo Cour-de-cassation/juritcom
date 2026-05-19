@@ -854,11 +854,6 @@
 						"type": "string"
 					},
 					{
-						"key": "accessTokenUrl",
-						"value": "{{JWT_TOKEN_URL}}",
-						"type": "string"
-					},
-					{
 						"key": "refreshRequestParams",
 						"value": [],
 						"type": "any"

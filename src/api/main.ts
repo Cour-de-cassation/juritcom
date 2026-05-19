@@ -60,11 +60,25 @@ async function bootstrap() {
 
       logger.log(`[POST /token] content-type=${req.headers['content-type']}`)
       logger.log(`[POST /token] client_id=${clientId} grant_type=${grantType}`)
-      logger.log(`[POST /token] client_secret reçu=${clientSecret?.slice(0, 8)}... (${clientSecret?.length} chars)`)
-      logger.log(`[POST /token] JWT_CLIENT_ID attendu=${JWT_CLIENT_ID} JWT_CLIENT_SECRET attendu=${JWT_CLIENT_SECRET?.slice(0, 8)}... (${JWT_CLIENT_SECRET?.length} chars)`)
+      logger.log(
+        `[POST /token] client_secret reçu=${clientSecret?.slice(
+          0,
+          8
+        )}... (${clientSecret?.length} chars)`
+      )
+      logger.log(
+        `[POST /token] JWT_CLIENT_ID attendu=${JWT_CLIENT_ID} JWT_CLIENT_SECRET attendu=${JWT_CLIENT_SECRET?.slice(
+          0,
+          8
+        )}... (${JWT_CLIENT_SECRET?.length} chars)`
+      )
 
       if (!isValidClient(clientId, clientSecret)) {
-        logger.error(`[POST /token] invalid_client: client_id match=${clientId === JWT_CLIENT_ID} secret_length match=${clientSecret?.length === JWT_CLIENT_SECRET?.length}`)
+        logger.error(
+          `[POST /token] invalid_client: client_id match=${
+            clientId === JWT_CLIENT_ID
+          } secret_length match=${clientSecret?.length === JWT_CLIENT_SECRET?.length}`
+        )
         return res.status(401).json({
           error: 'invalid_client',
           error_description: 'Invalid client credentials'
@@ -123,7 +137,9 @@ async function bootstrap() {
   await app.listen(process.env.PORT)
 
   logger.log(`=== APP STARTED ===`)
-  logger.log(`PORT=${process.env.PORT} USE_AUTH=${process.env.USE_AUTH} NODE_ENV=${process.env.NODE_ENV}`)
+  logger.log(
+    `PORT=${process.env.PORT} USE_AUTH=${process.env.USE_AUTH} NODE_ENV=${process.env.NODE_ENV}`
+  )
   logger.log(`JWT_ISSUER=${process.env.JWT_ISSUER}`)
   logger.log(`JWT_ACCEPTED_ISSUERS=${process.env.JWT_ACCEPTED_ISSUERS}`)
   logger.log(`JWT_ALGORITHM=${process.env.JWT_ALGORITHM}`)

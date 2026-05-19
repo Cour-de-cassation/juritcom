@@ -25,7 +25,9 @@ function validateEnv() {
   }
 }
 validateEnv()
-logger.log(`JWT config: ISSUER=${JWT_ISSUER} ALGORITHM=${JWT_ALGORITHM} EXPIRATION=${JWT_EXPIRATION_SECONDS}s ACCEPTED_ISSUERS=${JWT_ACCEPTED_ISSUERS}`)
+logger.log(
+  `JWT config: ISSUER=${JWT_ISSUER} ALGORITHM=${JWT_ALGORITHM} EXPIRATION=${JWT_EXPIRATION_SECONDS}s ACCEPTED_ISSUERS=${JWT_ACCEPTED_ISSUERS}`
+)
 
 export function generateToken(clientId: string): string | null {
   try {

@@ -25,9 +25,11 @@ function validateEnv() {
   }
 }
 validateEnv()
+logger.log(`JWT config: ISSUER=${JWT_ISSUER} ALGORITHM=${JWT_ALGORITHM} EXPIRATION=${JWT_EXPIRATION_SECONDS}s ACCEPTED_ISSUERS=${JWT_ACCEPTED_ISSUERS}`)
 
 export function generateToken(clientId: string): string | null {
   try {
+    logger.log(`generateToken: clientId=${clientId}`)
     const payload = {
       sub: JWT_SUBJECT,
       clientId
@@ -48,6 +50,7 @@ export function generateToken(clientId: string): string | null {
 
 export function verifyToken(token: string): jwt.JwtPayload | null {
   try {
+    logger.log(`verifyToken: token=${token.slice(0, 20)}...`)
     const options = {
       algorithms: [JWT_ALGORITHM as jwt.Algorithm],
       issuer: JWT_ACCEPTED_ISSUERS as [string, ...string[]]

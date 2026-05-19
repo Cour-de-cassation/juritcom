@@ -58,27 +58,7 @@ async function bootstrap() {
     try {
       const { client_id: clientId, client_secret: clientSecret, grant_type: grantType } = req.body
 
-      logger.log(`[POST /token] content-type=${req.headers['content-type']}`)
-      logger.log(`[POST /token] client_id=${clientId} grant_type=${grantType}`)
-      logger.log(
-        `[POST /token] client_secret reçu=${clientSecret?.slice(
-          0,
-          8
-        )}... (${clientSecret?.length} chars)`
-      )
-      logger.log(
-        `[POST /token] JWT_CLIENT_ID attendu=${JWT_CLIENT_ID} JWT_CLIENT_SECRET attendu=${JWT_CLIENT_SECRET?.slice(
-          0,
-          8
-        )}... (${JWT_CLIENT_SECRET?.length} chars)`
-      )
-
       if (!isValidClient(clientId, clientSecret)) {
-        logger.error(
-          `[POST /token] invalid_client: client_id match=${
-            clientId === JWT_CLIENT_ID
-          } secret_length match=${clientSecret?.length === JWT_CLIENT_SECRET?.length}`
-        )
         return res.status(401).json({
           error: 'invalid_client',
           error_description: 'Invalid client credentials'
@@ -117,36 +97,20 @@ async function bootstrap() {
   })
 
   httpAdapter.get('/test-auth', (req, res) => {
-    logger.log(`[GET /test-auth] authorization=${req.headers.authorization?.slice(0, 20)}...`)
     const token = jwtUtils.extractBearerToken(req.headers.authorization)
     if (!token) {
-      logger.error(`[GET /test-auth] missing or invalid Authorization header`)
       return res.status(401).json({ error: 'Missing or invalid Authorization header' })
     }
 
     const decoded = jwtUtils.verifyToken(token)
     if (!decoded) {
-      logger.error(`[GET /test-auth] token invalide ou expiré`)
       return res.status(401).json({ error: 'Invalid or expired token' })
     }
 
-    logger.log(`[GET /test-auth] token valide, decoded=${JSON.stringify(decoded)}`)
     return res.status(200).json({ test: true, decoded })
   })
 
   await app.listen(process.env.PORT)
-
-  logger.log(`=== APP STARTED ===`)
-  logger.log(
-    `PORT=${process.env.PORT} USE_AUTH=${process.env.USE_AUTH} NODE_ENV=${process.env.NODE_ENV}`
-  )
-  logger.log(`JWT_ISSUER=${process.env.JWT_ISSUER}`)
-  logger.log(`JWT_ACCEPTED_ISSUERS=${process.env.JWT_ACCEPTED_ISSUERS}`)
-  logger.log(`JWT_ALGORITHM=${process.env.JWT_ALGORITHM}`)
-  logger.log(`JWT_EXPIRATION_SECONDS=${process.env.JWT_EXPIRATION_SECONDS}`)
-  logger.log(`JWT_CLIENT_ID=${process.env.JWT_CLIENT_ID}`)
-  logger.log(`JWT_CLIENT_SECRET=${process.env.JWT_CLIENT_SECRET?.slice(0, 8)}...`)
-  logger.log(`JWT_SECRET=${process.env.JWT_SECRET?.slice(0, 8)}...`)
 }
 
 function isValidClient(clientId: string, clientSecret: string): boolean {

@@ -6,9 +6,9 @@ import { Logger } from '@nestjs/common'
 import { AppModule } from './app.module'
 import { RequestLoggerInterceptor } from './infrastructure/interceptors/request-logger.interceptor'
 import { NestApplicationOptions } from '@nestjs/common/interfaces/nest-application-options.interface'
-import * as bodyParser from 'body-parser'
 import * as jwtUtils from '../shared/infrastructure/security/jwt/jwt.utils'
 import { safeCompare } from '../shared/infrastructure/security/auth/auth.guard'
+import { json, urlencoded } from 'express'
 
 const JWT_CLIENT_ID = process.env.JWT_CLIENT_ID
 const JWT_CLIENT_SECRET = process.env.JWT_CLIENT_SECRET
@@ -22,8 +22,8 @@ async function bootstrap() {
   } as NestApplicationOptions
 
   const app = await NestFactory.create(AppModule, appOptions)
-  app.use(bodyParser.json())
-  app.use(bodyParser.urlencoded({ extended: false }))
+  app.use(json())
+  app.use(urlencoded({ extended: false }))
 
   // A voir si c'est necessaire de rajouter /v1 aux routes
   app.setGlobalPrefix('v1')

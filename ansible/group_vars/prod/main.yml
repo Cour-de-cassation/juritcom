@@ -2,7 +2,10 @@
 s3_access_key: "{{ vault_s3_access_key }}"
 s3_secret_key: "{{ vault_s3_secret_key }}"
 doc_password: "{{ vault_doc_password }}"
-oauth_client_secret: "{{ vault_oauth_client_secret}}"
+jwt_client_secret: "{{ vault_jwt_client_secret}}"
+jwt_secret: "{{ vault_jwt_secret }}"
+jwt_issuer: "juritcom-prod"
+jwt_accepted_issuers: "juritcom-prod"
 
 commissioning_date: "2024-12-31"
 file_db_url: "{{ vault_file_db_url }}"

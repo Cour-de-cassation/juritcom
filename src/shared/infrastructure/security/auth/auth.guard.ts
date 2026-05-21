@@ -6,8 +6,7 @@ import {
   Logger,
   HttpStatus
 } from '@nestjs/common'
-import { getOAuth, getModel } from '../../../../api/main'
-import { Request, Response } from '@node-oauth/oauth2-server'
+import * as jwtUtils from '../jwt/jwt.utils'
 import { timingSafeEqual } from 'crypto'
 import { TechLog } from '../../../../shared/infrastructure/utils/logsFormat.utils'
 
@@ -38,7 +37,7 @@ function parse(string) {
   }
 }
 
-function safeCompare(userInput, secret) {
+export function safeCompare(userInput, secret) {
   const userInputLength = Buffer.byteLength(userInput)
   const secretLength = Buffer.byteLength(secret)
   const userInputBuffer = Buffer.alloc(userInputLength, 0, 'utf8')
@@ -58,9 +57,8 @@ function staticUsersAuthorizer(users, username, password) {
 export class JwtAuthGuard implements CanActivate {
   async canActivate(context: ExecutionContext) {
     const request = context.switchToHttp().getRequest()
-    const response = context.switchToHttp().getResponse()
     let value = false
-    if (`${process.env.USE_AUTH}` === 'basic') {
+    if (process.env.USE_AUTH === 'basic') {
       try {
         const users = {}
         users[process.env.DOC_LOGIN] = process.env.DOC_PASSWORD
@@ -80,13 +78,14 @@ export class JwtAuthGuard implements CanActivate {
       } catch (_ignore) {
         value = false
       }
-    } else if (`${process.env.USE_AUTH}` === 'oauth') {
-      value = await this.validateRequest(request, response, context)
+    } else if (process.env.USE_AUTH === 'jwt') {
+      value = this.validateJwt(request)
       logger.log({
         ...formatLogs,
-        message: `Validate request using OAuth: ${value}`
+        message: `Validate request using JWT: ${value}`
       })
     }
+
     if (!value) {
       const error = new UnauthorizedException('You are not authorized to access this resource.')
       logger.error({
@@ -101,36 +100,29 @@ export class JwtAuthGuard implements CanActivate {
     return new Promise<boolean>((resolve) => resolve(value))
   }
 
-  async validateRequest(req: any, res: any, _context: ExecutionContext) {
-    let token
-    const oAuth = getOAuth()
-    const model = getModel()
-    const request = new Request(req)
-    const response = new Response(res)
-
-    try {
-      token = await oAuth.server.authenticate(request, response)
-    } catch (error) {
+  validateJwt(request): boolean {
+    const token = jwtUtils.extractBearerToken(request.headers.authorization)
+    if (!token) {
       logger.error({
         ...formatLogs,
-        message: error.message
+        message: 'Missing or invalid Authorization header'
       })
+
       return false
     }
 
-    if (!token) {
-      return false
-    }
-
-    if (token.user && token.client && token.scope) {
-      const validateScope = await model.validateScope(token.user, token.client, token.scope)
-      logger.log({
+    const decoded = jwtUtils.verifyToken(token)
+    if (!decoded) {
+      logger.error({
         ...formatLogs,
-        message: `Validate OAuth scope [${token.user}, ${token.client?.id}, ${token.scope}]: ${validateScope}`
+        message: 'Invalid or expired token'
       })
-      return validateScope !== false
-    } else {
+
       return false
     }
+
+    request.user = decoded
+
+    return true
   }
 }

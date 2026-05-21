@@ -614,21 +614,17 @@
       }
     },
     "securitySchemes": {
-      "oAuth2": {
-        "flows": {
-          "clientCredentials": {
-            "tokenUrl": "https://localhost/token",
-            "refreshUrl": "https://localhost/refresh"
-          }
-        },
-        "type": "oauth2",
-        "description": "Cette API utilise le protocole OAuth 2 avec un flow client credential"
+      "jwt": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Cette API utilise JWT avec un flow client credential"
       }
     }
   },
   "security": [
     {
-      "oAuth2": []
+      "jwt": []
     }
   ]
 }

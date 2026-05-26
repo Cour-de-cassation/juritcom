@@ -105,6 +105,17 @@ export class JwtAuthGuard implements CanActivate {
     let token
     const oAuth = getOAuth()
     const model = getModel()
+
+    const authHeader = req.headers?.authorization ?? ''
+    if (!authHeader) {
+      logger.error({ ...formatLogs, message: 'validateRequest - Authorization header absent' })
+    } else if (authHeader.startsWith('Bearer ')) {
+      const preview = authHeader.substring(7, 27)
+      logger.log({ ...formatLogs, message: `validateRequest - Bearer token reçu, preview: ${preview}..., longueur: ${authHeader.length - 7}` })
+    } else {
+      logger.error({ ...formatLogs, message: `validateRequest - Authorization header format inattendu: "${authHeader.substring(0, 30)}..."` })
+    }
+
     const request = new Request(req)
     const response = new Response(res)
 
@@ -119,6 +130,7 @@ export class JwtAuthGuard implements CanActivate {
     }
 
     if (!token) {
+      logger.error({ ...formatLogs, message: 'validateRequest - authenticate() a retourné null/undefined' })
       return false
     }
 
@@ -126,10 +138,15 @@ export class JwtAuthGuard implements CanActivate {
       const validateScope = await model.validateScope(token.user, token.client, token.scope)
       logger.log({
         ...formatLogs,
+        message: `validateRequest - token authentifié - client: ${token.client?.id}, user: ${token.user?.id}, scope: ${JSON.stringify(token.scope)}`
+      })
+      logger.log({
+        ...formatLogs,
         message: `Validate OAuth scope [${token.user}, ${token.client?.id}, ${token.scope}]: ${validateScope}`
       })
       return validateScope !== false
     } else {
+      logger.error({ ...formatLogs, message: `validateRequest - token incomplet - user: ${!!token.user}, client: ${!!token.client}, scope: ${JSON.stringify(token.scope)}` })
       return false
     }
   }

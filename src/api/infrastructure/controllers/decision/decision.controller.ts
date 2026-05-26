@@ -208,6 +208,16 @@ export class DecisionController {
       })
     }
 
+    const authHeader = request.headers['authorization'] ?? ''
+    if (authHeader.startsWith('Bearer ')) {
+      const token = authHeader.substring(7)
+      this.logger.log({ ...formatLogs, message: `PUT /decision - Bearer token reçu, preview: ${token.substring(0, 20)}..., longueur: ${token.length}` })
+    } else if (authHeader) {
+      this.logger.error({ ...formatLogs, message: `PUT /decision - Authorization header format inattendu: "${authHeader.substring(0, 30)}..."` })
+    } else {
+      this.logger.error({ ...formatLogs, message: 'PUT /decision - Authorization header absent' })
+    }
+
     if (!fichierDecisionIntegre || !isPdfFile(fichierDecisionIntegre.mimetype)) {
       const error = new BadFileFormatException('fichierDecisionIntegre', 'PDF')
       this.logger.error({

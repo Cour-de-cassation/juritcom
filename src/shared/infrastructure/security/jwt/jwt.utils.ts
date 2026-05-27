@@ -83,9 +83,13 @@ export function extractClientCredentials(
     source = 'Basic header'
     const decoded = Buffer.from(authHeader.slice(6), 'base64').toString()
     const colonIndex = decoded.indexOf(':')
-    result = colonIndex >= 0
-      ? { clientId: decoded.substring(0, colonIndex), clientSecret: decoded.substring(colonIndex + 1) }
-      : { clientId: null, clientSecret: null }
+    result =
+      colonIndex >= 0
+        ? {
+            clientId: decoded.substring(0, colonIndex),
+            clientSecret: decoded.substring(colonIndex + 1)
+          }
+        : { clientId: null, clientSecret: null }
   } else {
     source = 'none'
     result = { clientId: null, clientSecret: null }

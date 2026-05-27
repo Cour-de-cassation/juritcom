@@ -56,7 +56,10 @@ async function bootstrap() {
   const httpAdapter = app.getHttpAdapter()
   httpAdapter.post('/token', (req, res) => {
     try {
-      const { client_id: clientId, client_secret: clientSecret, grant_type: grantType } = req.body
+      const { clientId, clientSecret } = jwtUtils.extractClientCredentials(
+        req.body,
+        req.headers.authorization
+      )
 
       if (!isValidClient(clientId, clientSecret)) {
         return res.status(401).json({
@@ -65,6 +68,7 @@ async function bootstrap() {
         })
       }
 
+      const grantType = req.body?.grant_type
       if (grantType !== 'client_credentials') {
         return res.status(400).json({
           error: 'unsupported_grant_type',

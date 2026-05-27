@@ -112,6 +112,28 @@ describe('jwtUtils', () => {
     })
   })
 
+  describe('extractClientCredentials', () => {
+    const basicHeader = `Basic ${Buffer.from(`${TEST_CLIENT}:${TEST_SECRET}`).toString('base64')}`
+
+    it('should extract credentials from body', () => {
+      const result = jwtUtils.extractClientCredentials(
+        { client_id: TEST_CLIENT, client_secret: TEST_SECRET },
+        null
+      )
+      expect(result).toEqual({ clientId: TEST_CLIENT, clientSecret: TEST_SECRET })
+    })
+
+    it('should extract credentials from Basic auth header', () => {
+      const result = jwtUtils.extractClientCredentials({}, basicHeader)
+      expect(result).toEqual({ clientId: TEST_CLIENT, clientSecret: TEST_SECRET })
+    })
+
+    it('should return null credentials when neither body nor header provided', () => {
+      const result = jwtUtils.extractClientCredentials({}, null)
+      expect(result).toEqual({ clientId: null, clientSecret: null })
+    })
+  })
+
   describe('env validation', () => {
     const originalEnv = process.env
 

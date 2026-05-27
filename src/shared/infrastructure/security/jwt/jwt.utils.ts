@@ -68,3 +68,30 @@ export function extractBearerToken(authHeader: string): string | null {
 
   return authHeader.substring(7)
 }
+
+export function extractClientCredentials(
+  body: { client_id?: string; client_secret?: string },
+  authHeader: string
+): { clientId: string | null; clientSecret: string | null } {
+  let result: { clientId: string | null; clientSecret: string | null }
+  let source: string
+
+  if (body?.client_id) {
+    source = 'body'
+    result = { clientId: body.client_id, clientSecret: body.client_secret ?? null }
+  } else if (authHeader?.startsWith('Basic ')) {
+    source = 'Basic header'
+    const decoded = Buffer.from(authHeader.slice(6), 'base64').toString()
+    const colonIndex = decoded.indexOf(':')
+    result = colonIndex >= 0
+      ? { clientId: decoded.substring(0, colonIndex), clientSecret: decoded.substring(colonIndex + 1) }
+      : { clientId: null, clientSecret: null }
+  } else {
+    source = 'none'
+    result = { clientId: null, clientSecret: null }
+  }
+
+  logger.log(`POST /token - client_id: ${result.clientId ?? 'missing'}, auth: ${source}`)
+
+  return result
+}

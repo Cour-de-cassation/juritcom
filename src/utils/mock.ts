@@ -2,9 +2,11 @@ import {
   JusticeFunctionTcom,
   JusticeRoleTcom,
   QualitePartieExhaustive,
-  TypePartieExhaustive
-} from 'dbsder-api-types'
-import { Metadonnee, Composition, Partie } from '../services/decisions/models'
+  TypePartieExhaustive,
+  Metadonnee,
+  Composition,
+  Partie
+} from '../services/decisions/models'
 
 export class MockUtils {
   uniqueDecisionId = `0605_2001F00930_2012-12-05_19`

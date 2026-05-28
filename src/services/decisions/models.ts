@@ -1,11 +1,40 @@
 import { z } from 'zod'
-import {
-  JusticeFunctionTcom,
-  JusticeRoleTcom,
-  QualitePartieExhaustive,
-  TypePartieExhaustive
-} from 'dbsder-api-types'
 import { ValidationError } from '../error'
+
+export enum TypePartieExhaustive {
+  PP = 'PP',
+  PM = 'PM',
+  AA = 'AA',
+  NA = 'NA'
+}
+
+export enum QualitePartieExhaustive {
+  F = 'F',
+  G = 'G',
+  I = 'I',
+  J = 'J',
+  K = 'K',
+  L = 'L',
+  M = 'M',
+  N = 'N'
+}
+
+export enum JusticeFunctionTcom {
+  GRF = 'GRF',
+  JUG = 'JUG',
+  PDT = 'PDT',
+  PRO = 'PRO',
+  JUS = 'JUS'
+}
+
+export enum JusticeRoleTcom {
+  AVOCAT = 'AVOCAT',
+  AVOCAT_GENERAL = 'AVOCAT GENERAL',
+  RAPPORTEUR = 'RAPPORTEUR',
+  MANDATAIRE = 'MANDATAIRE',
+  PARTIE = 'PARTIE',
+  AUTRE = 'AUTRE'
+}
 
 const CompositionSchema = z.object({
   fonction: z.nativeEnum(JusticeFunctionTcom).optional(),

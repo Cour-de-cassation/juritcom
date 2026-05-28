@@ -53,7 +53,10 @@ describe('Decisions API', () => {
         const res = await request(app)
           .put('/v1/decision')
           .set('Authorization', validAuthHeader())
-          .attach('fichierDecisionIntegre', myBufferedFile, { filename: pdfFilename, contentType: 'application/pdf' })
+          .attach('fichierDecisionIntegre', myBufferedFile, {
+            filename: pdfFilename,
+            contentType: 'application/pdf'
+          })
           .field('metadonnees', JSON.stringify(metadata))
           .field('texteDecisionIntegre', 'some text')
 
@@ -70,7 +73,10 @@ describe('Decisions API', () => {
           .put('/v1/decision')
           .set('Authorization', validAuthHeader())
           .set('x-correlation-id', providedCorrelationId)
-          .attach('fichierDecisionIntegre', myBufferedFile, { filename: pdfFilename, contentType: 'application/pdf' })
+          .attach('fichierDecisionIntegre', myBufferedFile, {
+            filename: pdfFilename,
+            contentType: 'application/pdf'
+          })
           .field('metadonnees', JSON.stringify(metadata))
           .field('texteDecisionIntegre', 'some text')
 
@@ -93,7 +99,10 @@ describe('Decisions API', () => {
         const res = await request(app)
           .put('/v1/decision')
           .set('Authorization', validAuthHeader())
-          .attach('fichierDecisionIntegre', myBufferedFile, { filename: 'doc.xml', contentType: 'application/xml' })
+          .attach('fichierDecisionIntegre', myBufferedFile, {
+            filename: 'doc.xml',
+            contentType: 'application/xml'
+          })
           .field('metadonnees', JSON.stringify(metadata))
 
         expect(res.statusCode).toBe(400)
@@ -103,7 +112,10 @@ describe('Decisions API', () => {
         const res = await request(app)
           .put('/v1/decision')
           .set('Authorization', validAuthHeader())
-          .attach('fichierDecisionIntegre', myBufferedFile, { filename: pdfFilename, contentType: 'application/pdf' })
+          .attach('fichierDecisionIntegre', myBufferedFile, {
+            filename: pdfFilename,
+            contentType: 'application/pdf'
+          })
 
         expect(res.statusCode).toBe(400)
       })
@@ -112,7 +124,10 @@ describe('Decisions API', () => {
         const res = await request(app)
           .put('/v1/decision')
           .set('Authorization', validAuthHeader())
-          .attach('fichierDecisionIntegre', myBufferedFile, { filename: pdfFilename, contentType: 'application/pdf' })
+          .attach('fichierDecisionIntegre', myBufferedFile, {
+            filename: pdfFilename,
+            contentType: 'application/pdf'
+          })
           .field('metadonnees', 'not-json')
 
         expect(res.statusCode).toBe(400)
@@ -124,7 +139,10 @@ describe('Decisions API', () => {
         const res = await request(app)
           .put('/v1/decision')
           .set('Authorization', validAuthHeader())
-          .attach('fichierDecisionIntegre', myBufferedFile, { filename: pdfFilename, contentType: 'application/pdf' })
+          .attach('fichierDecisionIntegre', myBufferedFile, {
+            filename: pdfFilename,
+            contentType: 'application/pdf'
+          })
           .field('metadonnees', JSON.stringify(invalidMetadata))
 
         expect(res.statusCode).toBe(400)
@@ -134,7 +152,10 @@ describe('Decisions API', () => {
         const res = await request(app)
           .put('/v1/decision')
           .set('Authorization', validAuthHeader())
-          .attach('fichierDecisionIntegre', Buffer.alloc(31457280), { filename: pdfFilename, contentType: 'application/pdf' })
+          .attach('fichierDecisionIntegre', Buffer.alloc(31457280), {
+            filename: pdfFilename,
+            contentType: 'application/pdf'
+          })
           .field('metadonnees', JSON.stringify(metadata))
 
         expect(res.statusCode).toBe(400)
@@ -145,7 +166,10 @@ describe('Decisions API', () => {
       it('when no authorization header is provided', async () => {
         const res = await request(app)
           .put('/v1/decision')
-          .attach('fichierDecisionIntegre', myBufferedFile, { filename: pdfFilename, contentType: 'application/pdf' })
+          .attach('fichierDecisionIntegre', myBufferedFile, {
+            filename: pdfFilename,
+            contentType: 'application/pdf'
+          })
           .field('metadonnees', JSON.stringify(metadata))
 
         expect(res.statusCode).toBe(401)
@@ -159,7 +183,10 @@ describe('Decisions API', () => {
         const res = await request(app)
           .put('/v1/decision')
           .set('Authorization', validAuthHeader())
-          .attach('fichierDecisionIntegre', myBufferedFile, { filename: pdfFilename, contentType: 'application/pdf' })
+          .attach('fichierDecisionIntegre', myBufferedFile, {
+            filename: pdfFilename,
+            contentType: 'application/pdf'
+          })
           .field('metadonnees', JSON.stringify(metadata))
           .field('texteDecisionIntegre', 'some text')
 
@@ -181,8 +208,7 @@ describe('Decisions API', () => {
 
     describe('returns 401 Unauthorized', () => {
       it('when no authorization header is provided', async () => {
-        const res = await request(app)
-          .delete('/v1/decision/some-decision-id')
+        const res = await request(app).delete('/v1/decision/some-decision-id')
 
         expect(res.statusCode).toBe(401)
       })

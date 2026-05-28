@@ -58,7 +58,9 @@ describe('authMiddleware', () => {
     })
 
     it('calls next() for valid basic credentials', () => {
-      const credentials = Buffer.from(`${process.env.DOC_LOGIN}:${process.env.DOC_PASSWORD}`).toString('base64')
+      const credentials = Buffer.from(
+        `${process.env.DOC_LOGIN}:${process.env.DOC_PASSWORD}`
+      ).toString('base64')
       const mockReq: any = {
         headers: { authorization: `Basic ${credentials}` }
       }

@@ -1,6 +1,12 @@
 import * as jwt from 'jsonwebtoken'
 import { logger } from '../config/logger'
-import { JWT_ISSUER, JWT_ALGORITHM, JWT_SECRET, JWT_EXPIRATION_SECONDS, JWT_ACCEPTED_ISSUERS } from '../config/env'
+import {
+  JWT_ISSUER,
+  JWT_ALGORITHM,
+  JWT_SECRET,
+  JWT_EXPIRATION_SECONDS,
+  JWT_ACCEPTED_ISSUERS
+} from '../config/env'
 
 const JWT_SUBJECT = 'system'
 const acceptedIssuers = JWT_ACCEPTED_ISSUERS

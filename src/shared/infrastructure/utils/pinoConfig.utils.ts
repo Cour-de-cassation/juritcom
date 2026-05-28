@@ -14,9 +14,9 @@ const pinoPrettyConf = {
   }
 }
 
-export const normalizationPinoConfig = {
+export const pinoConfig = {
   pinoHttp: {
-    base: { appName: 'JuriTCOM-normalization' },
+    base: { appName: 'JuriTCOM' },
     formatters: {
       level: (label) => {
         return {

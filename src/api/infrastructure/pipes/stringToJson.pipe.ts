@@ -3,10 +3,10 @@ import { MissingFieldException } from '../exceptions/missingField.exception'
 import { BadFieldFormatException } from '../exceptions/badFieldFormat.exception'
 import { PinoLogger } from 'nestjs-pino'
 import { TechLog } from '../../../shared/infrastructure/utils/logsFormat.utils'
-import { normalizationPinoConfig } from '../../../shared/infrastructure/utils/pinoConfig.utils'
+import { pinoConfig } from '../../../shared/infrastructure/utils/pinoConfig.utils'
 import { HttpStatus } from '@nestjs/common'
 
-const logger = new PinoLogger(normalizationPinoConfig)
+const logger = new PinoLogger(pinoConfig)
 const formatLogs: TechLog = {
   operations: ['other', 'StringToJsonPipe.transform'],
   path: 'src/api/infrastructure/pipes/stringToJson.pipe.ts',

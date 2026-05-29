@@ -95,7 +95,10 @@ export function extractClientCredentials(
     result = { clientId: null, clientSecret: null }
   }
 
-  logger.log(`POST /token - client_id: ${result.clientId ?? 'missing'}, auth: ${source}`)
-
+  logger.log({
+    path: __filename,
+    operations: ['other', 'extractClientCredentials'],
+    message: `POST /token - client_id: ${result.clientId ?? 'missing'}, auth: ${source}`
+  })
   return result
 }

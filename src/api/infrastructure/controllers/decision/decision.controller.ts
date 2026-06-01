@@ -45,7 +45,6 @@ import { UnexpectedException } from '../../../../shared/infrastructure/exception
 import { SaveDecisionUsecase } from '../../../usecase/saveDecision.usecase'
 import { DeleteDecisionUsecase } from '../../../usecase/deleteDecision.usecase'
 import { JwtAuthGuard } from '../../../../shared/infrastructure/security/auth/auth.guard'
-import { DecisionMongoRepository } from 'src/shared/infrastructure/repositories/decisionMongo.repository'
 
 const FILE_MAX_SIZE = {
   size: 31457280,
@@ -108,7 +107,7 @@ export class DecisionController {
     @Req() request: Request
   ): Promise<DeleteDecisionResponse> {
     const routePath = request.method + ' ' + request.path
-    const decisionUseCase = new DeleteDecisionUsecase(new DecisionMongoRepository())
+    const decisionUseCase = new DeleteDecisionUsecase()
     const formatLogs: TechLog = {
       path: 'src/api/infrastructure/controllers/decision/decision.controller.ts',
       operations: ['other', 'deleteDecision'],

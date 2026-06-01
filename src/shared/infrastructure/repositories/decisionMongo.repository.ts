@@ -1,29 +1,30 @@
-import { Document, MongoClient, OptionalUnlessRequiredId, InferIdType, Db } from 'mongodb'
-import { RawFilesRepository } from '../../../api/domain/decisions/repositories/decision.repository'
+import { MongoClient, Db } from 'mongodb'
+import {
+  RawFilesRepository,
+  RawTcom,
+  TcomDeletion
+} from '../../../api/domain/decisions/repositories/decision.repository'
+import { ObjectId } from 'mongodb'
 
-export class DecisionMongoRepository implements RawFilesRepository {
-  private db: Promise<Db>
+const client = new MongoClient(process.env.FILE_DB_URL)
+const db: Promise<Db> = client.connect().then((_) => _.db())
 
-  constructor() {
-    const client = new MongoClient(process.env.FILE_DB_URL)
-    this.db = client.connect().then((_) => _.db())
-  }
+export const createFileInformation: RawFilesRepository['createFileInformation'] = async (
+  file: RawTcom
+): Promise<{ _id: ObjectId } & RawTcom> => {
+  const database = await db
+  const { insertedId } = await database
+    .collection<RawTcom>(process.env.S3_BUCKET_NAME_PDF)
+    .insertOne(file)
+  return { _id: insertedId, ...file }
+}
 
-  async createFileInformation<T extends Document>(
-    file: OptionalUnlessRequiredId<T>
-  ): Promise<{ _id: InferIdType<T> } & typeof file> {
-    const db = await this.db
-    const { insertedId } = await db.collection<T>(process.env.S3_BUCKET_NAME_PDF).insertOne(file)
-    return { _id: insertedId, ...file }
-  }
-
-  async createDeleteInformation<T extends Document>(
-    file: OptionalUnlessRequiredId<T>
-  ): Promise<{ _id: InferIdType<T> } & typeof file> {
-    const db = await this.db
-    const { insertedId } = await db
-      .collection<T>(process.env.DELETION_COLLECTION_NAME)
-      .insertOne(file)
-    return { _id: insertedId, ...file }
-  }
+export const createDeleteInformation: RawFilesRepository['createDeleteInformation'] = async (
+  file: TcomDeletion
+): Promise<{ _id: ObjectId } & TcomDeletion> => {
+  const database = await db
+  const { insertedId } = await database
+    .collection<TcomDeletion>(process.env.DELETION_COLLECTION_NAME)
+    .insertOne(file)
+  return { _id: insertedId, ...file }
 }

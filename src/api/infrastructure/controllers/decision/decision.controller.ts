@@ -39,12 +39,11 @@ import { StringToJsonPipe } from '../../pipes/stringToJson.pipe'
 import { ValidateDtoPipe } from '../../pipes/validateDto.pipe'
 import { TechLog } from '../../../../shared/infrastructure/utils/logsFormat.utils'
 import { Request } from 'express'
-import { BucketError } from '../../../../shared/domain/errors/bucket.error'
+import { BucketError } from '../../../../shared/infrastructure/exceptions/bucket.error'
 import { InfrastructureException } from '../../../../shared/infrastructure/exceptions/infrastructure.exception'
 import { UnexpectedException } from '../../../../shared/infrastructure/exceptions/unexpected.exception'
 import { SaveDecisionUsecase } from '../../../usecase/saveDecision.usecase'
 import { DeleteDecisionUsecase } from '../../../usecase/deleteDecision.usecase'
-import { DecisionS3Repository } from '../../../../shared/infrastructure/repositories/decisionS3.repository'
 import { JwtAuthGuard } from '../../../../shared/infrastructure/security/auth/auth.guard'
 
 const FILE_MAX_SIZE = {
@@ -59,14 +58,14 @@ const MULTER_OPTIONS = {
 } as MulterOptions
 
 export interface DecisionResponse {
-  jsonFileName: string | void
+  id: string | void
   pdfFileName: string | void
   body: string
 }
 
 export interface DeleteDecisionResponse {
   decisionId: string | void
-  decisionStoredKey: string | void
+  id: string | void
 }
 
 @ApiBearerAuth()
@@ -108,7 +107,7 @@ export class DecisionController {
     @Req() request: Request
   ): Promise<DeleteDecisionResponse> {
     const routePath = request.method + ' ' + request.path
-    const decisionUseCase = new DeleteDecisionUsecase(new DecisionS3Repository(this.logger))
+    const decisionUseCase = new DeleteDecisionUsecase()
     const formatLogs: TechLog = {
       path: 'src/api/infrastructure/controllers/decision/decision.controller.ts',
       operations: ['other', 'deleteDecision'],
@@ -122,7 +121,7 @@ export class DecisionController {
 
     this.logger.log({ ...formatLogs })
 
-    const decisionStoredKey = await decisionUseCase.deleteDecision(decisionId).catch((error) => {
+    const { rawfileId } = await decisionUseCase.deleteDecision(decisionId).catch((error) => {
       if (error instanceof BucketError) {
         this.logger.error({
           ...formatLogs,
@@ -149,7 +148,7 @@ export class DecisionController {
         msg: routePath + ' returns ' + HttpStatus.NO_CONTENT,
         data: {
           decisionId: decisionId,
-          decisionStoredKey: decisionStoredKey
+          rawfileId: rawfileId
         },
         statusCode: HttpStatus.NO_CONTENT
       })
@@ -157,7 +156,7 @@ export class DecisionController {
 
     return {
       decisionId: decisionId,
-      decisionStoredKey: decisionStoredKey
+      id: rawfileId
     }
   }
 
@@ -232,10 +231,10 @@ export class DecisionController {
       throw error
     }
 
-    const decisionUseCase = new SaveDecisionUsecase(new DecisionS3Repository(this.logger))
+    const decisionUseCase = new SaveDecisionUsecase()
 
-    const bucketFileDto = await decisionUseCase
-      .putDecision(fichierDecisionIntegre, texteDecisionIntegre, metadonneeDto)
+    const { fileName, rawfileId } = await decisionUseCase
+      .putDecision(fichierDecisionIntegre, metadonneeDto)
       .catch((error) => {
         if (error instanceof BucketError) {
           this.logger.error({
@@ -274,8 +273,8 @@ export class DecisionController {
     })
 
     return {
-      jsonFileName: bucketFileDto.jsonFileName,
-      pdfFileName: bucketFileDto.pdfFileName,
+      id: rawfileId,
+      pdfFileName: fileName,
       body: `la décision a bien été prise en compte`
     }
   }

@@ -1,13 +1,12 @@
-import { DecisionRepository } from '../domain/decisions/repositories/decision.repository'
+import { createDeleteInformation } from 'src/shared/infrastructure/repositories/decisionMongo.repository'
 
 export class DeleteDecisionUsecase {
-  constructor(private decisionsRepository: DecisionRepository) {}
+  async deleteDecision(decisionId: string): Promise<{ rawfileId: string }> {
+    const { _id } = await createDeleteInformation({
+      decisionId,
+      events: [{ type: 'created', date: new Date() }]
+    })
 
-  async deleteDecision(decisionId: string): Promise<string> {
-    const jsonFileName = `${decisionId}.json`
-
-    await this.decisionsRepository.deleteDataDecisionIntegre(jsonFileName)
-
-    return jsonFileName
+    return { rawfileId: _id.toString() }
   }
 }

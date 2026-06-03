@@ -1,16 +1,11 @@
 ---
 s3_access_key: "{{ vault_s3_access_key }}"
 s3_secret_key: "{{ vault_s3_secret_key }}"
-dbsder_api_key: "{{ vault_dbsder_api_key }}"
-dbsder_other_api_key: "{{ vault_dbsder_other_api_key }}"
-dbsder_powerful_api_key: "{{ vault_dbsder_powerful_api_key }}"
 doc_password: "{{ vault_doc_password }}"
-av_pdf_path: "{{ vault_av_pdf_path }}"
 jwt_client_secret: "{{ vault_jwt_client_secret}}"
 jwt_secret: "{{ vault_jwt_secret }}"
 jwt_issuer: "juritcom-dev"
 jwt_accepted_issuers: "juritcom-dev,juritcom-preprod"
 
 commissioning_date: "2024-12-31"
-av_node_name: "judilibre-dev"
-av_host_path: "/data/av"
+file_db_url: "{{ vault_file_db_url }}"

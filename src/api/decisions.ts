@@ -130,7 +130,7 @@ router.put(
 
 router.delete('/v1/decision/:decisionId', authMiddleware, async (req, res, next) => {
   try {
-    const { decisionId } = req.params
+    const decisionId = req.params.decisionId as string
     const routePath = req.method + ' ' + req.path
     const formatLogs = {
       path: 'src/api/decisions.ts',

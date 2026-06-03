@@ -7,7 +7,6 @@
     definition:
       apiVersion: v1
       kind: Namespace
-      metadata:
         name: juritcom
         namespace: "{{ juritcom_namespace }}"
 ...

@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
 import { timingSafeEqual } from 'crypto'
 import * as jwtUtils from '../services/jwt'
-import { DOC_LOGIN, DOC_PASSWORD } from '../config/env'
+import { DOC_LOGIN, DOC_PASSWORD, USE_AUTH } from '../config/env'
 import { logger } from '../config/logger'
 
 function safeCompare(a: string, b: string): boolean {
@@ -35,7 +35,7 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction):
     operations: ['other', 'authMiddleware'] as const
   }
 
-  const useAuth = process.env.USE_AUTH
+  const useAuth = USE_AUTH
 
   if (useAuth === 'basic') {
     const parsed = parseBasicAuth(req.headers.authorization ?? '')

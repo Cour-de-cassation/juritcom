@@ -30,11 +30,6 @@ export interface DecisionResponse {
   body: string
 }
 
-export interface DeleteDecisionResponse {
-  decisionId: string | void
-  id: string | void
-}
-
 function isPdfFile(mimeType: string): boolean {
   return mimeType === 'application/pdf'
 }
@@ -170,10 +165,7 @@ router.delete('/v1/decision/:decisionId', authMiddleware, async (req, res, next)
       })
     })
 
-    res.status(204).json({
-      decisionId,
-      id: rawfileId
-    } satisfies DeleteDecisionResponse)
+    res.status(204)
   } catch (err) {
     next(err)
   }

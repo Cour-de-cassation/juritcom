@@ -2,6 +2,10 @@ import { authMiddleware } from './auth'
 import * as jwtUtils from '../services/jwt'
 
 const TEST_CLIENT = 'jest-client'
+const TEST_LOGIN = 'login'
+const TEST_PASSWORD = 'password'
+
+jest.mock('../config/env', () => jest.requireActual('../config/env'))
 
 describe('authMiddleware', () => {
   const mockNext = jest.fn()
@@ -16,7 +20,7 @@ describe('authMiddleware', () => {
 
   describe('USE_AUTH=jwt', () => {
     beforeEach(() => {
-      process.env.USE_AUTH = 'jwt'
+      jest.requireMock('../config/env').USE_AUTH = 'jwt'
     })
 
     it('calls next() for a valid token', () => {
@@ -54,13 +58,11 @@ describe('authMiddleware', () => {
 
   describe('USE_AUTH=basic', () => {
     beforeEach(() => {
-      process.env.USE_AUTH = 'basic'
+      jest.requireMock('../config/env').USE_AUTH = 'basic'
     })
 
     it('calls next() for valid basic credentials', () => {
-      const credentials = Buffer.from(
-        `${process.env.DOC_LOGIN}:${process.env.DOC_PASSWORD}`
-      ).toString('base64')
+      const credentials = Buffer.from(`${TEST_LOGIN}:${TEST_PASSWORD}`).toString('base64')
       const mockReq: any = {
         headers: { authorization: `Basic ${credentials}` }
       }

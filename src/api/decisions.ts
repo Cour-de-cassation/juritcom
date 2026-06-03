@@ -165,7 +165,7 @@ router.delete('/v1/decision/:decisionId', authMiddleware, async (req, res, next)
       })
     })
 
-    res.status(204)
+    res.status(204).json()
   } catch (err) {
     next(err)
   }

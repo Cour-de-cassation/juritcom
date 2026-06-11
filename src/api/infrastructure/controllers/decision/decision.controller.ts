@@ -234,7 +234,7 @@ export class DecisionController {
     const decisionUseCase = new SaveDecisionUsecase()
 
     const { fileName, rawfileId } = await decisionUseCase
-      .putDecision(fichierDecisionIntegre, metadonneeDto)
+      .putDecision(fichierDecisionIntegre, texteDecisionIntegre, metadonneeDto)
       .catch((error) => {
         if (error instanceof BucketError) {
           this.logger.error({

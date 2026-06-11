@@ -26,7 +26,7 @@ export type Event = Created | Normalized | Blocked | Deleted
 export type RawTcom = {
   path: string
   events: [Created, ...Event[]]
-  metadatas: MetadonneeDto
+  metadatas: { texteDecisionIntegre: string; metadonnees: MetadonneeDto }
 }
 
 export type TcomDeletion = {

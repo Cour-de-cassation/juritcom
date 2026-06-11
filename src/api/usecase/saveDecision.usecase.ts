@@ -6,6 +6,7 @@ import { createFileInformation } from 'src/shared/infrastructure/repositories/de
 export class SaveDecisionUsecase {
   async putDecision(
     fichierDecisionIntegre: Express.Multer.File,
+    texteDecisionIntegre: string,
     metadonnees: MetadonneeDto
   ): Promise<{ fileName: string; rawfileId: string }> {
     const fileName = uuidv4() + '.pdf'
@@ -15,7 +16,7 @@ export class SaveDecisionUsecase {
     const { _id } = await createFileInformation({
       path: fileName,
       events: [{ type: 'created', date: new Date() }],
-      metadatas: metadonnees
+      metadatas: { texteDecisionIntegre, metadonnees }
     })
 
     return { fileName, rawfileId: _id.toString() }

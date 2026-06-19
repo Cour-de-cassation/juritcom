@@ -18,6 +18,7 @@ import { saveDecision, deleteDecision } from './handler'
 const mockUtils = new MockUtils()
 const fakeFile = { originalname: 'decision.pdf', buffer: Buffer.from('') } as Express.Multer.File
 const fakeMetadonnees = mockUtils.mandatoryMetadonneesDtoMock
+const fakeTextDecisionIntegre = 'Mon texte de décision\nde justice'
 
 describe('saveDecision handler', () => {
   beforeEach(() => {
@@ -29,17 +30,17 @@ describe('saveDecision handler', () => {
 
   describe('saveDecision', () => {
     it('returns a fileName with .pdf extension', async () => {
-      const result = await saveDecision(fakeFile, fakeMetadonnees)
+      const result = await saveDecision(fakeFile, fakeMetadonnees, fakeTextDecisionIntegre)
       expect(result.fileName).toMatch(/\.pdf$/)
     })
 
     it('returns rawfileId from mongo', async () => {
-      const result = await saveDecision(fakeFile, fakeMetadonnees)
+      const result = await saveDecision(fakeFile, fakeMetadonnees, fakeTextDecisionIntegre)
       expect(result.rawfileId).toBe('fake-id')
     })
 
     it('calls saveDecisionFile with the file and generated filename', async () => {
-      await saveDecision(fakeFile, fakeMetadonnees)
+      await saveDecision(fakeFile, fakeMetadonnees, fakeTextDecisionIntegre)
 
       expect(mockSaveDecisionFile).toHaveBeenCalledTimes(1)
       const [calledFile, calledFileName] = mockSaveDecisionFile.mock.calls[0]
@@ -48,18 +49,21 @@ describe('saveDecision handler', () => {
     })
 
     it('calls saveFileMetadata with correct structure', async () => {
-      await saveDecision(fakeFile, fakeMetadonnees)
+      await saveDecision(fakeFile, fakeMetadonnees, fakeTextDecisionIntegre)
 
       expect(mockSaveFileMetadata).toHaveBeenCalledTimes(1)
       const calledWith = mockSaveFileMetadata.mock.calls[0][0]
       expect(calledWith).toHaveProperty('path')
       expect(calledWith).toHaveProperty('events')
       expect(calledWith).toHaveProperty('metadatas')
-      expect(calledWith.metadatas).toEqual(fakeMetadonnees)
+      expect(calledWith.metadatas).toEqual({
+        metadonnees: fakeMetadonnees,
+        textDecisionIntegre: fakeTextDecisionIntegre
+      })
     })
 
     it('includes created event with date', async () => {
-      await saveDecision(fakeFile, fakeMetadonnees)
+      await saveDecision(fakeFile, fakeMetadonnees, fakeTextDecisionIntegre)
 
       const calledWith = mockSaveFileMetadata.mock.calls[0][0]
       expect(calledWith.events[0]).toEqual({ type: 'created', date: expect.any(Date) })

@@ -1,20 +1,21 @@
 import { v4 as uuidv4 } from 'uuid'
 import { Metadonnee } from './models'
 import { saveDecisionFile } from '../../connectors/s3'
-import { saveFileMetadata, saveDeleteMetadata } from '../../connectors/mongodb'
+import { saveFileMetadata, saveDeleteMetadata, RawTcom } from '../../connectors/mongodb'
 
 export async function saveDecision(
   fichierDecisionIntegre: Express.Multer.File,
-  metadonnees: Metadonnee
+  metadonnees: Metadonnee,
+  texteDecisionIntegre: string
 ): Promise<{ fileName: string; rawfileId: string }> {
   const fileName = uuidv4() + '.pdf'
 
   await saveDecisionFile(fichierDecisionIntegre, fileName)
 
-  const { _id } = await saveFileMetadata({
+  const { _id } = await saveFileMetadata<RawTcom>({
     path: fileName,
     events: [{ type: 'created', date: new Date() }],
-    metadatas: metadonnees
+    metadatas: { texteDecisionIntegre, metadonnees }
   })
 
   return { fileName, rawfileId: _id.toString() }

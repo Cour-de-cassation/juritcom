@@ -25,15 +25,15 @@ export class ValidationError extends Error {
 
 export class InfrastructureError extends Error {
   type = 'infrastructureError' as const
-  constructor(message?: string) {
-    super(message ?? "Une erreur inattendue liée à une dépendance de l'API a été rencontrée.")
+  constructor() {
+    super("Une erreur inattendue liée à une dépendance de l'API a été rencontrée.")
   }
 }
 
 export class UnexpectedError extends Error {
   type = 'unexpectedError' as const
-  constructor(message?: string) {
-    super(message ?? 'Une erreur inattendue a été rencontrée.')
+  constructor() {
+    super('Une erreur inattendue a été rencontrée.')
   }
 }
 

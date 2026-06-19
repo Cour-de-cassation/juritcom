@@ -52,9 +52,15 @@ router.put(
         throw new BadFileSize(FILE_MAX_SIZE.readSize)
       }
 
+      const texteDecisionIntegre = req.body?.texteDecisionIntegre
+
+      if (!texteDecisionIntegre || typeof texteDecisionIntegre != 'string') {
+        throw new ValidationError('Le texteDecisionIntegre est requis')
+      }
+
       const metadonneesRaw = req.body?.metadonnees
       if (!metadonneesRaw) {
-        throw new BadFileFormat('Les métadonnées sont requises')
+        throw new ValidationError('Les métadonnées sont requises')
       }
 
       let metadonneesJson: unknown
@@ -80,24 +86,26 @@ router.put(
       }
       req.log?.info(formatLogs)
 
-      const { fileName, rawfileId } = await saveDecision(fichierDecisionIntegre, metadonnees).catch(
-        (error) => {
-          if (error instanceof InfrastructureError) {
-            req.log?.error({
-              ...formatLogs,
-              message: JSON.stringify({ msg: error.message, statusCode: 503 }),
-              stack: error.stack
-            })
-            throw error
-          }
+      const { fileName, rawfileId } = await saveDecision(
+        fichierDecisionIntegre,
+        metadonnees,
+        texteDecisionIntegre
+      ).catch((error) => {
+        if (error instanceof InfrastructureError) {
           req.log?.error({
             ...formatLogs,
-            message: JSON.stringify({ msg: error.message, statusCode: 500 }),
+            message: JSON.stringify({ msg: error.message, statusCode: 503 }),
             stack: error.stack
           })
-          throw new UnexpectedError(error.message)
+          throw error
         }
-      )
+        req.log?.error({
+          ...formatLogs,
+          message: JSON.stringify({ msg: error.message, statusCode: 500 }),
+          stack: error.stack
+        })
+        throw new UnexpectedError()
+      })
 
       const metadonneesForLog = { ...metadonnees } as Record<string, unknown>
       delete metadonneesForLog['parties']
@@ -153,7 +161,7 @@ router.delete('/v1/decision/:decisionId', authMiddleware, async (req, res, next)
         message: JSON.stringify({ msg: error.message, statusCode: 500 }),
         stack: error.stack
       })
-      throw new UnexpectedError(error.message)
+      throw new UnexpectedError()
     })
 
     req.log?.info({

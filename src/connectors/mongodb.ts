@@ -1,6 +1,7 @@
 import { Document, MongoClient, OptionalUnlessRequiredId, InferIdType, Db } from 'mongodb'
 import { FILE_DB_URL, S3_BUCKET_NAME_PDF, DELETION_COLLECTION_NAME } from '../config/env'
 import { logger } from '../config/logger'
+import { Metadonnee } from 'src/services/decisions/models'
 
 let dbPromise: Promise<Db> | null = null
 
@@ -12,15 +13,34 @@ function getDb(): Promise<Db> {
   return dbPromise
 }
 
+type Created = {
+  type: 'created'
+  date: Date
+}
+type Normalized = {
+  type: 'normalized'
+  date: Date
+}
+type Blocked = {
+  type: 'blocked'
+  date: Date
+  reason: string
+}
+type Deleted = {
+  type: 'deleted'
+  date: Date
+}
+export type Event = Created | Normalized | Blocked | Deleted
+
 export type RawTcom = {
   path: string
-  events: Array<{ type: string; date: Date }>
-  metadatas: unknown
+  events: [Created, ...Event[]]
+  metadatas: { texteDecisionIntegre: string; metadonnees: Metadonnee }
 }
 
 export type TcomDeletion = {
   decisionId: string
-  events: Array<{ type: string; date: Date }>
+  events: [Created, ...(Blocked | Deleted)[]]
 }
 
 export async function saveFileMetadata<T extends Document>(

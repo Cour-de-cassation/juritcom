@@ -43,7 +43,7 @@ export async function saveDecisionFile(file: Express.Multer.File, fileName: stri
       message: JSON.stringify({ msg: error.message, data: error }),
       stack: error.stack
     })
-    throw new InfrastructureError(error.message)
+    throw new InfrastructureError()
   }
 }
 

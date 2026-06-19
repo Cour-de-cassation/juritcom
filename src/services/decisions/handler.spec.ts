@@ -58,7 +58,7 @@ describe('saveDecision handler', () => {
       expect(calledWith).toHaveProperty('metadatas')
       expect(calledWith.metadatas).toEqual({
         metadonnees: fakeMetadonnees,
-        textDecisionIntegre: fakeTextDecisionIntegre
+        texteDecisionIntegre: fakeTextDecisionIntegre
       })
     })
 

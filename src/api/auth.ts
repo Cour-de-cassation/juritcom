@@ -1,18 +1,8 @@
 import { Request, Response, NextFunction } from 'express'
-import { timingSafeEqual } from 'crypto'
 import * as jwtUtils from '../services/jwt'
+import { safeCompare } from '../services/crypto'
 import { DOC_LOGIN, DOC_PASSWORD, USE_AUTH } from '../config/env'
 import { logger } from '../config/logger'
-
-function safeCompare(a: string, b: string): boolean {
-  const aLen = Buffer.byteLength(a)
-  const bLen = Buffer.byteLength(b)
-  const aBuf = Buffer.alloc(aLen, 0, 'utf8')
-  aBuf.write(a)
-  const bBuf = Buffer.alloc(aLen, 0, 'utf8')
-  bBuf.write(b)
-  return !!(timingSafeEqual(aBuf, bBuf) && aLen === bLen)
-}
 
 function parseBasicAuth(authHeader: string): { name: string; pass: string } | undefined {
   const credentialsRegex = /^ *(?:[Bb][Aa][Ss][Ii][Cc]) +([A-Za-z0-9._~+/-]+=*) *$/

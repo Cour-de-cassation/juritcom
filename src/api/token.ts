@@ -1,19 +1,9 @@
 import { Router } from 'express'
-import { timingSafeEqual } from 'crypto'
 import * as jwtUtils from '../services/jwt'
+import { safeCompare } from '../services/crypto'
 import { JWT_CLIENT_ID, JWT_CLIENT_SECRET } from '../config/env'
 
 const ENABLED_SCOPES = ['collect']
-
-function safeCompare(a: string, b: string): boolean {
-  const aLen = Buffer.byteLength(a)
-  const bLen = Buffer.byteLength(b)
-  const aBuf = Buffer.alloc(aLen, 0, 'utf8')
-  aBuf.write(a)
-  const bBuf = Buffer.alloc(aLen, 0, 'utf8')
-  bBuf.write(b)
-  return !!(timingSafeEqual(aBuf, bBuf) && aLen === bLen)
-}
 
 function isValidClient(clientId: string, clientSecret: string): boolean {
   return safeCompare(clientId, JWT_CLIENT_ID) && safeCompare(clientSecret, JWT_CLIENT_SECRET)

@@ -4,10 +4,12 @@ import { MulterError } from 'multer'
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const errorHandler = (err: Error, req: Request, res: Response, _next: NextFunction) => {
+  const isValidationErr = isCustomError(err) && err.type === 'validationError'
   req.log?.error({
     path: 'src/api/error.ts',
     operations: ['other', `${req.method} ${req.path}`],
     message: `${err}`,
+    ...(isValidationErr && { details: err.details }),
     stack: err.stack
   })
 

@@ -37,34 +37,34 @@ export enum JusticeRoleTcom {
 }
 
 const CompositionSchema = z.object({
-  fonction: z.nativeEnum(JusticeFunctionTcom).optional(),
+  fonction: z.nativeEnum(JusticeFunctionTcom).optional().nullable(),
   nom: z.string(),
-  prenom: z.string().optional(),
-  civilite: z.string().optional()
+  prenom: z.string().optional().nullable(),
+  civilite: z.string().optional().nullable()
 })
 
 const AdresseSchema = z.object({
-  numero: z.string().optional(),
-  type: z.string().optional(),
-  voie: z.string().optional(),
-  codePostal: z.string().optional(),
-  pays: z.string().optional(),
-  localite: z.string().optional(),
-  complement: z.string().optional(),
-  bureau: z.string().optional()
+  numero: z.string().optional().nullable(),
+  type: z.string().optional().nullable(),
+  voie: z.string().optional().nullable(),
+  codePostal: z.string().optional().nullable(),
+  pays: z.string().optional().nullable(),
+  localite: z.string().optional().nullable(),
+  complement: z.string().optional().nullable(),
+  bureau: z.string().optional().nullable()
 })
 
 const PartieSchema = z.object({
   type: z.nativeEnum(TypePartieExhaustive),
   role: z.nativeEnum(JusticeRoleTcom),
   nom: z.string(),
-  nomUsage: z.string().optional(),
-  prenom: z.string().optional(),
-  alias: z.string().optional(),
-  prenomAutre: z.string().optional(),
-  civilite: z.string().optional(),
+  nomUsage: z.string().optional().nullable(),
+  prenom: z.string().optional().nullable(),
+  alias: z.string().optional().nullable(),
+  prenomAutre: z.string().optional().nullable(),
+  civilite: z.string().optional().nullable(),
   qualite: z.nativeEnum(QualitePartieExhaustive),
-  adresse: AdresseSchema.optional()
+  adresse: AdresseSchema.optional().nullable()
 })
 
 const OccultationsComplementairesSchema = z.object({
@@ -79,8 +79,8 @@ const OccultationsComplementairesSchema = z.object({
   professionnelMagistratGreffier: z.boolean(),
   motifsDebatsChambreConseil: z.boolean(),
   motifsSecretAffaires: z.boolean(),
-  conserverElement: z.string().optional(),
-  supprimerElement: z.string().optional()
+  conserverElement: z.string().optional().nullable(),
+  supprimerElement: z.string().optional().nullable()
 })
 
 export const MetadonneeSchema = z.object({
@@ -90,19 +90,18 @@ export const MetadonneeSchema = z.object({
   libelleJuridiction: z.string().min(2).max(42),
   dateDecision: z.string().regex(/^[0-9]{8}$/),
   numeroDossier: z.string().min(1).max(20),
-  idChambre: z.string().optional(),
-  libelleChambre: z.string().optional(),
-  idMatiere: z.string().optional(),
-  libelleMatiere: z.string().optional(),
-  idProcedure: z.string().optional(),
-  libelleProcedure: z.string().optional(),
+  idChambre: z.string().optional().nullable(),
+  libelleChambre: z.string().optional().nullable(),
+  idMatiere: z.string().optional().nullable(),
+  libelleMatiere: z.string().optional().nullable(),
+  idProcedure: z.string().optional().nullable(),
+  libelleProcedure: z.string().optional().nullable(),
   decisionPublique: z.boolean(),
   debatChambreDuConseil: z.boolean(),
   interetParticulier: z.boolean(),
-  composition: z.array(CompositionSchema).optional(),
-  parties: z.array(PartieSchema).optional(),
-  occultationsComplementaires: OccultationsComplementairesSchema.optional(),
-  date: z.unknown().optional()
+  composition: z.array(CompositionSchema).optional().nullable(),
+  parties: z.array(PartieSchema).optional().nullable(),
+  occultationsComplementaires: OccultationsComplementairesSchema.optional().nullable()
 })
 
 export type Metadonnee = z.infer<typeof MetadonneeSchema>

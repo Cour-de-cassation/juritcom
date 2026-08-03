@@ -11,7 +11,7 @@
         name: '{{ api_app_id }}-deployment'
         namespace: '{{ juritcom_namespace }}'
         labels:
-          app:
+          app: '{{ api_app_id }}'
       spec:
         replicas: 1
         selector:
@@ -27,6 +27,13 @@
                 image: '{{ app_image }}'
                 ports:
                   - containerPort: 3000
+                livenessProbe:
+                  httpGet:
+                    path: /v1/health
+                    port: 3000
+                  initialDelaySeconds: 60
+                  periodSeconds: 20
+                  failureThreshold: 6
                 envFrom:
                   - configMapRef:
                       name: 'api-config'

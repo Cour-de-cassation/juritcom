@@ -1,3 +1,4 @@
+import { jest, describe, it, expect, beforeEach } from '@jest/globals'
 import { authMiddleware } from './auth'
 import * as jwtUtils from '../services/jwt'
 
@@ -20,7 +21,7 @@ describe('authMiddleware', () => {
 
   describe('USE_AUTH=jwt', () => {
     beforeEach(() => {
-      jest.requireMock('../config/env').USE_AUTH = 'jwt'
+      jest.requireMock<{ USE_AUTH: string }>('../config/env').USE_AUTH = 'jwt'
     })
 
     it('calls next() for a valid token', () => {
@@ -58,7 +59,7 @@ describe('authMiddleware', () => {
 
   describe('USE_AUTH=basic', () => {
     beforeEach(() => {
-      jest.requireMock('../config/env').USE_AUTH = 'basic'
+      jest.requireMock<{ USE_AUTH: string }>('../config/env').USE_AUTH = 'basic'
     })
 
     it('calls next() for valid basic credentials', () => {

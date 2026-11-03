@@ -38,11 +38,7 @@ export class UnexpectedError extends Error {
 }
 
 type CustomError =
-  | BadFileFormat
-  | BadFileSize
-  | ValidationError
-  | InfrastructureError
-  | UnexpectedError
+  BadFileFormat | BadFileSize | ValidationError | InfrastructureError | UnexpectedError
 
 export function isCustomError(x: unknown): x is CustomError {
   const isValidX = !!x && x instanceof Error && 'type' in x

@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from 'uuid'
+import { randomUUID } from 'node:crypto'
 import { Metadonnee } from './models'
 import { saveDecisionFile } from '../../connectors/s3'
 import { saveFileMetadata, saveDeleteMetadata, RawTcom } from '../../connectors/mongodb'
@@ -8,7 +8,7 @@ export async function saveDecision(
   metadonnees: Metadonnee,
   texteDecisionIntegre: string
 ): Promise<{ fileName: string; rawfileId: string }> {
-  const fileName = uuidv4() + '.pdf'
+  const fileName = randomUUID() + '.pdf'
 
   await saveDecisionFile(fichierDecisionIntegre, fileName)
 

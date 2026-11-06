@@ -50,7 +50,7 @@ router.post('/token', (req, res) => {
       expires_in: jwtUtils.JWT_EXPIRATION_SECONDS_NUMBER,
       scope: ENABLED_SCOPES
     })
-  } catch (error) {
+  } catch (_) {
     res.status(500).json({
       error: 'server_error',
       error_description: 'Internal server error'

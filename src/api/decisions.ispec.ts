@@ -1,3 +1,5 @@
+import { jest, describe, it, expect, beforeAll, beforeEach } from '@jest/globals'
+
 import request from 'supertest'
 import express from 'express'
 import helmet from 'helmet'
@@ -8,11 +10,16 @@ import decisionsRouter from './decisions'
 import { errorHandler } from './error'
 import { loggerHttp } from './logger'
 import { setS3Client } from '../connectors/s3'
+import { ObjectId } from 'mongodb'
+import { saveDeleteMetadata, saveFileMetadata } from '../connectors/mongodb'
 
 jest.mock('../connectors/mongodb', () => ({
-  saveFileMetadata: jest.fn().mockResolvedValue({ _id: 'fake-id' }),
-  saveDeleteMetadata: jest.fn().mockResolvedValue({ _id: 'fake-delete-id' })
+  saveFileMetadata: jest.fn<typeof saveFileMetadata>(),
+  saveDeleteMetadata: jest.fn<typeof saveDeleteMetadata>()
 }))
+
+jest.mocked(saveFileMetadata).mockResolvedValue({ _id: new ObjectId('111111111111111111111111') })
+jest.mocked(saveDeleteMetadata).mockResolvedValue({ _id: new ObjectId('222222222222222222222222') })
 
 describe('Decisions API', () => {
   let app: express.Express

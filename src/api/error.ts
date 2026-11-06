@@ -2,7 +2,6 @@ import { NextFunction, Request, Response } from 'express'
 import { isCustomError } from '../services/error'
 import { MulterError } from 'multer'
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const errorHandler = (err: Error, req: Request, res: Response, _next: NextFunction) => {
   const isValidationErr = isCustomError(err) && err.type === 'validationError'
   req.log?.error({

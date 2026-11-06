@@ -1,19 +1,22 @@
+import { jest, describe, it, expect, beforeEach } from '@jest/globals'
 import { MockUtils } from '../../utils/mock'
-
-const mockSaveDecisionFile = jest.fn()
-const mockSaveFileMetadata = jest.fn()
-const mockSaveDeleteMetadata = jest.fn()
+import { saveDecision, deleteDecision } from './handler'
+import { saveDecisionFile } from '../../connectors/s3'
+import { saveDeleteMetadata, saveFileMetadata } from '../../connectors/mongodb'
+import { ObjectId } from 'mongodb'
 
 jest.mock('../../connectors/s3', () => ({
-  saveDecisionFile: (...args: unknown[]) => mockSaveDecisionFile(...args)
+  saveDecisionFile: jest.fn<typeof saveDecisionFile>()
 }))
 
 jest.mock('../../connectors/mongodb', () => ({
-  saveFileMetadata: (...args: unknown[]) => mockSaveFileMetadata(...args),
-  saveDeleteMetadata: (...args: unknown[]) => mockSaveDeleteMetadata(...args)
+  saveFileMetadata: jest.fn<typeof saveFileMetadata>(),
+  saveDeleteMetadata: jest.fn<typeof saveDeleteMetadata>()
 }))
 
-import { saveDecision, deleteDecision } from './handler'
+const mockSaveDecisionFile = jest.mocked(saveDecisionFile)
+const mockSaveFileMetadata = jest.mocked(saveFileMetadata)
+const mockSaveDeleteMetadata = jest.mocked(saveDeleteMetadata)
 
 const mockUtils = new MockUtils()
 const fakeFile = { originalname: 'decision.pdf', buffer: Buffer.from('') } as Express.Multer.File
@@ -24,8 +27,8 @@ describe('saveDecision handler', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockSaveDecisionFile.mockResolvedValue(undefined)
-    mockSaveFileMetadata.mockResolvedValue({ _id: 'fake-id' })
-    mockSaveDeleteMetadata.mockResolvedValue({ _id: 'fake-delete-id' })
+    mockSaveFileMetadata.mockResolvedValue({ _id: new ObjectId('111111111111111111111111') })
+    mockSaveDeleteMetadata.mockResolvedValue({ _id: new ObjectId('222222222222222222222222') })
   })
 
   describe('saveDecision', () => {
@@ -36,7 +39,7 @@ describe('saveDecision handler', () => {
 
     it('returns rawfileId from mongo', async () => {
       const result = await saveDecision(fakeFile, fakeMetadonnees, fakeTextDecisionIntegre)
-      expect(result.rawfileId).toBe('fake-id')
+      expect(result.rawfileId).toBe('111111111111111111111111')
     })
 
     it('calls saveDecisionFile with the file and generated filename', async () => {
@@ -73,7 +76,7 @@ describe('saveDecision handler', () => {
   describe('deleteDecision', () => {
     it('returns rawfileId from mongo', async () => {
       const result = await deleteDecision('some-decision-id')
-      expect(result.rawfileId).toBe('fake-delete-id')
+      expect(result.rawfileId).toBe('222222222222222222222222')
     })
 
     it('calls saveDeleteMetadata with decisionId and created event', async () => {

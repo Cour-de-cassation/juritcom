@@ -24,7 +24,8 @@ export function generateToken(clientId: string): string | null {
       expiresIn: JWT_EXPIRATION_SECONDS_NUMBER
     }
     return jwt.sign(payload, JWT_SECRET, options)
-  } catch (error) {
+  } catch (_err) {
+    const error = _err instanceof Error ? _err : new Error(`${_err}`)
     logger.error({
       path: 'src/services/jwt.ts',
       operations: ['other', 'generateToken'],
@@ -42,7 +43,8 @@ export function verifyToken(token: string): jwt.JwtPayload | null {
       issuer: acceptedIssuers as [string, ...string[]]
     }
     return jwt.verify(token, JWT_SECRET, options) as jwt.JwtPayload
-  } catch (error) {
+  } catch (_err) {
+    const error = _err instanceof Error ? _err : new Error(`${_err}`)
     logger.error({
       path: 'src/services/jwt.ts',
       operations: ['other', 'verifyToken'],
